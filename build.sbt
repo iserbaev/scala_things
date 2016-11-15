@@ -18,6 +18,8 @@ testOptions += Tests.Argument(TestFrameworks.JUnit, "-v")
 
 lazy val actorLearn = (project in file("actorLearn"))
 
+lazy val scalaLearn = (project in file("scalaLearn"))
+
 lazy val root = (project in file("."))
-  .aggregate(actorLearn)
-  .dependsOn(actorLearn)
+  .aggregate(actorLearn, scalaLearn)
+  .dependsOn(actorLearn, scalaLearn)
