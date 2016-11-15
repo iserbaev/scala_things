@@ -21,6 +21,7 @@ class Actor1() extends Actor{
       println("pong11")
       sender ! Ping
     case Stop =>
+      sender! "STOP"
       println("Stop ")
   }
 }
