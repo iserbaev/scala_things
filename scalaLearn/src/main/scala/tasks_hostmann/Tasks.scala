@@ -1,5 +1,7 @@
 package tasks_hostmann
 
+import scala.collection.mutable.ArrayBuffer
+
 /**
   * Created by ilnur on 16.11.16.
   */
@@ -38,4 +40,18 @@ object Tasks extends App{
       ).toArray
   }
   println(arr_ch3_tsk2(Array(1,2,3,4,5,6)).toBuffer.toString())
+
+  def arr_ch3_tsk4(ar:Array[Int]):Array[Int] = {
+    Array(ar.partition(_ >0)._1, ar.partition(_ <= 0)._1).flatten
+  }
+  println(arr_ch3_tsk4(Array(-1,-2,1,0,2,-5,3,4)).toBuffer.toString())
+
+  def arr_ch3_tsk5(ar:Array[Double]):Double = ar.sum/ar.length
+  println(arr_ch3_tsk5(Array(1,2,3,4)))
+
+  def arr_ch3_tsk6_1(ar:Array[Int]):Array[Int] = scala.util.Sorting.stableSort(ar, _ > _)
+  println(arr_ch3_tsk6_1(Array(1,2,5,4,6,9,2)).toBuffer.toString())
+
+  def arr_ch3_tsk6_2(ar:ArrayBuffer[Int]):ArrayBuffer[Int] = ar.sorted.reverse
+  println(arr_ch3_tsk6_2(ArrayBuffer(1,2,5,4,6,9,2)).toString())
 }
