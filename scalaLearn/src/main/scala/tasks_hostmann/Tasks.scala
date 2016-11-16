@@ -1,7 +1,6 @@
 package tasks_hostmann
 
 import scala.collection.mutable.ArrayBuffer
-import java.awt.datatransfer
 import java.awt.datatransfer.{DataFlavor, SystemFlavorMap}
 /**
   * Created by ilnur on 16.11.16.
