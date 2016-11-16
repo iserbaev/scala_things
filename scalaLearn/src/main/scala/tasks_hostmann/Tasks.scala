@@ -1,7 +1,8 @@
 package tasks_hostmann
 
 import scala.collection.mutable.ArrayBuffer
-
+import java.awt.datatransfer
+import java.awt.datatransfer.{DataFlavor, SystemFlavorMap}
 /**
   * Created by ilnur on 16.11.16.
   */
@@ -54,4 +55,18 @@ object Tasks extends App{
 
   def arr_ch3_tsk6_2(ar:ArrayBuffer[Int]):ArrayBuffer[Int] = ar.sorted.reverse
   println(arr_ch3_tsk6_2(ArrayBuffer(1,2,5,4,6,9,2)).toString())
+
+  def arr_ch3_tsk9():Array[String]=
+    java.util.TimeZone.getAvailableIDs()
+      .filter(_.contains("America/"))
+      .map(_.substring(8))
+  println(arr_ch3_tsk9().toBuffer.toString())
+
+  def arr_ch3_tsk10():Array[AnyRef] ={
+    SystemFlavorMap.getDefaultFlavorMap()
+      .asInstanceOf[SystemFlavorMap]
+      .getNativesForFlavor(DataFlavor.imageFlavor)
+      .toArray
+  }
+  println(arr_ch3_tsk10().toBuffer.toString())
 }
