@@ -23,6 +23,19 @@ object Tasks extends App{
     else if (i%2 !=0 && i>0) x*pow_ch2_tsk10(x, i-1)
     else 1/pow_ch2_tsk10(x, -i)
   }
-
   println(pow_ch2_tsk10(2,2))
+
+  def arr_ch3_tsk1(ar:Array[Int], n:Int):Array[Int] = {
+    (for (i<-0 until n) yield i).toArray
+  }
+  println(arr_ch3_tsk1(new Array[Int](40), 40).toBuffer.toString)
+
+  def arr_ch3_tsk2(ar:Array[Int]):Array[Int] = {
+    (for (i<-ar.indices) yield
+      if (i % 2 == 0 && i!=ar.length-1) ar(i+1)
+      else if (i % 2 == 0 && i==ar.length-1) ar(i)
+      else ar(i-1)
+      ).toArray
+  }
+  println(arr_ch3_tsk2(Array(1,2,3,4,5,6)).toBuffer.toString())
 }
