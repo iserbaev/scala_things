@@ -2,6 +2,10 @@ package tasks_hostmann
 
 import scala.collection.mutable.ArrayBuffer
 import java.awt.datatransfer.{DataFlavor, SystemFlavorMap}
+import java.util
+
+import scala.collection.JavaConverters._
+import scala.collection.mutable
 /**
   * Created by ilnur on 16.11.16.
   */
@@ -68,4 +72,59 @@ object Tasks extends App{
       .toArray
   }
   println(arr_ch3_tsk10().toBuffer.toString())
+
+  def map_ch4_tsk1():Map[String, Double]={
+    val pc = Map("PC"->50, "LapTop"->75,"Dev"->5)
+    for ((k, v) <- pc) yield (k, v * 0.9)
+  }
+
+  def map_ch4_tsk2(fileName: String):Map[String, Int] = {
+    val ar = new mutable.ArrayBuffer[String]
+    val in = new java.util.Scanner(new java.io.File(fileName))
+    while (in.hasNext) {
+      ar += in.next()
+    }
+    (for (i<-ar) yield (i, ar.count(_.eq(i)))).toMap
+  }
+  println(map_ch4_tsk2("/home/ilnur/Загрузки/ant.conf"))
+
+  def map_ch4_tsk4(fileName: String):mutable.SortedMap[String, Int] = {
+    val ar = new mutable.ArrayBuffer[String]
+    val in = new java.util.Scanner(new java.io.File(fileName))
+    while (in.hasNext) {
+      ar += in.next()
+    }
+    val m = (for (i<-ar) yield (i, ar.count(_.eq(i)))).toMap
+    val sm = mutable.SortedMap[String, Int]()
+    sm.++(m)
+  }
+  println(map_ch4_tsk4("/home/ilnur/Загрузки/ant.conf"))
+
+  def map_ch4_tsk5():Unit = {
+    import scala.collection.JavaConversions.mapAsScalaMap
+    val scores: collection.mutable.Map[String, Int] = new java.util.TreeMap[String, Int]
+
+    import scala.collection.JavaConversions.propertiesAsScalaMap
+    val props: scala.collection.Map[String, String] = System.getProperties()
+    println(props)
+  }
+  map_ch4_tsk5()
+
+  def map_ch4_tsk7():Unit = {
+    import scala.collection.JavaConversions.propertiesAsScalaMap
+    val props: scala.collection.Map[String, String] = System.getProperties()
+    println("___________________________________________________________________________________________________")
+    for ((k,v)<-props) Console.print(k.concat("                                                                "
+      .substring(k.length))+" |  "+v+"\n")
+    println("______________________________________________________________________________________")
+  }
+  map_ch4_tsk7()
+
+  def map_ch4_tsk8(ar:Array[Int]):(Int,Int) = ar.min -> ar.max
+  println(map_ch4_tsk8(Array(2,3,54,5,6,9)))
+
+  def map_ch4_tsk9_lteqgt(ar: Array[Int], v:Int):(Int,Int,Int) = (ar.count(_ < v), ar.count(_ == v), ar.count(_ > v))
+  println(map_ch4_tsk9_lteqgt(Array(2,3,5,6,9,5,6,5,4,6,2,65899,0), 8))
+
+  println("Hello".zip("World"))
 }
