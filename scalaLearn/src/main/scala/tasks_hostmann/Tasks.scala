@@ -127,4 +127,13 @@ object Tasks extends App{
   println(map_ch4_tsk9_lteqgt(Array(2,3,5,6,9,5,6,5,4,6,2,65899,0), 8))
 
   println("Hello".zip("World"))
+
+  println(Time(47,98).toString)
+  assert(Time(49,98).hour == Time(1,38).hour)
+
+  println(new Student("name", 1))
+  new Person("Fred Smith")
+
+  new Car("lada", "granta")
+  new CarJava("lada", "granta")
 }

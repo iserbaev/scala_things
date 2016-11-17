@@ -18,5 +18,4 @@ object App extends App{
 
   val sendOb11 = inbox1.send(actor11, StartMsgTo(actor21))
   println("sendOb actor11")
-
 }
