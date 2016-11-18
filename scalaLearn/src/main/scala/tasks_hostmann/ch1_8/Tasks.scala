@@ -1,13 +1,9 @@
-package tasks_hostmann
+package tasks_hostmann.ch1_8
 
-import scala.collection.mutable.ArrayBuffer
 import java.awt.datatransfer.{DataFlavor, SystemFlavorMap}
-import java.util
 
-import tasks_hostmann.ch1_8._
-
-import scala.collection.JavaConverters._
 import scala.collection.mutable
+import scala.collection.mutable.ArrayBuffer
 /**
   * Created by ilnur on 16.11.16.
   */
