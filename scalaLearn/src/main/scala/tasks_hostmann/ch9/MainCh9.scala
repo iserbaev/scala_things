@@ -46,6 +46,12 @@ object MainCh9 extends App{
     Source.fromFile(filePath).mkString.split("\\s+").filter(_.length>12).foreach(println(_))
   }
 
+  /**
+    * Write a Scala program that reads a text file containing only floating-point
+    * numbers. Print the sum, average, maximum, and minimum of the numbers
+    * in the file.
+    * @param filePath
+    */
   def ch9_tsk4(filePath:String):Unit = {
 //    val sourse = Source.fromFile(filePath)
     val sourse = Source.stdin
