@@ -1,4 +1,4 @@
-package tasks_hostmann
+package tasks_hostmann.ch1_8
 
 import scala.beans.BeanProperty
 
