@@ -136,4 +136,6 @@ object Tasks extends App{
 
   new Car("lada", "granta")
   new CarJava("lada", "granta")
+
+  println(CardEnum.toString())
 }
