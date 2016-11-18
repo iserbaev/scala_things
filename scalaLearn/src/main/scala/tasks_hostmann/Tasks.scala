@@ -138,4 +138,10 @@ object Tasks extends App{
   new CarJava("lada", "granta")
 
   println(CardEnum.toString())
+
+  val creature = new Creature
+  println(creature.range+" "+creature.env.length)
+
+  val ant = new Ant
+  println(ant.range+" "+ant.env.length)
 }
