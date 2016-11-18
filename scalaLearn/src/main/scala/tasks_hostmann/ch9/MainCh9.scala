@@ -53,15 +53,15 @@ object MainCh9 extends App{
     * @param filePath
     */
   def ch9_tsk4(filePath:String):Unit = {
-//    val sourse = Source.fromFile(filePath)
-    val sourse = Source.stdin
-    val tokens = sourse.mkString.split("[+-]([0-9]*[.])?[0-9]+")
-    val buffer = tokens.toBuffer
-    println(" "+buffer.sum+buffer.max+buffer.min+buffer.count(_))
+    val source = Source.fromFile(filePath)
+    val tokens = source.mkString.split("[+-]([0-9]*[.][0-9])+").flatMap(_.split(" "))
+    println(tokens.toBuffer.toString())
+    val buffer = tokens.map(_.toDouble)
+    println("sum="+buffer.sum+", max="+buffer.max+", min="+buffer.min+", avg="+buffer.sum/buffer.length)
   }
 
 //  ch9_tsk1("/home/ilnur/Загрузки/ant.conf")
 //  ch9_tsk2("/home/ilnur/Загрузки/ant.conf")
 //  ch9_tsk3("/home/ilnur/Загрузки/ant.conf")
-  ch9_tsk4("/home/ilnur/Загрузки/ant.conf")
+  ch9_tsk4("/home/ilnur/Загрузки/test.conf")
 }
