@@ -60,8 +60,26 @@ object MainCh9 extends App{
     println("sum="+buffer.sum+", max="+buffer.max+", min="+buffer.min+", avg="+buffer.sum/buffer.length)
   }
 
+  /**
+    * Write a Scala program that prints the src attributes of all img tags of a web
+    * page. Use regular expressions and groups.
+    * @param url
+    * @return
+    */
+  def ch9_tsk8(url:String):Array[String] = {
+    val sourceURL = Source.fromURL(url, "UTF-8")
+    val urlString = sourceURL.mkString
+
+    val pattern = """(<img+) (src=.*+)""".r
+    val s= for (pattern(img, src) <- pattern.findAllIn(urlString)) yield src
+    val srcBuffer= s.map(_.split(" ")(0)).toArray
+    println(srcBuffer.toBuffer.toString())
+    srcBuffer
+  }
+
 //  ch9_tsk1("/home/ilnur/Загрузки/ant.conf")
 //  ch9_tsk2("/home/ilnur/Загрузки/ant.conf")
 //  ch9_tsk3("/home/ilnur/Загрузки/ant.conf")
-  ch9_tsk4("/home/ilnur/Загрузки/test.conf")
+//  ch9_tsk4("/home/ilnur/Загрузки/test.conf")
+  ch9_tsk8("http://eax.me/")
 }
