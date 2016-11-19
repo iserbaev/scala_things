@@ -1,7 +1,11 @@
 package tasks_hostmann.ch9
 
+import java.io._
 import java.nio.charset.StandardCharsets
-import java.nio.file.{Files, Paths}
+import java.nio.file.attribute.BasicFileAttributes
+import java.nio.file.{Files, Path, Paths}
+
+import tasks_hostmann.ch1_8.Person
 
 import scala.io.Source
 
@@ -77,9 +81,59 @@ object MainCh9 extends App{
     srcBuffer
   }
 
+  /**
+    * Alternatively, if you use Java 7, you can adapt the walkFileTree method of the
+    * java.nio.file.Files class. That class makes use of a FileVisitor interface. In Scala,
+    * we generally prefer to use function objects, not interfaces, for specifying work
+    * (even though in this case the interface allows more fine-grained control—see the
+    * Javadoc for details). The following implicit conversion adapts a function to the interface
+    */
+  import java.nio.file._
+  implicit def makeFileVisitor(f:(Path) => Unit) = new SimpleFileVisitor[Path] {
+    override def visitFile(file: Path, attrs: BasicFileAttributes) = {
+      f(file)
+      FileVisitResult.CONTINUE
+    }
+  }
+  /**
+    * Write a Scala program that counts how many files with .class extension are
+    * in a given directory and its subdirectories.
+    */
+  def ch9_tsk9(catalog:String):Int = {
+    var count =0
+    Files.walkFileTree(Paths.get(catalog), (f:Path) => if (f.getFileName.toString.contains(".class")) count=count+1)
+    count
+  }
+
+  /**
+    * Expand the example with the serializable Person class that stores a collection
+    * of friends. Construct a few Person objects, make some of them friends of
+    * another, and then save an Array[Person] to a file. Read the array back in and
+    * verify that the friend relations are intact.
+    */
+  def ch9_tsk10():Unit = {
+    val fred = new Person("Fred M.")
+    val stiv = new Person("Stiv K.")
+    fred.friends += stiv
+
+    val out = new ObjectOutputStream(new FileOutputStream(
+      "/home/ilnur/repo/scala/scalaLearn/src/main/scala/tasks_hostmann/ch9/test.obj"))
+    out.writeObject(fred)
+    out.close()
+
+    val in = new ObjectInputStream(new FileInputStream(
+      "/home/ilnur/repo/scala/scalaLearn/src/main/scala/tasks_hostmann/ch9/test.obj"))
+    val savedFred = in.readObject().asInstanceOf[Person]
+    print(savedFred+" and his friend: ")
+    savedFred.friends.foreach(println(_))
+  }
+
+
 //  ch9_tsk1("/home/ilnur/Загрузки/ant.conf")
 //  ch9_tsk2("/home/ilnur/Загрузки/ant.conf")
 //  ch9_tsk3("/home/ilnur/Загрузки/ant.conf")
 //  ch9_tsk4("/home/ilnur/Загрузки/test.conf")
-  ch9_tsk8("http://eax.me/")
+//  ch9_tsk8("http://eax.me/")
+//  println(ch9_tsk9("/home/ilnur/repo/scala/scalaLearn/src/main/scala/"))
+  ch9_tsk10()
 }
