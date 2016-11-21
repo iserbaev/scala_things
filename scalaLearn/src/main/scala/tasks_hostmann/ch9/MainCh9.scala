@@ -4,7 +4,10 @@ import java.io._
 import java.nio.charset.StandardCharsets
 import java.nio.file.attribute.BasicFileAttributes
 import java.nio.file.{Files, Path, Paths}
+import java.time.LocalDate
 
+import org.joda.time._
+import org.joda.time.format.DateTimeFormat
 import tasks_hostmann.ch1_8.Person
 
 import scala.io.Source
@@ -128,6 +131,15 @@ object MainCh9 extends App{
     savedFred.friends.foreach(println(_))
   }
 
+  def markDateIfWeekend(inputDate: String): String = {
+    val format = DateTimeFormat.forPattern("dd.MM.yy")
+    val date = DateTime.parse(inputDate, format)
+    val dayOfWeek = date.getDayOfWeek()
+    if (dayOfWeek == 6 || dayOfWeek == 7) "*".concat(inputDate) else inputDate
+  }
+
+
+
 
 //  ch9_tsk1("/home/ilnur/Загрузки/ant.conf")
 //  ch9_tsk2("/home/ilnur/Загрузки/ant.conf")
@@ -136,4 +148,6 @@ object MainCh9 extends App{
 //  ch9_tsk8("http://eax.me/")
 //  println(ch9_tsk9("/home/ilnur/repo/scala/scalaLearn/src/main/scala/"))
   ch9_tsk10()
+  println(markDateIfWeekend("12.11.16")+" "+markDateIfWeekend("13.11.16")+" "+markDateIfWeekend("14.11.16")
+    +" "+markDateIfWeekend("15.11.16")+" "+markDateIfWeekend("21.11.16"))
 }

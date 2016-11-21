@@ -13,6 +13,8 @@ libraryDependencies ++= Seq(
   "com.typesafe.akka" %% "akka-testkit" % akkaVersion,
   "org.scalatest" %% "scalatest" % "3.0.0" % "test",
   "junit" % "junit" % "4.12" % "test",
-  "com.novocode" % "junit-interface" % "0.11" % "test"
+  "com.novocode" % "junit-interface" % "0.11" % "test",
+  "joda-time" % "joda-time" % "2.9.4",
+  "org.joda" % "joda-convert" % "1.8.1"
 )
     
