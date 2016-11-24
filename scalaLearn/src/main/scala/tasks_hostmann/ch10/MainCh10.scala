@@ -20,4 +20,9 @@ object MainCh10 extends App{
     "or alphanumeric characters."
   println(CryptoLogger(msg).crypto())
   println(CryptoLogger(msg).decrypto())
+
+  /**
+    * ch10_tsk5
+    */
+  val point = new java.awt.Point() with PropertyChangeSupport
 }
