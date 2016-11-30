@@ -10,4 +10,14 @@ object MainCh11 extends App{
   println(Money(1,75)+Money(0,50)==Money(2,25))
   println(Money(1,75)+Money(0,50)<Money(2,26))
   println(Money(1,75)+Money(0,50)>Money(2,26))
+
+  /**
+    * ch11_tsk6
+    */
+  val art = ASCIIArt("  /\\_/\\","(  ' '  )","(   -   )","  | | | "," (__|__)")
+  println(art)
+  val art2= ASCIIArt("   -----"," / Hello \\","<  Scala |"," \\ Coder /","   _____")
+  println(art2)
+  val art3 = art+art2
+  println(art3)
 }
