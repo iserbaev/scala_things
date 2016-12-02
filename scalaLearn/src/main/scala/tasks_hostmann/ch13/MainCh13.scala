@@ -1,5 +1,6 @@
 package tasks_hostmann.ch13
 
+import scala.collection.mutable
 import scala.collection.mutable.ArrayBuffer
 
 /**
@@ -22,4 +23,26 @@ object MainCh13 extends App{
     ss.toList.sorted
   }
   println(indexesOfString("Mississippi"))
+
+  /**
+    * ch13_tsk3
+    */
+  def delZeroFrom(linkedList: scala.collection.mutable.LinkedList[Int]):mutable.LinkedList[Int] = {
+    var cur = linkedList
+    var res = ArrayBuffer[Int]().mapResult{xs => mutable.LinkedList(xs:_*)}
+    while (cur != Nil){
+      if (cur.elem !=0)  res += cur.elem
+      cur = cur.next
+    }
+    res.result()
+  }
+  println(delZeroFrom(scala.collection.mutable.LinkedList(2,0,3,6,0,9)))
+
+  /**
+    * ch13_tsk4
+    */
+  def findCountOf(arr:Array[String], assoc: Map[String, Int]):Array[Int] = {
+    arr.filter(assoc.contains).map(assoc(_))
+  }
+  println(findCountOf(Array("Tom","Fred","Harry"),Map("Tom" -> 3, "Dick" ->4, "Harry" -> 5)).mkString("Array(",", ",")"))
 }
