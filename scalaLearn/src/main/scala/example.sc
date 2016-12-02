@@ -1,2 +1,3 @@
-5+5
-6-9
+def indexesOfString(s:String) = {
+  s.map((_,s.count(_)))
+}
