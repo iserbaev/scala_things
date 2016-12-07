@@ -45,4 +45,13 @@ object MainCh13 extends App{
     arr.filter(assoc.contains).map(assoc(_))
   }
   println(findCountOf(Array("Tom","Fred","Harry"),Map("Tom" -> 3, "Dick" ->4, "Harry" -> 5)).mkString("Array(",", ",")"))
+
+  /**
+    * ch13_tsk5
+    */
+  def suchAsMkString(a: Array[String]):String = {
+    a.reduceLeft(_.toString +", "+_.toString)
+  }
+  println(suchAsMkString("kjsdfhkjsdh".map(String.valueOf).toArray))
+  println(suchAsMkString(Array(1,2,3,5,6,8,7).map(String.valueOf)))
 }
