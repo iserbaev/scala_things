@@ -24,6 +24,58 @@ object MainCoursera extends App{
     else f(a)*product(f)(a+1,b)
   }
   println(product(x=>x)(1,4))
-
   def fact(n:Int) = product(x=>x)(1,n)
+
+  /**
+    * wk2_tsk3
+    */
+  def isCloseEnough(x:Double, y:Double):Boolean = {
+    val tolerance=0.01
+    math.abs((x-y)/x)/x < tolerance
+  }
+  def fixedPoint(f:Double => Double)(firstGuess : Double) = {
+    def iterate(guess:Double): Double = {
+      val next = f(guess)
+      if (isCloseEnough(guess, next)) next
+      else iterate(next)
+    }
+    iterate(firstGuess)
+  }
+  fixedPoint(x => 1+x/2)(1)
+  def sqrtIncrt(x:Double) = fixedPoint(y => x/y)(1)
+  sqrtIncrt(2)
+  def averageDump(f: Double => Double)(x:Double) = (x+f(x))/2
+  def sqrt(x:Double) = fixedPoint(averageDump(y => x/y))(1)
+  sqrt(2)
+
+  /**
+    * wk2_tsk4
+    */
+  class Rational(x:Int, y:Int){
+    private def gcd(a:Int, b:Int):Int = if(b==0)a else gcd(b,a%b)
+    private val g = gcd(x,y)
+    def numer = x / g
+    def denom = y/ g
+
+    def add(that: Rational) =
+      new Rational(
+        numer*that.denom+that.numer*denom,
+        denom*that.denom
+      )
+
+    def neg = new Rational(-numer, denom)
+    def sub(that:Rational) = add(that.neg)
+    def div(that:Rational) =
+      new Rational(
+        numer*that.denom,
+        denom*that.numer
+      )
+    def mul(that:Rational) =
+      new Rational(
+        numer*that.numer,
+        denom*that.denom
+      )
+
+    override def toString() = numer + "/" + denom
+  }
 }
