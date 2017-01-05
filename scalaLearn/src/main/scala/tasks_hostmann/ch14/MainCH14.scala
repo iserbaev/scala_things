@@ -33,6 +33,8 @@ object MainCH14 extends App{
   }
   println(swapArr(Array(1,2,3)).toBuffer.toString())
   println(swapArr(Array('d','f','g')).toBuffer.toString())
+  val x = List(3,4)
+  5 :: List(5)
 
   /**
     *ch14_tsk4

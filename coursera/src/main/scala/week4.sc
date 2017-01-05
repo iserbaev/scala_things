@@ -10,6 +10,31 @@ nth(3, list)
 
 
 trait List[+T]{
+  def ::[T](h: T): List[T] = {
+    new ::(h, this)
+  }
+
+  def splitAt(n: Int): (List[T], List[T]) = {
+    var b = List[T]
+    var i = 0
+    var these = this
+    while (!these.isEmpty && i < n) {
+      i += 1
+      b = these.head :: b
+      these = these.tail
+    }
+    (b, these)
+  }
+
+  def length:Int = {
+    var these = this
+    var len =0
+    while (!these.isEmpty){
+      len += 1
+      these = these.tail
+    }
+    len
+  }
   def isEmpty:Boolean
   def head:T
   def tail:List[T]
@@ -24,6 +49,11 @@ class Nil[T] extends List[T]{
   override def head: Nothing = throw new NoSuchElementException("Nil.head")
   override def tail: Nothing = throw new NoSuchElementException("Nil.tail")
 }
+class ::[T](h: T, list: List[T]) extends List[T]{
+  override def isEmpty: Boolean = false
+  override def head: T = h
+  override def tail: List[T] = list
+}
 object List{
   def apply[T](): List[T] = new Nil
   def apply[T](x: T): List[T] = new ConsList[T](x, new Nil)
@@ -35,5 +65,50 @@ object List{
   def insert(x: Int, xs: List[Int]): List[Int] = xs match {
     case List() => x :: Nil
     case y :: ys => if (x <= y) x :: xs else y :: insert(x, ys)
+  }
+
+  /**
+    *
+    *week 5.1
+    */
+  def last[T](xs: List[T]):T = xs match {
+    case List() => throw new Error("last of empty list")
+    case List(x) => x
+    case y :: ys => last(ys)
+  }
+  def init[T](xs: List[T]):List[T] = xs match {
+    case List() => throw new Error("init of empty list")
+    case List(x) =>List()
+    case y :: ys => y :: init(ys)
+  }
+  def concat[T](xs: List[T], ys: List[T]):List[T] = xs match {
+    case List() => ys
+    case z :: zs => z :: concat(zs, ys)
+  }
+  def reverse[T](xs: List[T]):List[T] = xs match {
+    case List() => xs
+    case y :: ys => reverse(ys) ++ List(y)
+  }
+  def removeAt[T](xs: List[T], n: Int): List[T] = (xs take n) ::: (xs drop n+1)
+  def flatten(xs: List[Any]): List[Any] = xs match {
+    case List() => xs
+    case List(x) => x match {
+      case `x` => x
+      case y :: ys => y :: flatten(ys)
+    }
+    case z :: zs => z :: flatten(zs)
+  }
+
+  /**
+    * week 5.2
+    */
+  def msort[T](xs: List[T]): List[T] = {
+    val n = xs.length/2
+    if(n==0) xs
+    else {
+      def merge[T](xs: List[T], ys: List[T]): List[T] = ???
+      (f,s) = xs splitAt n
+      merge(msort(f), msort(s))
+    }
   }
 }
