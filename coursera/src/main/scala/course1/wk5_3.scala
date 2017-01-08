@@ -37,7 +37,7 @@ object wk5_3 extends App{
       first :: pack(rest)
   }
   val data = List("a", "a", "a", "b", "c", "c", "a")
-  print(pack(data))
+  println(pack(data))
 
   def encode[T](xs: List[T]): List[(T, Int)] = xs match {
     case Nil => Nil
@@ -46,5 +46,49 @@ object wk5_3 extends App{
       (x, first.length) :: encode(rest)
   }
   def encode2[T](xs: List[T]): List[(T, Int)] = pack(xs) map (ys => (ys.head, ys.length))
-  print(encode(data))
+  println(encode(data))
+
+  def sum(xs: List[Int]): Int = xs match {
+    case Nil => 0
+    case y :: ys => y + sum(ys)
+  }
+  def product(xs: List[Int]): Int = xs match {
+    case Nil => 1
+    case y :: ys => y * product(ys)
+  }
+
+//  def reduceLeft(op: (T, T) => T): T = this match {
+//    case Nil => throw new Error("Nil reduceLeft")
+//    case x :: xs => (xs foldLeft x)(op)
+//  }
+//
+//  def foldLeft[U](z: U)(op: (U, T) => U): U = this match {
+//    case Nil => z
+//    case x :: xs => (xs foldLeft op(z,x))(op)
+//  }
+//  def reduceRight(op: (T, T) => T): T = this match {
+//    case Nil => throw new Error("Nil reduceRight")
+//    case x :: Nil => x
+//    case x :: xs => op(x, xs.reduceRight(op))
+//  }
+//  def foldRight[U](z: U)(op: (U, T) => U): U = this match {
+//    case Nil => z
+//    case x :: xs => op(x, (xs foldRight(z))(op))
+//  }
+
+  def sum2(xs: List[Int]): Int = (0 :: xs) reduceLeft(_ + _)
+  def product2(xs: List[Int]): Int = (1 :: xs) reduceLeft(_ * _)
+
+  def sum3(xs: List[Int]): Int = (xs foldLeft 0)(_ + _)
+  def product3(xs: List[Int]): Int = (xs foldLeft 1)( _ * _)
+
+  def mapFun[T, U](xs: List[T], f: T => U): List[U] =
+    (xs foldRight List[U]())((x, y) => y ++ List(f(x)))
+
+  def lengthFun[T](xs: List[T]): Int =
+    (xs foldRight 0)((x,y) => if (x == Nil) y else y+1)
+
+  println(nums)
+  println(lengthFun(data))
+  println(mapFun[Int, Int](nums, x => x*2))
 }

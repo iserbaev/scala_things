@@ -17,9 +17,9 @@ import scala.annotation.{tailrec, varargs}
 @deprecated
 @throws[java.rmi.RemoteException] @SerialVersionUID(656465464654321654L)
 @Entity class Sample [@specialized T] @Inject() (@Id @BeanProperty @NotNull id:String, @BeanProperty name: String, title:T) extends Cloneable{
-  @BeanProperty @Named("pass") val password:String = _
-  @volatile var x:Integer = _
-  @transient var none:String = _
+  @BeanProperty @Named("pass") val password:String = ""
+  @volatile var x:Integer = 0
+  @transient var none:String = ""
   @throws(classOf[IOException]) def readSample(path: String):String = ""
   @varargs def setProperties(props:String*):Unit = {}
   @tailrec final def sum(xs: Seq[Int], partial: Int): Int = if (xs.isEmpty) partial else sum(xs.tail, xs.head+partial)
