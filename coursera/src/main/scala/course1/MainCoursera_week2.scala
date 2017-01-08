@@ -1,7 +1,7 @@
-/**
+package course1; /**
   * Created by ilnur on 07.12.16.
   */
-object MainCoursera extends App{
+object MainCoursera_week2 extends App{
   /**
     * wk2_tsk1
     */
@@ -93,4 +93,6 @@ object MainCoursera extends App{
   x - y - z
   x + y * z
   x < y
+
+
 }
