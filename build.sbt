@@ -21,8 +21,7 @@ lazy val actorLearn = (project in file("actorLearn"))
 lazy val scalaLearn = (project in file("scalaLearn"))
 
 lazy val coursera = (project in file("coursera"))
-lazy val recfun1 = (project in file("recfun1"))
 
 lazy val root = (project in file("."))
-  .aggregate(actorLearn, scalaLearn, coursera,recfun1)
-  .dependsOn(actorLearn, scalaLearn, coursera, recfun1)
+  .aggregate(actorLearn, scalaLearn, coursera)
+  .dependsOn(actorLearn, scalaLearn, coursera)
