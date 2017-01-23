@@ -56,5 +56,9 @@ object Main15 extends App{
   firstThread.start()
   secondThread.start()
 
-
+  /**
+    * 8. Добавьте метод allDifferent в объект скомпилируйте и загляните в байт-код.
+    * Какие методы будут сгенерированы после применения аннотации @specialized
+    */
+  def allDifferent[@specialized T](x: T, y: T, z: T) = x != y && x!= z && y != z
 }
