@@ -8,4 +8,4 @@ val items = <li>Fred</li><li>Wilma</li>
 val (x, y) = (1, 2)
 x < y // OK
 x<y // OK
-x <y // Error—unclosed XML literal
+x < y // Error—unclosed XML literal
