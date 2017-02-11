@@ -86,7 +86,7 @@ object MainWeek1 extends App{
     *   .map(j => (i,j))
     *   )
     */
-  val forQuery = for(b <- books; a <- b.authors if a startsWith("Bird"))
+  val forQuery = for(b <- books; a <- b.authors if a startsWith "Bird")
     yield b.title
   val translatedQuery = books flatMap (b =>
     b.authors withFilter(a => a startsWith "Bird") map(y => b.title))
