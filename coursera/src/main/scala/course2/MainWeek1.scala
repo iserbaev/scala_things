@@ -1,5 +1,7 @@
 package course2
 
+import scala.util.Try
+
 /**
   * week 1 - for expressions and monads
   */
@@ -167,10 +169,10 @@ object MainWeek1 extends App{
     println("passed " + numTimes + " tests")
   }
   /**
-    * example of test using -> must be assertion failed
+    * example of test using -> if ">" must be assertion failed or if ">=" must be true
     */
   test(pairs(lists, lists)) {
-    case (xs: List[Int], ys: List[Int]) => (xs ++ ys).length > xs.length
+    case (xs: List[Int], ys: List[Int]) => (xs ++ ys).length >= xs.length
   }
 
   /**
@@ -180,4 +182,27 @@ object MainWeek1 extends App{
     *   l1.size + l2.size == (l1 ++ l2).size
     * }
   */
+
+  /**
+    * lecture 1.4 Monads
+    */
+  trait M[T] {
+    def flatMap[U](f: T => M[U]): M[U]  //in literature called as "bind"
+  }
+
+  /**
+    *     def unit[T](x: T): M[T]
+    *
+    *     List is a monad with unit(x) = List(x)
+    *     Option is a monad with unit(x) = Some(x)
+    *
+    *     map for monad is combination of flatMap and unit
+    *     m map f == m flatMap (x => unit(f(x)))
+    *             == m flatMap (f andThen unit)
+    */
+  val trySum = Try(5+1)
+  println(trySum)
+
+  val tryFail = Try(5/0)
+  println(tryFail)
 }
