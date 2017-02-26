@@ -1,3 +1,5 @@
+import course2.MainWeek2.Pouring
+
 def isPrime(n: Int): Boolean =
   (2 until n).forall(x => n%x != 0)
 
@@ -33,3 +35,4 @@ def isGoodEnough(guess: Double, x: Double) =
   math.abs((guess*guess - x) / x) < 0.0001
 
 sqrtStream(4).filter(isGoodEnough(_, 4)).take(10).toList
+
