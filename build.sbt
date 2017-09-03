@@ -4,8 +4,6 @@ version := "1.0"
 
 scalaVersion := "2.12.0"
 
-lazy val akkaVersion = "2.4.12"
-
 libraryDependencies ++= Seq(
     "org.scalatest" %% "scalatest" % "3.0.0" % "test",
     "junit" % "junit" % "4.12" % "test",
