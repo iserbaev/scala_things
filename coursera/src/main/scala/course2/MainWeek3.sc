@@ -60,5 +60,3 @@ acct withdraw 15
   * referential transparency
   * operational equivalence - x and y are operational equivalent if no possible test can distinguish between them
   */
-
-test
