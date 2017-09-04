@@ -35,4 +35,3 @@ def isGoodEnough(guess: Double, x: Double) =
   math.abs((guess*guess - x) / x) < 0.0001
 
 sqrtStream(4).filter(isGoodEnough(_, 4)).take(10).toList
-
