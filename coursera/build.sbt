@@ -15,3 +15,12 @@ libraryDependencies ++= Seq(
   "joda-time" % "joda-time" % "2.9.4",
   "org.joda" % "joda-convert" % "1.8.1"
 )
+
+resolvers += "Sonatype OSS Snapshots" at
+  "https://oss.sonatype.org/content/repositories/releases"
+
+libraryDependencies += "com.storm-enroute" %% "scalameter" % "0.8.2"
+
+testFrameworks += new TestFramework("org.scalameter.ScalaMeterFramework")
+
+parallelExecution in Test := false

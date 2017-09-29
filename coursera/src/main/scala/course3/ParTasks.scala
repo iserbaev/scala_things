@@ -1,7 +1,7 @@
 import java.util.concurrent._
 import scala.util.DynamicVariable
 
-package object course3 {
+object ParTasks {
   val forkJoinPool = new ForkJoinPool
   abstract class TaskScheduler {
     def schedule[T](body: => T): ForkJoinTask[T]
