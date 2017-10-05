@@ -1,57 +1,14 @@
 package course3
 
-import java.util.concurrent.{ForkJoinPool, ForkJoinTask, ForkJoinWorkerThread, RecursiveTask}
-
-import org.scalameter._
-
-import scala.collection.mutable.ArrayBuffer
 import scala.collection.parallel.Combiner
+import scala.collection.mutable.ArrayBuffer
 import scala.reflect.ClassTag
-import scala.util.DynamicVariable
+import org.scalameter._
+import common._
 
-object ParTasks {
-  val forkJoinPool = new ForkJoinPool
-  abstract class TaskScheduler {
-    def schedule[T](body: => T): ForkJoinTask[T]
-    def parallel[A, B](taskA: => A, taskB: => B): (A, B) = {
-      val right = task {
-        taskB
-      }
-      val left = taskA
-      (left, right.join())
-    }
-  }
-  class DefaultTaskScheduler extends TaskScheduler {
-    def schedule[T](body: => T): ForkJoinTask[T] = {
-      val t = new RecursiveTask[T] {
-        def compute = body
-      }
-      Thread.currentThread match {
-        case wt: ForkJoinWorkerThread => t.fork()
-        case _ => forkJoinPool.execute(t)
-      }
-      t
-    }
-  }
-  val scheduler = new DynamicVariable[TaskScheduler](new DefaultTaskScheduler)
-  def task[T](body: => T): ForkJoinTask[T] = {
-    scheduler.value.schedule(body)
-  }
-  def parallel[A, B](taskA: => A, taskB: => B): (A, B) = {
-    scheduler.value.parallel(taskA, taskB)
-  }
-  def parallel[A, B, C, D](taskA: => A, taskB: => B, taskC: => C, taskD: => D): (A, B, C, D) = {
-    val ta=task{taskA}
-    val tb=task{taskB}
-    val tc=task{taskC}
-    val td = taskD
-    (ta.join(), tb.join(), tc.join(), td)
-  }
-}
 
-class ArrayCombiner[T <: AnyRef: ClassTag](val parallelism: Int) extends Combiner[T, Array[T]] {
-  import ParTasks._
-
+class ArrayCombiner[T <: AnyRef: ClassTag](val parallelism: Int)
+  extends Combiner[T, Array[T]] {
   private var numElems = 0
   private val buffers = new ArrayBuffer[ArrayBuffer[T]]
   buffers += new ArrayBuffer[T]
@@ -87,7 +44,7 @@ class ArrayCombiner[T <: AnyRef: ClassTag](val parallelism: Int) extends Combine
     while (k < end) {
       array(k) = buffers(j)(i)
       i += 1
-      if (i > buffers(j).length) {
+      if (i >= buffers(j).length) {
         i = 0
         j += 1
       }
@@ -139,6 +96,4 @@ object ArrayCombiner {
   }
 
 }
-
-
 
