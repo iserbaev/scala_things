@@ -17,7 +17,8 @@ trait Combiner[T, Repr] extends Builder[T, Repr] {
 }
 
 Typically, set data structures have efficient lookup, insertion and deletion.
-  ▶ hash tables – expected O(1) ▶ balanced trees – O(log n)
+  ▶ hash tables – expected O(1)
+  ▶ balanced trees – O(log n)
   ▶ linked lists – O(n)
 Most set implementations do not have efficient union operation.
 

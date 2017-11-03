@@ -188,7 +188,7 @@ trait Iterator[T] {
   }
 }
 
-import ParTasks._
+import common._
 
 trait Splitter[T] extends Iterator[T]{
   def split: Seq[Splitter[T]]
