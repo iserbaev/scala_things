@@ -3,7 +3,7 @@ import sbt._
 object Deps {
   private object Versions {
     val cats        = "2.0.0"
-    val catsTagless = "0.10" // 0.11
+    val catsTagless = "0.11"
     val shapeless   = "2.3.3"
 
     val scalaLogging = "3.9.2"

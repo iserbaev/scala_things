@@ -20,4 +20,3 @@ lazy val algorithms = project
 
 lazy val root = (project in file("."))
   .aggregate(scalaLearn, coursera, algorithms)
-  .dependsOn(scalaLearn, coursera, algorithms)
