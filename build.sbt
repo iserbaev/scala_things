@@ -1,16 +1,7 @@
-name := """scala sbt"""
+import Deps._
+import Settings._
 
-version := "1.0"
-
-scalaVersion := "2.12.0"
-
-libraryDependencies ++= Seq(
-    "org.scalatest" %% "scalatest" % "3.0.0" % "test",
-    "junit" % "junit" % "4.12" % "test",
-    "com.novocode" % "junit-interface" % "0.11" % "test"
-)
-
-testOptions += Tests.Argument(TestFrameworks.JUnit, "-v")
+name := """scala learn"""
 
 lazy val scalaLearn = project in file("scalaLearn")
 
@@ -18,6 +9,15 @@ lazy val coursera = project in file("coursera")
 
 lazy val sparkLearn = project in file("sparkLearn")
 
+lazy val algorithms = project
+  .in(file("algorithms"))
+  .settings(commonSettings())
+  .settings(
+    version := "0.1",
+    name    := "algorithms",
+    libraryDependencies ++= algsProjectDeps
+  )
+
 lazy val root = (project in file("."))
-  .aggregate(scalaLearn, coursera)
-  .dependsOn(scalaLearn, coursera)
+  .aggregate(scalaLearn, coursera, algorithms)
+  .dependsOn(scalaLearn, coursera, algorithms)
