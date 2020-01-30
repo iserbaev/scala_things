@@ -11,7 +11,7 @@ lazy val sparkLearn = project in file("sparkLearn")
 
 lazy val algorithms = project
   .in(file("algorithms"))
-  .settings(commonSettings())
+  .settings(commonSettings2_13())
   .settings(
     version := "0.1",
     name    := "algorithms",
