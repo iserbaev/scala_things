@@ -4,10 +4,10 @@ package tasks_hostmann.ch10
   * Created by ilnur on 21.11.16.
   * ch10_tsk1
   */
-trait RectangleLike{
-  private var x: Int = 0
-  private var y: Int = 0
-  private var width: Int = 0
+trait RectangleLike {
+  private var x:      Int = 0
+  private var y:      Int = 0
+  private var width:  Int = 0
   private var height: Int = 0
   def translate(dx: Int, dy: Int): Unit = {
     var oldv: Int = this.x
@@ -33,8 +33,7 @@ trait RectangleLike{
         }
         newv = Integer.MIN_VALUE
       }
-    }
-    else {
+    } else {
       // moving rightward (or staying still)
       if (newv < oldv) {
         // positive overflow
@@ -63,8 +62,7 @@ trait RectangleLike{
         }
         newv = Integer.MIN_VALUE
       }
-    }
-    else {
+    } else {
       // moving downward (or staying still)
       if (newv < oldv) {
         // positive overflow
@@ -99,8 +97,7 @@ trait RectangleLike{
       if (x1 < Integer.MIN_VALUE) x1 = Integer.MIN_VALUE
       if (x0 < Integer.MIN_VALUE) x0 = Integer.MIN_VALUE
       else if (x0 > Integer.MAX_VALUE) x0 = Integer.MAX_VALUE
-    }
-    else {
+    } else {
       // (x1 >= x0)
       // Clip x0 before we subtract it from x1 in case the clipping
       // affects the representable area of the rectangle.
@@ -121,8 +118,7 @@ trait RectangleLike{
       if (y1 < Integer.MIN_VALUE) y1 = Integer.MIN_VALUE
       if (y0 < Integer.MIN_VALUE) y0 = Integer.MIN_VALUE
       else if (y0 > Integer.MAX_VALUE) y0 = Integer.MAX_VALUE
-    }
-    else {
+    } else {
       // (y1 >= y0)
       if (y0 < Integer.MIN_VALUE) y0 = Integer.MIN_VALUE
       else if (y0 > Integer.MAX_VALUE) y0 = Integer.MAX_VALUE
@@ -131,9 +127,9 @@ trait RectangleLike{
       else if (y1 > Integer.MAX_VALUE) y1 = Integer.MAX_VALUE
     }
 
-    this.x =x0.toInt
-    this.y = y0.toInt
-    this.width = x1.toInt
+    this.x      = x0.toInt
+    this.y      = y0.toInt
+    this.width  = x1.toInt
     this.height = y1.toInt
   }
 }

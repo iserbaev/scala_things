@@ -7,14 +7,14 @@ import scala.collection.mutable.ArrayBuffer
   * ch5_tsk7
   * ch8_tsk8
   */
-class Person(val fullName:String) extends Serializable{
+class Person(val fullName: String) extends Serializable {
 //  val firstName=fullName.split(" ")(0)
 //  val lastName=fullName.split(" ")(1)
   var friends = new ArrayBuffer[Person]()
-  override def toString: String = getClass.getName+"[name="+fullName+"]"
+  override def toString: String = getClass.getName + "[name=" + fullName + "]"
 }
 
-class SecretAgent(codeName:String) extends Person(codeName){
+class SecretAgent(codeName: String) extends Person(codeName) {
   override val fullName = "secret"
   override def toString: String = "secret"
 }

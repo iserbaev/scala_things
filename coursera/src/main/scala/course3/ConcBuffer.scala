@@ -4,13 +4,16 @@ import scala.reflect.ClassTag
 import org.scalameter._
 import common._
 
-class ConcBuffer[@specialized(Byte, Char, Int, Long, Float, Double) T: ClassTag](val k: Int, private var conc: Conc[T]) extends Traversable[T] {
+class ConcBuffer[@specialized(Byte, Char, Int, Long, Float, Double) T: ClassTag](
+  val k:            Int,
+  private var conc: Conc[T]
+) extends Traversable[T] {
   require(k > 0)
 
   def this() = this(128, Conc.Empty)
 
-  private var chunk: Array[T] = new Array(k)
-  private var lastSize: Int = 0
+  private var chunk:    Array[T] = new Array(k)
+  private var lastSize: Int      = 0
 
   def foreach[U](f: T => U): Unit = {
     conc.foreach(f)
@@ -42,13 +45,13 @@ class ConcBuffer[@specialized(Byte, Char, Int, Long, Float, Double) T: ClassTag]
 
   private def expand() {
     pack()
-    chunk = new Array(k)
+    chunk    = new Array(k)
     lastSize = 0
   }
 
   def clear() {
-    conc = Conc.Empty
-    chunk = new Array(k)
+    conc     = Conc.Empty
+    chunk    = new Array(k)
     lastSize = 0
   }
 
@@ -63,21 +66,24 @@ object ConcBuffer {
   val standardConfig = config(
     Key.exec.minWarmupRuns -> 20,
     Key.exec.maxWarmupRuns -> 40,
-    Key.exec.benchRuns -> 60,
-    Key.verbose -> true
-  ) withWarmer(new Warmer.Default)
+    Key.exec.benchRuns     -> 60,
+    Key.verbose            -> true
+  ).withWarmer(new Warmer.Default)
 
   def main(args: Array[String]) {
     val size = 1000000
 
     def run(p: Int) {
       val taskSupport = new collection.parallel.ForkJoinTaskSupport(
-        new scala.concurrent.forkjoin.ForkJoinPool(p))
+        new scala.concurrent.forkjoin.ForkJoinPool(p)
+      )
       val strings = (0 until size).map(_.toString)
-      val time = standardConfig measure {
+      val time = standardConfig.measure {
         val parallelized = strings.par
         parallelized.tasksupport = taskSupport
-        parallelized.aggregate(new ConcBuffer[String])(_ += _, _ combine _).result
+        parallelized
+          .aggregate(new ConcBuffer[String])(_ += _, _.combine(_))
+          .result
       }
       println(s"p = $p, time = $time ms")
     }

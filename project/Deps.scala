@@ -19,6 +19,8 @@ object Deps {
     val kafkaStreams = "2.3.0"
     val fs2_kafka    = "0.20.2"
 
+    val spire = "0.17.0-M1"
+
     val scalaTest             = "3.0.8"
     val testcontainers        = "0.34.1"
     val kafkaTestContainer    = "1.12.3"
@@ -91,6 +93,10 @@ object Deps {
     "com.ovoenergy" %% "fs2-kafka" % Versions.fs2_kafka
   )
 
+  private lazy val spire = Seq(
+    "org.typelevel" %% "spire" % Versions.spire
+  )
+
   lazy val algsProjectDeps
-    : Seq[ModuleID] = logging ++ testDeps ++ cats ++ catsEffect ++ catsTagless ++ conf ++ fs2 ++ shapeless
+    : Seq[ModuleID] = logging ++ testDeps ++ cats ++ catsEffect ++ catsTagless ++ conf ++ fs2 ++ shapeless ++ spire
 }

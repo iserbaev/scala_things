@@ -11,22 +11,21 @@ import scala.collection.mutable.ArrayBuffer
 trait PropertyChangeSupport {
   import scala.collection.mutable
   private var arrayBuffer = mutable.ArrayBuffer[PropertyChangeListener]()
-  def addPropertyChangeListener(listener: PropertyChangeListener): Unit = {
+  def addPropertyChangeListener(listener: PropertyChangeListener): Unit =
     arrayBuffer += listener
-  }
-  def removePropertyChangeListener(listener: PropertyChangeListener): Unit = {
+  def removePropertyChangeListener(listener: PropertyChangeListener): Unit =
     arrayBuffer -= listener
-  }
-  def firePropertyChange(propertyName: String, oldValue:Any, newValue: Any) {
-    if (oldValue == None || newValue == None || !oldValue.equals(newValue)) {
-
-    }
+  def firePropertyChange(propertyName: String, oldValue: Any, newValue: Any) {
+    if (oldValue == None || newValue == None || !oldValue.equals(newValue)) {}
   }
   def firePropertyChange(event: PropertyChangeEvent) {
     val oldValue = Option(event.getOldValue)
     val newValue = Option(event.getNewValue)
   }
-  private def fire(listeners: ArrayBuffer[PropertyChangeListener], event: PropertyChangeEvent) {
+  private def fire(
+    listeners: ArrayBuffer[PropertyChangeListener],
+    event:     PropertyChangeEvent
+  ) {
     if (listeners.nonEmpty) listeners.foreach(_.propertyChange(event))
   }
 }

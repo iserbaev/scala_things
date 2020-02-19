@@ -15,19 +15,22 @@ import scala.io.Source
 /**
   * Created by ilnur on 18.11.16.
   */
-object MainCh9 extends App{
+object MainCh9 extends App {
 
   /**
     * Write a Scala code snippet that reverses the lines in a file (making the last
     * line the first one, and so on).
     * @param filePath
     */
-  def ch9_tsk1(filePath:String):Unit ={
-    val source = Source.fromFile(filePath, "UTF-8")
-    val tokens = source.mkString.split("\\s+")
-    val reversedLineArray = tokens.map(_+" ").toBuffer.reverse
+  def ch9_tsk1(filePath: String): Unit = {
+    val source            = Source.fromFile(filePath, "UTF-8")
+    val tokens            = source.mkString.split("\\s+")
+    val reversedLineArray = tokens.map(_ + " ").toBuffer.reverse
     source.close()
-    Files.write(Paths.get(filePath), reversedLineArray.mkString.getBytes(StandardCharsets.UTF_8))
+    Files.write(
+      Paths.get(filePath),
+      reversedLineArray.mkString.getBytes(StandardCharsets.UTF_8)
+    )
   }
 
   /**
@@ -36,12 +39,15 @@ object MainCh9 extends App{
     * same file.
     * @param filePath
     */
-  def ch9_tsk2(filePath:String):Unit = {
-    val source = Source.fromFile(filePath, "UTF-8")
-    val tokens = source.mkString.split("\\t")
-    val reversedLineArray = tokens.map(_+" ").toBuffer.reverse
+  def ch9_tsk2(filePath: String): Unit = {
+    val source            = Source.fromFile(filePath, "UTF-8")
+    val tokens            = source.mkString.split("\\t")
+    val reversedLineArray = tokens.map(_ + " ").toBuffer.reverse
     source.close()
-    Files.write(Paths.get(filePath), reversedLineArray.mkString.getBytes(StandardCharsets.UTF_8))
+    Files.write(
+      Paths.get(filePath),
+      reversedLineArray.mkString.getBytes(StandardCharsets.UTF_8)
+    )
   }
 
   /**
@@ -49,9 +55,13 @@ object MainCh9 extends App{
     * Extra credit if you can do this in a single line.
     * @param filePath
     */
-  def ch9_tsk3(filePath:String):Unit = {
-    Source.fromFile(filePath).mkString.split("\\s+").filter(_.length>12).foreach(println(_))
-  }
+  def ch9_tsk3(filePath: String): Unit =
+    Source
+      .fromFile(filePath)
+      .mkString
+      .split("\\s+")
+      .filter(_.length > 12)
+      .foreach(println(_))
 
   /**
     * Write a Scala program that reads a text file containing only floating-point
@@ -59,12 +69,15 @@ object MainCh9 extends App{
     * in the file.
     * @param filePath
     */
-  def ch9_tsk4(filePath:String):Unit = {
+  def ch9_tsk4(filePath: String): Unit = {
     val source = Source.fromFile(filePath)
-    val tokens = source.mkString.split("[+-]([0-9]*[.][0-9])+").flatMap(_.split(" "))
+    val tokens =
+      source.mkString.split("[+-]([0-9]*[.][0-9])+").flatMap(_.split(" "))
     println(tokens.toBuffer.toString())
     val buffer = tokens.map(_.toDouble)
-    println("sum="+buffer.sum+", max="+buffer.max+", min="+buffer.min+", avg="+buffer.sum/buffer.length)
+    println(
+      "sum=" + buffer.sum + ", max=" + buffer.max + ", min=" + buffer.min + ", avg=" + buffer.sum / buffer.length
+    )
   }
 
   /**
@@ -73,13 +86,13 @@ object MainCh9 extends App{
     * @param url
     * @return
     */
-  def ch9_tsk8(url:String):Array[String] = {
+  def ch9_tsk8(url: String): Array[String] = {
     val sourceURL = Source.fromURL(url, "UTF-8")
     val urlString = sourceURL.mkString
 
-    val pattern = """(<img+) (src=.*+)""".r
-    val s= for (pattern(img, src) <- pattern.findAllIn(urlString)) yield src
-    val srcBuffer= s.map(_.split(" ")(0)).toArray
+    val pattern   = """(<img+) (src=.*+)""".r
+    val s         = for (pattern(img, src) <- pattern.findAllIn(urlString)) yield src
+    val srcBuffer = s.map(_.split(" ")(0)).toArray
     println(srcBuffer.toBuffer.toString())
     srcBuffer
   }
@@ -92,19 +105,25 @@ object MainCh9 extends App{
     * Javadoc for details). The following implicit conversion adapts a function to the interface
     */
   import java.nio.file._
-  implicit def makeFileVisitor(f:(Path) => Unit) = new SimpleFileVisitor[Path] {
-    override def visitFile(file: Path, attrs: BasicFileAttributes) = {
-      f(file)
-      FileVisitResult.CONTINUE
+  implicit def makeFileVisitor(f: (Path) => Unit) =
+    new SimpleFileVisitor[Path] {
+      override def visitFile(file: Path, attrs: BasicFileAttributes) = {
+        f(file)
+        FileVisitResult.CONTINUE
+      }
     }
-  }
+
   /**
     * Write a Scala program that counts how many files with .class extension are
     * in a given directory and its subdirectories.
     */
-  def ch9_tsk9(catalog:String):Int = {
-    var count =0
-    Files.walkFileTree(Paths.get(catalog), (f:Path) => if (f.getFileName.toString.contains(".class")) count=count+1)
+  def ch9_tsk9(catalog: String): Int = {
+    var count = 0
+    Files.walkFileTree(
+      Paths.get(catalog),
+      (f: Path) =>
+        if (f.getFileName.toString.contains(".class")) count = count + 1
+    )
     count
   }
 
@@ -114,32 +133,35 @@ object MainCh9 extends App{
     * another, and then save an Array[Person] to a file. Read the array back in and
     * verify that the friend relations are intact.
     */
-  def ch9_tsk10():Unit = {
+  def ch9_tsk10(): Unit = {
     val fred = new Person("Fred M.")
     val stiv = new Person("Stiv K.")
     fred.friends += stiv
 
-    val out = new ObjectOutputStream(new FileOutputStream(
-      "/home/ilnur/repo/scala/scalaLearn/src/main/scala/tasks_hostmann/ch9/test.obj"))
+    val out = new ObjectOutputStream(
+      new FileOutputStream(
+        "/home/ilnur/repo/scala/scalaLearn/src/main/scala/tasks_hostmann/ch9/test.obj"
+      )
+    )
     out.writeObject(fred)
     out.close()
 
-    val in = new ObjectInputStream(new FileInputStream(
-      "/home/ilnur/repo/scala/scalaLearn/src/main/scala/tasks_hostmann/ch9/test.obj"))
+    val in = new ObjectInputStream(
+      new FileInputStream(
+        "/home/ilnur/repo/scala/scalaLearn/src/main/scala/tasks_hostmann/ch9/test.obj"
+      )
+    )
     val savedFred = in.readObject().asInstanceOf[Person]
-    print(savedFred+" and his friend: ")
+    print(savedFred + " and his friend: ")
     savedFred.friends.foreach(println(_))
   }
 
   def markDateIfWeekend(inputDate: String): String = {
-    val format = DateTimeFormat.forPattern("dd.MM.yy")
-    val date = DateTime.parse(inputDate, format)
+    val format    = DateTimeFormat.forPattern("dd.MM.yy")
+    val date      = DateTime.parse(inputDate, format)
     val dayOfWeek = date.getDayOfWeek()
     if (dayOfWeek == 6 || dayOfWeek == 7) "*".concat(inputDate) else inputDate
   }
-
-
-
 
 //  ch9_tsk1("/home/ilnur/Загрузки/ant.conf")
 //  ch9_tsk2("/home/ilnur/Загрузки/ant.conf")
@@ -148,6 +170,10 @@ object MainCh9 extends App{
 //  ch9_tsk8("http://eax.me/")
 //  println(ch9_tsk9("/home/ilnur/repo/scala/scalaLearn/src/main/scala/"))
   ch9_tsk10()
-  println(markDateIfWeekend("12.11.16")+" "+markDateIfWeekend("13.11.16")+" "+markDateIfWeekend("14.11.16")
-    +" "+markDateIfWeekend("15.11.16")+" "+markDateIfWeekend("21.11.16"))
+  println(
+    markDateIfWeekend("12.11.16") + " " + markDateIfWeekend("13.11.16") + " " + markDateIfWeekend(
+      "14.11.16"
+    )
+    + " " + markDateIfWeekend("15.11.16") + " " + markDateIfWeekend("21.11.16")
+  )
 }

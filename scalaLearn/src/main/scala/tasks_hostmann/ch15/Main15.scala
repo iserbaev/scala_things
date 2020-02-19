@@ -8,15 +8,15 @@ import scala.io.Source
 /**
   * Created by ilnur on 18.01.17.
   */
-object Main15 extends App{
+object Main15 extends App {
+
   /**
     * 4. напишите метод sum с переменным числом целочисленных аргументов,
     * возвращающий сумму своих аргументов.
     * Вызовите его из Java.
     */
-  @varargs def sum(e: Int*): Int = {
+  @varargs def sum(e: Int*): Int =
     e.sum
-  }
   println(sum(5, 8, 9, 6, 6, 3, 2, 5, 6))
 
   /**
@@ -37,7 +37,7 @@ object Main15 extends App{
     * Что случится если поле не объявлено как volatile?
     */
   @volatile var done = false
-  val firstThread = new Thread( new Runnable {
+  val firstThread = new Thread(new Runnable {
     override def run() = {
       Thread.sleep(3003)
       done = true
@@ -46,7 +46,7 @@ object Main15 extends App{
   })
   val secondThread = new Thread(new Runnable {
     override def run() = {
-      while (!done){
+      while (!done) {
         Thread.sleep(1000)
         println(s"second thread - done is $done")
       }
@@ -60,5 +60,6 @@ object Main15 extends App{
     * 8. Добавьте метод allDifferent в объект скомпилируйте и загляните в байт-код.
     * Какие методы будут сгенерированы после применения аннотации @specialized
     */
-  def allDifferent[@specialized T](x: T, y: T, z: T) = x != y && x!= z && y != z
+  def allDifferent[@specialized T](x: T, y: T, z: T) =
+    x != y && x != z && y != z
 }

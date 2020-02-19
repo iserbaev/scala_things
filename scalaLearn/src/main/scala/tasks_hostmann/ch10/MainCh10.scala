@@ -9,13 +9,14 @@ import scala.collection.mutable.ArrayBuffer
   * Created by ilnur on 21.11.16.
   *
   */
-object MainCh10 extends App{
+object MainCh10 extends App {
+
   /**
     * ch10_tsk1
     */
-  val egg = new java.awt.geom.Ellipse2D.Double(5,10,20,30) with RectangleLike
-  egg.translate(10,-10)
-  egg.grow(10,20)
+  val egg = new java.awt.geom.Ellipse2D.Double(5, 10, 20, 30) with RectangleLike
+  egg.translate(10, -10)
+  egg.grow(10, 20)
 
   /**
     * ch10_tsk4
@@ -35,13 +36,13 @@ object MainCh10 extends App{
     * ch10_tsk7
     */
   val beg = DateTime.now().getMillis
-  val bs= BitSequence(5,6,9,8)
-  bs(0)=15
+  val bs  = BitSequence(5, 6, 9, 8)
+  bs(0) = 15
   println(bs.toString())
   val end = DateTime.now().getMillis
-  println(end -beg)
+  println(end - beg)
 
-  var t = mutable.Map[String, Int](("s",6),("d",9))
-  t("s")=11
+  var t = mutable.Map[String, Int](("s", 6), ("d", 9))
+  t("s") = 11
   println(t)
 }
