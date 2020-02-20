@@ -1,3 +1,4 @@
+import scala.collection.mutable
 import scala.io.StdIn
 import scala.collection.mutable.PriorityQueue
 
@@ -11,7 +12,9 @@ import scala.collection.mutable.PriorityQueue
  * В последней строке выведите закодированную строку.
  */
 object Main {
-  val pq = PriorityQueue.empty[Byte] // TODO
+  type A = (Char,Int)
+  type Queue = mutable.PriorityQueue[A]
+  implicit val ord: Ordering[A] = (x: (Char, Int), y: (Char, Int)) => Ordering.Int.compare(x._2, y._2)
   def frequency(chars: Array[Char]): Map[Char,Int] = {
     val (m,(c,freq)) = chars.sorted.foldLeft((Map.empty[Char,Int], ('a',0))){
       case ((m,(accChar,freq)),c) =>
@@ -29,13 +32,12 @@ object Main {
   def code(in: String): Unit = {
     val chars = in.toCharArray
     val map = frequency(chars)
+    val ppq = mutable.PriorityQueue.empty[A]
+    ppq.addAll(map.toList)
 
     println(in)
     println(map)
-
-    def decode(bytes: String): Unit = {
-      println(bytes)
-    }
+    println(ppq)
   }
   def main(args: Array[String]): Unit = {
     val in = StdIn.readLine()
