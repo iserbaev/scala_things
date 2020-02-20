@@ -33,7 +33,7 @@ object Main {
     val chars = in.toCharArray
     val map = frequency(chars)
     val ppq = mutable.PriorityQueue.empty[A]
-    ppq.addAll(map.toList)
+    ppq.addAll(map)
 
     println(in)
     println(map)
