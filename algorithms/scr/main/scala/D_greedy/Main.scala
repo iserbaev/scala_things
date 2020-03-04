@@ -1,6 +1,7 @@
+package D_greedy
+
 import scala.collection.mutable
-import scala.io.StdIn
-import scala.collection.mutable.{ListBuffer, PriorityQueue}
+import scala.collection.mutable.ListBuffer
 
 /**
   * По данной непустой строке
@@ -13,6 +14,9 @@ import scala.collection.mutable.{ListBuffer, PriorityQueue}
   */
 object Main {
   case class Edge(code: Option[String] = None, prev: Option[Edge] = None) {
+
+    override def toString: String = s"edge: Edge($code,$prev)"
+
     def mergeCodes: Option[String] =
       prev
         .flatMap(_.mergeCodes)
@@ -38,6 +42,22 @@ object Main {
           edge = n.edge.map(_.copy(code = Some(c))).orElse(Some(Edge(Some(c))))
         )
     }
+
+    def asString(acc: String = ""): String = this match {
+      case Leaf(value, edge, priority) =>
+        acc + s"Leaf(value: $value, edge: $edge, priority: $priority)"
+      case Node(left, right, edge, priority) =>
+        val next = acc + "     "
+        acc + s"""Node(
+         ${left.asString(next)}
+         ${right.asString(next)}
+         ${acc + edge}
+         ${acc + s"priority: $priority"}
+         $acc)
+         """
+    }
+
+    override def toString: String = this.asString()
   }
   object Tree {
     def create[T](value: (T, Int)): Tree[T] =
@@ -117,8 +137,9 @@ object Main {
     val map   = frequency(chars)
     val ppq   = mutable.PriorityQueue.empty[A]
     ppq.addAll(map)
-    val tree = ppq.foldLeft(Option.empty[Tree[Char]]){ case (maybeTree,(c,i)) =>
-      Option(maybeTree.fold(Tree.create((c,i)))(t => Tree.add(c,i,t)))
+    val tree = ppq.foldLeft(Option.empty[Tree[Char]]) {
+      case (maybeTree, (c, i)) =>
+        Option(maybeTree.fold(Tree.create((c, i)))(t => Tree.add(c, i, t)))
     }
 
     println(in)
@@ -126,34 +147,34 @@ object Main {
     println(ppq)
     println(tree)
   }
-  def main(args: Array[String]): Unit = {
-    val in = StdIn.readLine()
-    code(in)
+  def main(args: Array[String]): Unit =
+//    val in = scala.io.StdIn.readLine()
+//    code(in)
 
-  }
+//    val tests = List(
+//      "a" -> List(1 -> 1, List('a' -> "0"), "0"),
+//      "abacabad" -> List(
+//        4 -> 14,
+//        List('a' -> "0", 'b' -> "10", 'c' -> "110", 'd' -> "111"),
+//        "01001100100111"
+//      ),
+//      "accepted" -> List(
+//        6 -> 20,
+//        List(
+//          'p' -> "110",
+//          'a' -> "111",
+//          'c' -> "10",
+//          't' -> "011",
+//          'd' -> "010",
+//          'e' -> "00"
+//        ),
+//        "11110100011001100010"
+//      )
+//    )
+
+//    code(tests.head._1)
+//    code(tests.tail.head._1)
+//    code(tests.tail.tail.head._1)
+    code("beep boop beer!")
+
 }
-import Main._
-val tests = List(
-    "a" -> List(1 -> 1, List('a' -> "0"), "0"),
-    "abacabad" -> List(
-      4 -> 14,
-      List('a' -> "0", 'b' -> "10", 'c' -> "110", 'd' -> "111"),
-      "01001100100111"
-    ),
-    "accepted" -> List(
-      6 -> 20,
-      List(
-        'p' -> "110",
-        'a' -> "111",
-        'c' -> "10",
-        't' -> "011",
-        'd' -> "010",
-        'e' -> "00"
-      ),
-      "11110100011001100010"
-    )
-  )
-
-code(tests.head._1)
-code(tests.tail.head._1)
-code(tests.tail.tail.head._1)
