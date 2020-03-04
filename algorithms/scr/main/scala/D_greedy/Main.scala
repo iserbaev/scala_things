@@ -1,7 +1,6 @@
 package D_greedy
 
 import scala.collection.mutable
-import scala.collection.mutable.ListBuffer
 
 /**
   * По данной непустой строке
@@ -137,8 +136,10 @@ object Main {
     val map   = frequency(chars)
     val ppq   = mutable.PriorityQueue.empty[A]
     ppq.addAll(map)
-    val tree = ppq.foldLeft(Option.empty[Tree[Char]]) {
-      case (maybeTree, (c, i)) =>
+    val tree = (1 to ppq.size).foldLeft(Option.empty[Tree[Char]]) {
+      case (maybeTree, _) =>
+        val (c, i) = ppq.dequeue()
+        println(s"ppq get next = ($c,$i)")
         Option(maybeTree.fold(Tree.create((c, i)))(t => Tree.add(c, i, t)))
     }
 
