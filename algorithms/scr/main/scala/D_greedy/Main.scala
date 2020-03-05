@@ -112,40 +112,65 @@ object Main {
   case class Leaf[T](value: T, edge: Option[Edge], priority: Int)
       extends Tree[T]
 
-  type A     = (Char, Int)
+  type E     = Either[Char, Tree[Char]]
+  type A     = (E, Int)
   type Queue = mutable.PriorityQueue[A]
-  implicit val ord: Ordering[A] = (x: (Char, Int), y: (Char, Int)) =>
+  implicit val ord: Ordering[A] = (x: A, y: A) =>
     -Ordering.Int.compare(x._2, y._2)
-  def frequency(chars: Array[Char]): Map[Char, Int] = {
+  def frequency(chars: Array[Char]): Map[E, Int] = {
     val (m, (c, freq)) =
-      chars.sorted.foldLeft((Map.empty[Char, Int], ('a', 0))) {
+      chars.sorted.foldLeft((Map.empty[E, Int], ('a', 0))) {
         case ((m, (accChar, freq)), c) =>
           accChar match {
             case a if a == c =>
               (m, (accChar, freq + 1))
             case aa if aa != c =>
-              val mm = if (freq == 0) m else m.+((accChar, freq))
+              val mm = if (freq == 0) m else m.+((Left(accChar), freq))
               (mm, (c, 1))
           }
       }
-    m.+((c, freq))
+    m.+((Left(c), freq))
   }
 
   def code(in: String): Unit = {
+    println(in)
     val chars = in.toCharArray
     val map   = frequency(chars)
-    val ppq   = mutable.PriorityQueue.empty[A]
-    ppq.addAll(map)
-    val tree = (1 to ppq.size).foldLeft(Option.empty[Tree[Char]]) {
-      case (maybeTree, _) =>
-        val (c, i) = ppq.dequeue()
-        println(s"ppq get next = ($c,$i)")
-        Option(maybeTree.fold(Tree.create((c, i)))(t => Tree.add(c, i, t)))
-    }
-
-    println(in)
     println(map)
+    val ppq = mutable.PriorityQueue.empty[A]
+    ppq.addAll(map)
     println(ppq)
+    def recur(pq: mutable.PriorityQueue[A]): mutable.PriorityQueue[A] =
+      if (pq.size >= 2) {
+        val (e1, i1) = pq.dequeue()
+        println(s"ppq get next = ($e1,$i1)")
+        val (e2, i2) = pq.dequeue()
+        println(s"ppq get next = ($e2,$i2)")
+        (e1, e2) match {
+          case (c1: Left[Char, Tree[Char]], c2: Left[Char, Tree[Char]]) =>
+            val leaf = Tree.create((c1.value, i1), (c2.value, i2))
+            pq.enqueue((Right(leaf), leaf.priority))
+            recur(pq)
+          case (c1: Left[Char, Tree[Char]], t2: Right[Char, Tree[Char]]) =>
+            val node = Tree.add(c1.value, i1, t2.value)
+            pq.enqueue((Right(node), node.priority))
+            recur(pq)
+          case (t1: Right[Char, Tree[Char]], c2: Left[Char, Tree[Char]]) =>
+            val node = Tree.add(c2.value, i2, t1.value)
+            pq.enqueue((Right(node), node.priority))
+            recur(pq)
+          case (t1: Right[Char, Tree[Char]], t2: Right[Char, Tree[Char]]) =>
+            val node = Tree.merge(t1.value, t2.value)
+            pq.enqueue((Right(node), node.priority))
+            recur(pq)
+        }
+      } else {
+        println(s"nothing do ${pq}")
+        pq
+      }
+    val tree: Tree[Char] =
+      recur(ppq).dequeue()._1.getOrElse(sys.error("queue is empty"))
+
     println(tree)
   }
   def main(args: Array[String]): Unit =
