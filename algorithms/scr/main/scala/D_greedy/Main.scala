@@ -15,11 +15,6 @@ object Main {
   case class Edge(code: Option[String] = None, prev: Option[Edge] = None) {
 
     override def toString: String = s"edge: Edge($code,$prev)"
-
-    def mergeCodes: Option[String] =
-      prev
-        .flatMap(_.mergeCodes)
-        .fold(code)(acc => code.map(acc + _).orElse(Some(acc)))
   }
   trait Tree[T] {
     def priority: Int
