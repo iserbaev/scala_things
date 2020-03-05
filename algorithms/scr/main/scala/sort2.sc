@@ -29,6 +29,6 @@ def sort2(arr: Array[Int]): List[List[Int]] = {
 }
 
 
-sort2(arr)
-sort2(arr2)
-sort2(arr3)
+assert(sort2(arr) == List(List(2, 3, 4), List(8, 8)))
+assert(sort2(arr2) == List(List(4, 5, 6), List(13)))
+assert(sort2(arr3) == List(List(11), List(17, 18), List(22, 23)))
