@@ -13,86 +13,17 @@ import Main.Tree._
   * В последней строке выведите закодированную строку.
   */
 object Main {
+  type E     = Either[Char, Tree[Char]]
+  type HeapElement     = (E, Int)
+
   trait Codec[I,O] {
     def code: I => O
     def decode: O => I
   }
-  case class HuffmanCodec() extends Codec[String,String] {
-    type E     = Either[Char, Tree[Char]]
-    type A     = (E, Int)
-    type Queue = mutable.PriorityQueue[A]
-    implicit val ord: Ordering[A] = (x: A, y: A) =>
-      -Ordering.Int.compare(x._2, y._2)
-    def frequency(chars: Array[Char]): Map[E, Int] = {
-      val (m, (c, freq)) =
-        chars.sorted.foldLeft((Map.empty[E, Int], ('a', 0))) {
-          case ((m, (accChar, freq)), c) =>
-            accChar match {
-              case a if a == c =>
-                (m, (accChar, freq + 1))
-              case aa if aa != c =>
-                val mm = if (freq == 0) m else m.+((Left(accChar), freq))
-                (mm, (c, 1))
-            }
-        }
-      m.+((Left(c), freq))
-    }
-    def treeCodes[T](tree: Tree[T],
-                     treeCodeAcc: String = "",
-                     acc: Map[T,String] = Map.empty[T,String]): Map[T,String] = tree match {
-      case Leaf(value, _) =>
-        acc.+((value, treeCodeAcc))
-      case Node(left, right, _) =>
-        treeCodes[T](left, treeCodeAcc + "0", acc) ++ treeCodes[T](right, treeCodeAcc + "1", acc)
-    }
-    override def code: String => String = in => {
-      println(in)
-      val chars = in.toCharArray
-      val map   = frequency(chars)
-      println(map)
-      val ppq = mutable.PriorityQueue.empty[A]
-      ppq.addAll(map)
-      println(ppq)
-      def recur(pq: mutable.PriorityQueue[A]): mutable.PriorityQueue[A] =
-        if (pq.size >= 2) {
-          val (e1, i1) = pq.dequeue()
-          println(s"ppq get next = ($e1,$i1)")
-          val (e2, i2) = pq.dequeue()
-          println(s"ppq get next = ($e2,$i2)")
-          (e1, e2) match {
-            case (c1: Left[Char, Tree[Char]], c2: Left[Char, Tree[Char]]) =>
-              val leaf = Tree.create((c1.value, i1), (c2.value, i2))
-              pq.enqueue((Right(leaf), leaf.priority))
-              recur(pq)
-            case (c1: Left[Char, Tree[Char]], t2: Right[Char, Tree[Char]]) =>
-              val node = Tree.add(c1.value, i1, t2.value)
-              pq.enqueue((Right(node), node.priority))
-              recur(pq)
-            case (t1: Right[Char, Tree[Char]], c2: Left[Char, Tree[Char]]) =>
-              val node = Tree.add(c2.value, i2, t1.value)
-              pq.enqueue((Right(node), node.priority))
-              recur(pq)
-            case (t1: Right[Char, Tree[Char]], t2: Right[Char, Tree[Char]]) =>
-              val node = Tree.merge(t1.value, t2.value)
-              pq.enqueue((Right(node), node.priority))
-              recur(pq)
-          }
-        } else {
-          println(s"nothing do ${pq}")
-          pq
-        }
-      val tree: Tree[Char] =
-        recur(ppq).dequeue()._1.getOrElse(sys.error("queue is empty"))
-
-      println(tree)
-      val codes = treeCodes(tree)
-      println(codes)
-      val coded = chars.foldLeft("")((acc,c) => acc + codes(c))
-      println(coded)
-      coded
-    }
-
-    override def decode: String => String = ???
+  trait Heap[T] {
+    def getMin: (T,Int)
+    def add(t: T, priority: Int): Unit
+    def size: Int
   }
   trait Tree[T] {
     def priority: Int
@@ -155,6 +86,89 @@ object Main {
          $acc)
          """
     }
+  }
+
+  case class PriorityQueueHeap(val chars: Array[Char]) extends Heap[E] {
+    type Queue = mutable.PriorityQueue[HeapElement]
+    implicit val ord: Ordering[HeapElement] = (x: HeapElement, y: HeapElement) =>
+      -Ordering.Int.compare(x._2, y._2)
+
+    val map: Map[E, Int] = frequency(chars)
+    val underlying: Queue = mutable.PriorityQueue.empty[HeapElement]
+    underlying.addAll(map)
+
+    def frequency(chars: Array[Char]): Map[E, Int] = {
+      val (m, (c, freq)) =
+        chars.sorted.foldLeft((Map.empty[E, Int], ('a', 0))) {
+          case ((m, (accChar, freq)), c) =>
+            accChar match {
+              case a if a == c =>
+                (m, (accChar, freq + 1))
+              case aa if aa != c =>
+                val mm = if (freq == 0) m else m.+((Left(accChar), freq))
+                (mm, (c, 1))
+            }
+        }
+      m.+((Left(c), freq))
+    }
+
+    override def getMin: (E,Int) = underlying.dequeue()
+    override def add(e: E, priority: Int): Unit = underlying.enqueue((e,priority))
+    override def size: Int = underlying.size
+  }
+  case class HuffmanCodec() extends Codec[String,String] {
+
+    def treeCodes[T](tree: Tree[T],
+                     treeCodeAcc: String = "",
+                     acc: Map[T,String] = Map.empty[T,String]): Map[T,String] = tree match {
+      case Leaf(value, _) =>
+        acc.+((value, treeCodeAcc))
+      case Node(left, right, _) =>
+        treeCodes[T](left, treeCodeAcc + "0", acc) ++ treeCodes[T](right, treeCodeAcc + "1", acc)
+    }
+    override def code: String => String = in => {
+      val chars = in.toCharArray
+      val heap = PriorityQueueHeap(chars)
+
+      def treesChars(pq: Heap[E]): Heap[E] =
+        if (pq.size >= 2) {
+          val (e1, i1) = pq.getMin
+          val (e2, i2) = pq.getMin
+          (e1, e2) match {
+            case (c1: Left[Char, Tree[Char]], c2: Left[Char, Tree[Char]]) =>
+              val leaf = Tree.create((c1.value, i1), (c2.value, i2))
+              pq.add(Right(leaf), leaf.priority)
+              treesChars(pq)
+            case (c1: Left[Char, Tree[Char]], t2: Right[Char, Tree[Char]]) =>
+              val node = Tree.add(c1.value, i1, t2.value)
+              pq.add(Right(node), node.priority)
+              treesChars(pq)
+            case (t1: Right[Char, Tree[Char]], c2: Left[Char, Tree[Char]]) =>
+              val node = Tree.add(c2.value, i2, t1.value)
+              pq.add(Right(node), node.priority)
+              treesChars(pq)
+            case (t1: Right[Char, Tree[Char]], t2: Right[Char, Tree[Char]]) =>
+              val node = Tree.merge(t1.value, t2.value)
+              pq.add(Right(node), node.priority)
+              treesChars(pq)
+          }
+        } else {
+          pq
+        }
+      val tree: Tree[Char] =
+        treesChars(heap).getMin._1.getOrElse(sys.error("queue is empty"))
+
+      val codes = treeCodes(tree)
+      val coded = chars.foldLeft("")((acc,c) => acc + codes(c))
+
+      println(tree)
+      println(codes)
+      println(coded)
+
+      coded
+    }
+
+    override def decode: String => String = ???
   }
 
   def main(args: Array[String]): Unit = {
