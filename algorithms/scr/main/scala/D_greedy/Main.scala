@@ -1,6 +1,7 @@
 package D_greedy
 
 import scala.collection.mutable
+import Main.Tree._
 
 /**
   * По данной непустой строке
@@ -17,7 +18,6 @@ object Main {
     def decode: O => I
   }
   case class HuffmanCodec() extends Codec[String,String] {
-    var codes: Map[Char,String] = Map.empty[Char,String]
     type E     = Either[Char, Tree[Char]]
     type A     = (E, Int)
     type Queue = mutable.PriorityQueue[A]
@@ -36,6 +36,14 @@ object Main {
             }
         }
       m.+((Left(c), freq))
+    }
+    def treeCodes[T](tree: Tree[T],
+                     treeCodeAcc: String = "",
+                     acc: Map[T,String] = Map.empty[T,String]): Map[T,String] = tree match {
+      case Leaf(value, _) =>
+        acc.+((value, treeCodeAcc))
+      case Node(left, right, _) =>
+        treeCodes[T](left, treeCodeAcc + "0", acc) ++ treeCodes[T](right, treeCodeAcc + "1", acc)
     }
     override def code: String => String = in => {
       println(in)
@@ -77,7 +85,7 @@ object Main {
         recur(ppq).dequeue()._1.getOrElse(sys.error("queue is empty"))
 
       println(tree)
-      codes = Tree.codes[Char](tree)
+      val codes = treeCodes(tree)
       println(codes)
       val coded = chars.foldLeft("")((acc,c) => acc + codes(c))
       println(coded)
@@ -88,22 +96,17 @@ object Main {
   }
   trait Tree[T] {
     def priority: Int
-    def asString(acc: String = ""): String = this match {
-      case Leaf(value, priority) =>
-        acc + s"Leaf(value: $value, priority: $priority)"
-      case Node(left, right, priority) =>
-        val next = acc + "     "
-        acc + s"""Node(
-         ${left.asString(next)}
-         ${right.asString(next)}
-         ${acc + s"priority: $priority"}
-         $acc)
-         """
-    }
-
-    override def toString: String = this.asString()
+    override def toString: String = Tree.asString(this)
   }
   object Tree {
+    case class Node[T](
+                        left:     Tree[T],
+                        right:    Tree[T],
+                        priority: Int
+                      ) extends Tree[T]
+
+    case class Leaf[T](value: T, priority: Int)
+      extends Tree[T]
     def create[T](value: (T, Int)): Tree[T] =
       Leaf(value._1, value._2)
     def create[T](value1: (T, Int), value2: (T, Int)): Tree[T] = {
@@ -140,24 +143,19 @@ object Main {
         t1.priority + t2.priority
       )
     }
-
-    def codes[T](tree: Tree[T],
-                 treeCodeAcc: String = "",
-                 acc: Map[T,String] = Map.empty[T,String]): Map[T,String] = tree match {
-      case Leaf(value, _) =>
-        acc.+((value, treeCodeAcc))
-      case Node(left, right, _) =>
-        codes[T](left, treeCodeAcc + "0", acc) ++ codes[T](right, treeCodeAcc + "1", acc)
+    def asString[T](t: Tree[T], acc: String = ""): String = t match {
+      case Leaf(value, priority) =>
+        acc + s"Leaf(value: $value, priority: $priority)"
+      case Node(left, right, priority) =>
+        val next = acc + "     "
+        acc + s"""Node(
+         ${asString(left, next)}
+         ${asString(right, next)}
+         ${acc + s"priority: $priority"}
+         $acc)
+         """
     }
   }
-  case class Node[T](
-    left:     Tree[T],
-    right:    Tree[T],
-    priority: Int
-  ) extends Tree[T]
-
-  case class Leaf[T](value: T, priority: Int)
-      extends Tree[T]
 
   def main(args: Array[String]): Unit = {
     val in  = "beep boop beer!"
