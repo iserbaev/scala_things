@@ -18,6 +18,25 @@ object Main {
   }
   case class HuffmanCodec() extends Codec[String,String] {
     var codes: Map[Char,String] = Map.empty[Char,String]
+    type E     = Either[Char, Tree[Char]]
+    type A     = (E, Int)
+    type Queue = mutable.PriorityQueue[A]
+    implicit val ord: Ordering[A] = (x: A, y: A) =>
+      -Ordering.Int.compare(x._2, y._2)
+    def frequency(chars: Array[Char]): Map[E, Int] = {
+      val (m, (c, freq)) =
+        chars.sorted.foldLeft((Map.empty[E, Int], ('a', 0))) {
+          case ((m, (accChar, freq)), c) =>
+            accChar match {
+              case a if a == c =>
+                (m, (accChar, freq + 1))
+              case aa if aa != c =>
+                val mm = if (freq == 0) m else m.+((Left(accChar), freq))
+                (mm, (c, 1))
+            }
+        }
+      m.+((Left(c), freq))
+    }
     override def code: String => String = in => {
       println(in)
       val chars = in.toCharArray
@@ -139,26 +158,6 @@ object Main {
 
   case class Leaf[T](value: T, priority: Int)
       extends Tree[T]
-
-  type E     = Either[Char, Tree[Char]]
-  type A     = (E, Int)
-  type Queue = mutable.PriorityQueue[A]
-  implicit val ord: Ordering[A] = (x: A, y: A) =>
-    -Ordering.Int.compare(x._2, y._2)
-  def frequency(chars: Array[Char]): Map[E, Int] = {
-    val (m, (c, freq)) =
-      chars.sorted.foldLeft((Map.empty[E, Int], ('a', 0))) {
-        case ((m, (accChar, freq)), c) =>
-          accChar match {
-            case a if a == c =>
-              (m, (accChar, freq + 1))
-            case aa if aa != c =>
-              val mm = if (freq == 0) m else m.+((Left(accChar), freq))
-              (mm, (c, 1))
-          }
-      }
-    m.+((Left(c), freq))
-  }
 
   def main(args: Array[String]): Unit = {
     val in  = "beep boop beer!"
