@@ -12,40 +12,71 @@ import scala.collection.mutable
   * В последней строке выведите закодированную строку.
   */
 object Main {
-  case class Edge(code: Option[String] = None, prev: Option[Edge] = None) {
+  trait Codec[I,O] {
+    def code: I => O
+    def decode: O => I
+  }
+  case class HuffmanCodec() extends Codec[String,String] {
+    var codes: Map[Char,String] = Map.empty[Char,String]
+    override def code: String => String = in => {
+      println(in)
+      val chars = in.toCharArray
+      val map   = frequency(chars)
+      println(map)
+      val ppq = mutable.PriorityQueue.empty[A]
+      ppq.addAll(map)
+      println(ppq)
+      def recur(pq: mutable.PriorityQueue[A]): mutable.PriorityQueue[A] =
+        if (pq.size >= 2) {
+          val (e1, i1) = pq.dequeue()
+          println(s"ppq get next = ($e1,$i1)")
+          val (e2, i2) = pq.dequeue()
+          println(s"ppq get next = ($e2,$i2)")
+          (e1, e2) match {
+            case (c1: Left[Char, Tree[Char]], c2: Left[Char, Tree[Char]]) =>
+              val leaf = Tree.create((c1.value, i1), (c2.value, i2))
+              pq.enqueue((Right(leaf), leaf.priority))
+              recur(pq)
+            case (c1: Left[Char, Tree[Char]], t2: Right[Char, Tree[Char]]) =>
+              val node = Tree.add(c1.value, i1, t2.value)
+              pq.enqueue((Right(node), node.priority))
+              recur(pq)
+            case (t1: Right[Char, Tree[Char]], c2: Left[Char, Tree[Char]]) =>
+              val node = Tree.add(c2.value, i2, t1.value)
+              pq.enqueue((Right(node), node.priority))
+              recur(pq)
+            case (t1: Right[Char, Tree[Char]], t2: Right[Char, Tree[Char]]) =>
+              val node = Tree.merge(t1.value, t2.value)
+              pq.enqueue((Right(node), node.priority))
+              recur(pq)
+          }
+        } else {
+          println(s"nothing do ${pq}")
+          pq
+        }
+      val tree: Tree[Char] =
+        recur(ppq).dequeue()._1.getOrElse(sys.error("queue is empty"))
 
-    override def toString: String = s"edge: Edge($code,$prev)"
+      println(tree)
+      codes = Tree.codes[Char](tree)
+      println(codes)
+      val coded = chars.foldLeft("")((acc,c) => acc + codes(c))
+      println(coded)
+      coded
+    }
+
+    override def decode: String => String = ???
   }
   trait Tree[T] {
     def priority: Int
-    def edge:     Option[Edge]
-    def updateEdges(): Tree[T] = this match {
-      case l: Leaf[T] =>
-        l.copy(edge = edge)
-      case n: Node[T] =>
-        n.copy(edge = edge)
-          .copy(left = n.left.updateEdges(), right = n.right.updateEdges())
-    }
-    def setCode(c: String): Tree[T] = this match {
-      case l: Leaf[T] =>
-        l.copy(
-          edge = l.edge.map(_.copy(code = Some(c))).orElse(Some(Edge(Some(c))))
-        )
-      case n: Node[T] =>
-        n.copy(
-          edge = n.edge.map(_.copy(code = Some(c))).orElse(Some(Edge(Some(c))))
-        )
-    }
-
     def asString(acc: String = ""): String = this match {
-      case Leaf(value, edge, priority) =>
-        acc + s"Leaf(value: $value, edge: $edge, priority: $priority)"
-      case Node(left, right, edge, priority) =>
+      case Leaf(value, priority) =>
+        acc + s"Leaf(value: $value, priority: $priority)"
+      case Node(left, right, priority) =>
         val next = acc + "     "
         acc + s"""Node(
          ${left.asString(next)}
          ${right.asString(next)}
-         ${acc + edge}
          ${acc + s"priority: $priority"}
          $acc)
          """
@@ -55,34 +86,29 @@ object Main {
   }
   object Tree {
     def create[T](value: (T, Int)): Tree[T] =
-      Leaf(value._1, Some(Edge(Some("0"))), value._2)
+      Leaf(value._1, value._2)
     def create[T](value1: (T, Int), value2: (T, Int)): Tree[T] = {
       val ((t1, p1), (t2, p2)) =
         if (value1._2 <= value2._2) (value1, value2) else (value2, value1)
       Node(
-        Leaf(t1, Some(Edge(Some("0"))), p1),
-        Leaf(t2, Some(Edge(Some("1"))), p2),
-        None,
+        Leaf(t1, p1),
+        Leaf(t2, p2),
         p1 + p2
       )
     }
     def add[T](v1: T, p1: Int, tree: Tree[T]): Tree[T] =
       if (p1 <= tree.priority) {
-        val t = tree.setCode("1")
         Node(
-          Leaf(v1, Some(Edge(Some("0"), t.edge)), p1),
-          t,
-          None,
+          Leaf(v1, p1),
+          tree,
           p1 + tree.priority
-        ).updateEdges()
+        )
       } else {
-        val t = tree.setCode("0")
         Node(
-          t,
-          Leaf(v1, Some(Edge(Some("1"), t.edge)), p1),
-          None,
+          tree,
+          Leaf(v1, p1),
           p1 + tree.priority
-        ).updateEdges()
+        )
       }
 
     def merge[T](tree1: Tree[T], tree2: Tree[T]): Tree[T] = {
@@ -90,21 +116,28 @@ object Main {
         if (tree1.priority <= tree2.priority) tree1 -> tree2 else tree2 -> tree1
 
       Node(
-        t1.setCode("0"),
-        t2.setCode("1"),
-        None,
+        t1,
+        t2,
         t1.priority + t2.priority
-      ).updateEdges()
+      )
+    }
+
+    def codes[T](tree: Tree[T],
+                 treeCodeAcc: String = "",
+                 acc: Map[T,String] = Map.empty[T,String]): Map[T,String] = tree match {
+      case Leaf(value, _) =>
+        acc.+((value, treeCodeAcc))
+      case Node(left, right, _) =>
+        codes[T](left, treeCodeAcc + "0", acc) ++ codes[T](right, treeCodeAcc + "1", acc)
     }
   }
   case class Node[T](
     left:     Tree[T],
     right:    Tree[T],
-    edge:     Option[Edge],
     priority: Int
   ) extends Tree[T]
 
-  case class Leaf[T](value: T, edge: Option[Edge], priority: Int)
+  case class Leaf[T](value: T, priority: Int)
       extends Tree[T]
 
   type E     = Either[Char, Tree[Char]]
@@ -127,48 +160,14 @@ object Main {
     m.+((Left(c), freq))
   }
 
-  def code(in: String): Unit = {
-    println(in)
-    val chars = in.toCharArray
-    val map   = frequency(chars)
-    println(map)
-    val ppq = mutable.PriorityQueue.empty[A]
-    ppq.addAll(map)
-    println(ppq)
-    def recur(pq: mutable.PriorityQueue[A]): mutable.PriorityQueue[A] =
-      if (pq.size >= 2) {
-        val (e1, i1) = pq.dequeue()
-        println(s"ppq get next = ($e1,$i1)")
-        val (e2, i2) = pq.dequeue()
-        println(s"ppq get next = ($e2,$i2)")
-        (e1, e2) match {
-          case (c1: Left[Char, Tree[Char]], c2: Left[Char, Tree[Char]]) =>
-            val leaf = Tree.create((c1.value, i1), (c2.value, i2))
-            pq.enqueue((Right(leaf), leaf.priority))
-            recur(pq)
-          case (c1: Left[Char, Tree[Char]], t2: Right[Char, Tree[Char]]) =>
-            val node = Tree.add(c1.value, i1, t2.value)
-            pq.enqueue((Right(node), node.priority))
-            recur(pq)
-          case (t1: Right[Char, Tree[Char]], c2: Left[Char, Tree[Char]]) =>
-            val node = Tree.add(c2.value, i2, t1.value)
-            pq.enqueue((Right(node), node.priority))
-            recur(pq)
-          case (t1: Right[Char, Tree[Char]], t2: Right[Char, Tree[Char]]) =>
-            val node = Tree.merge(t1.value, t2.value)
-            pq.enqueue((Right(node), node.priority))
-            recur(pq)
-        }
-      } else {
-        println(s"nothing do ${pq}")
-        pq
-      }
-    val tree: Tree[Char] =
-      recur(ppq).dequeue()._1.getOrElse(sys.error("queue is empty"))
-
-    println(tree)
+  def main(args: Array[String]): Unit = {
+    val in  = "beep boop beer!"
+    HuffmanCodec().code(in)
+    ()
   }
-  def main(args: Array[String]): Unit =
+
+}
+
 //    val in = scala.io.StdIn.readLine()
 //    code(in)
 
@@ -196,6 +195,3 @@ object Main {
 //    code(tests.head._1)
 //    code(tests.tail.head._1)
 //    code(tests.tail.tail.head._1)
-    code("beep boop beer!")
-
-}
