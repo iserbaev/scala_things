@@ -26,17 +26,17 @@ object Main {
   trait Codec[I, O, IS, OS] {
     def dictionary: Dictionary[I, O, IS, OS]
     def code:   I                => O = calcIn
-    def decode: (O, Map[OS, IS]) => I = calcOut
+    def decode: (O, Map[IS, OS]) => I = calcOut
     def calcIn: I => O = in => {
       val inSplitted     = dictionary.splitInput(in)
       val relationsInput = dictionary.calculateRelationsInput(inSplitted)
-      println(relationsInput)
-      val outSeq = inSplitted.map(relationsInput)
+      val outSeq         = inSplitted.map(relationsInput)
       dictionary.combineOutput(outSeq)
     }
-    def calcOut: (O, Map[OS, IS]) => I = (out, relationsOutput) => {
-      val outSplitted = dictionary.splitOutput(out, relationsOutput.keySet)
-      val inSeq       = outSplitted.map(relationsOutput)
+    def calcOut: (O, Map[IS, OS]) => I = (out, relationsInput) => {
+      val relationsOutput = relationsInput.map { case (is, os) => os -> is }
+      val outSplitted     = dictionary.splitOutput(out, relationsOutput.keySet)
+      val inSeq           = outSplitted.map(relationsOutput)
       dictionary.combineInput(inSeq)
     }
   }
@@ -178,7 +178,7 @@ object Main {
     override def size: Int = underlying.size
   }
 
-  case class HuffmanDictionary(val relationsOutput: Map[String, Char])
+  case class HuffmanDictionary()
       extends Dictionary[String, String, Char, String] {
     override def splitInput: String => List[Char] = _.toCharArray.toList
 
@@ -196,8 +196,6 @@ object Main {
                 (prevs2, acc)
               }
           }
-        println(s"Splitted $splitted")
-        println(s"not collected $notCollected")
         if (notCollected.nonEmpty)
           sys.error(
             s"can't split out not collected chars ${notCollected.mkString(",")}"
@@ -220,28 +218,17 @@ object Main {
 
     override def combineOutput: List[String] => String = _.mkString("")
   }
-  case class HuffmanCodec(relationsOutput: Map[String, Char])
-      extends Codec[String, String, Char, String] {
+  case class HuffmanCodec() extends Codec[String, String, Char, String] {
     override val dictionary: Dictionary[String, String, Char, String] =
-      HuffmanDictionary(
-        relationsOutput
-      )
+      HuffmanDictionary()
   }
 
   def main(args: Array[String]): Unit = {
-    val in    = "beep boop beer!"
-    val codec = HuffmanCodec(Map())
-    val coded = codec.code(in)
-    val outRel = Map(
-      "10"   -> 'e',
-      "1111" -> '!',
-      "110"  -> ' ',
-      "00"   -> 'b',
-      "011"  -> 'p',
-      "1110" -> 'r',
-      "010"  -> 'o'
-    )
-    val decoded = codec.decode(coded, outRel)
+    val in      = "beep boop beer!"
+    val codec   = HuffmanCodec()
+    val coded   = codec.code(in)
+    val inRel   = codec.dictionary.calculateRelationsInput(in.toCharArray.toList)
+    val decoded = codec.decode(coded, inRel)
     println(coded)
     println(decoded)
   }
