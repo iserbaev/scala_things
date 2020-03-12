@@ -1,6 +1,7 @@
 package D_greedy
 
 import scala.collection.mutable
+import scala.collection.mutable.ListBuffer
 
 /**
   * По данной непустой строке
@@ -18,12 +19,12 @@ object Main {
   trait Dictionary[I, O] {
     type IS
     type OS
-    def splitInput:              I => Seq[IS]
-    def splitOutput:             O => Seq[OS]
-    def calculateRelationsInput: Seq[IS] => Map[IS, OS]
+    def splitInput:              I => List[IS]
+    def splitOutput:             (O, Set[OS]) => List[OS]
+    def calculateRelationsInput: List[IS] => Map[IS, OS]
     def relationsOutput:         Map[OS, IS]
-    def combineInput:            Seq[IS] => I
-    def combineOutput:           Seq[OS] => O
+    def combineInput:            List[IS] => I
+    def combineOutput:           List[OS] => O
     def calcIn: I => O = in => {
       val inSplitted     = splitInput(in)
       val relationsInput = calculateRelationsInput(inSplitted)
@@ -31,12 +32,12 @@ object Main {
       combineOutput(outSeq)
     }
     def calcOut: O => I = out => {
-      val outSplitted = splitOutput(out)
+      val outSplitted = splitOutput(out, relationsOutput.keySet)
       val inSeq       = outSplitted.map(relationsOutput)
       combineInput(inSeq)
     }
   }
-  trait Codec[I, O] {
+  trait Codec[I, O, IS, OS] {
     def dictionary: Dictionary[I, O]
     def code:   I => O = dictionary.calcIn
     def decode: O => I = dictionary.calcOut
@@ -184,11 +185,33 @@ object Main {
     override type IS = Char
     override type OS = String
 
-    override def splitInput: String => Seq[Char] = _.toCharArray.toSeq
+    override def splitInput: String => List[Char] = _.toCharArray.toList
 
-    override def splitOutput: String => Seq[String] = ???
+    override def splitOutput: (String, Set[String]) => List[String] =
+      (s, codes) => {
+        val chars = s.toCharArray.toList
+        val (notCollected, splitted) =
+          chars.foldLeft((ListBuffer.empty[Char], ListBuffer.empty[String])) {
+            case ((prevs, acc), ch) =>
+              val prevs2 = prevs.appended(ch)
+              val s      = prevs2.mkString("")
+              if (codes.contains(s)) {
+                (ListBuffer.empty[Char], acc.appended(s))
+              } else {
+                (prevs2, acc)
+              }
+          }
+        println(s"Splitted $splitted")
+        println(s"not collected $notCollected")
+        if (notCollected.nonEmpty)
+          sys.error(
+            s"can't split out not collected chars ${notCollected.mkString(",")}"
+          )
 
-    override def calculateRelationsInput: Seq[Char] => Map[Char, String] =
+        splitted.toList
+      }
+
+    override def calculateRelationsInput: List[Char] => Map[Char, String] =
       chars => {
         val heap = PriorityQueueHeap(chars.toArray)
 
@@ -198,9 +221,9 @@ object Main {
         Tree.treeCodes(tree)
       }
 
-    override def combineInput: Seq[Char] => String = _.mkString("")
+    override def combineInput: List[Char] => String = _.mkString("")
 
-    override def combineOutput: Seq[String] => String = _.mkString("")
+    override def combineOutput: List[String] => String = _.mkString("")
   }
   case class HuffmanCodec(relationsOutput: Map[String, Char])
       extends Codec[String, String] {
@@ -210,8 +233,12 @@ object Main {
   }
 
   def main(args: Array[String]): Unit = {
-    val in = "beep boop beer!"
-    println(HuffmanCodec(Map()).code(in))
+    val in      = "beep boop beer!"
+    val codec   = HuffmanCodec(Map())
+    val coded   = codec.code(in)
+    val decoded = codec.decode(coded)
+    println(coded)
+    println(decoded)
   }
 
 }
