@@ -157,7 +157,7 @@ object Main {
     val underlying: Queue       = mutable.PriorityQueue.empty[HeapElement]
     underlying.addAll(map)
 
-    def frequency(chars: Array[Char]): Map[E, Int] = {
+    def frequency(chars: Array[Char]): Map[E, Int] = { // TODO unique priorities
       val (m, (c, freq)) =
         chars.sorted.foldLeft((Map.empty[E, Int], ('a', 0))) {
           case ((m, (accChar, freq)), c) =>
