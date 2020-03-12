@@ -16,31 +16,29 @@ object Main {
   type E           = Either[Char, Tree[Char]]
   type HeapElement = (E, Int)
 
-  trait Dictionary[I, O] {
-    type IS
-    type OS
-    def splitInput:              I => List[IS]
+  trait Dictionary[I, O, IS, OS] {
+    def splitInput:              I            => List[IS]
     def splitOutput:             (O, Set[OS]) => List[OS]
-    def calculateRelationsInput: List[IS] => Map[IS, OS]
-    def relationsOutput:         Map[OS, IS]
-    def combineInput:            List[IS] => I
-    def combineOutput:           List[OS] => O
-    def calcIn: I => O = in => {
-      val inSplitted     = splitInput(in)
-      val relationsInput = calculateRelationsInput(inSplitted)
-      val outSeq         = inSplitted.map(relationsInput)
-      combineOutput(outSeq)
-    }
-    def calcOut: O => I = out => {
-      val outSplitted = splitOutput(out, relationsOutput.keySet)
-      val inSeq       = outSplitted.map(relationsOutput)
-      combineInput(inSeq)
-    }
+    def calculateRelationsInput: List[IS]     => Map[IS, OS]
+    def combineInput:            List[IS]     => I
+    def combineOutput:           List[OS]     => O
   }
-  trait Codec[I, O] {
-    def dictionary: Dictionary[I, O]
-    def code:   I => O = dictionary.calcIn
-    def decode: O => I = dictionary.calcOut
+  trait Codec[I, O, IS, OS] {
+    def dictionary: Dictionary[I, O, IS, OS]
+    def code:   I                => O = calcIn
+    def decode: (O, Map[OS, IS]) => I = calcOut
+    def calcIn: I => O = in => {
+      val inSplitted     = dictionary.splitInput(in)
+      val relationsInput = dictionary.calculateRelationsInput(inSplitted)
+      println(relationsInput)
+      val outSeq = inSplitted.map(relationsInput)
+      dictionary.combineOutput(outSeq)
+    }
+    def calcOut: (O, Map[OS, IS]) => I = (out, relationsOutput) => {
+      val outSplitted = dictionary.splitOutput(out, relationsOutput.keySet)
+      val inSeq       = outSplitted.map(relationsOutput)
+      dictionary.combineInput(inSeq)
+    }
   }
   trait Heap[T] {
     def getMin: (T, Int)
@@ -181,10 +179,7 @@ object Main {
   }
 
   case class HuffmanDictionary(val relationsOutput: Map[String, Char])
-      extends Dictionary[String, String] {
-    override type IS = Char
-    override type OS = String
-
+      extends Dictionary[String, String, Char, String] {
     override def splitInput: String => List[Char] = _.toCharArray.toList
 
     override def splitOutput: (String, Set[String]) => List[String] =
@@ -226,17 +221,27 @@ object Main {
     override def combineOutput: List[String] => String = _.mkString("")
   }
   case class HuffmanCodec(relationsOutput: Map[String, Char])
-      extends Codec[String, String] {
-    override val dictionary: Dictionary[String, String] = HuffmanDictionary(
-      relationsOutput
-    )
+      extends Codec[String, String, Char, String] {
+    override val dictionary: Dictionary[String, String, Char, String] =
+      HuffmanDictionary(
+        relationsOutput
+      )
   }
 
   def main(args: Array[String]): Unit = {
-    val in      = "beep boop beer!"
-    val codec   = HuffmanCodec(Map())
-    val coded   = codec.code(in)
-    val decoded = codec.decode(coded)
+    val in    = "beep boop beer!"
+    val codec = HuffmanCodec(Map())
+    val coded = codec.code(in)
+    val outRel = Map(
+      "10"   -> 'e',
+      "1111" -> '!',
+      "110"  -> ' ',
+      "00"   -> 'b',
+      "011"  -> 'p',
+      "1110" -> 'r',
+      "010"  -> 'o'
+    )
+    val decoded = codec.decode(coded, outRel)
     println(coded)
     println(decoded)
   }
