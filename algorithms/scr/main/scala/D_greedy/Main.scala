@@ -231,6 +231,16 @@ object Main {
     val decoded = codec.decode(coded, inRel)
     println(coded)
     println(decoded)
+
+    println(codec.code("abacabad"))
+    println("01001100100111")
+    assert(codec.code("abacabad") == "01001100100111")
+    assert(
+      codec.decode(
+        "01001100100111",
+        Map('a' -> "0", 'b' -> "10", 'c' -> "110", 'd' -> "111")
+      ) == "abacabad"
+    )
   }
 
 }
