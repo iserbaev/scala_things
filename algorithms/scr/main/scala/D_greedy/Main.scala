@@ -37,7 +37,7 @@ object Main {
       combineInput(inSeq)
     }
   }
-  trait Codec[I, O, IS, OS] {
+  trait Codec[I, O] {
     def dictionary: Dictionary[I, O]
     def code:   I => O = dictionary.calcIn
     def decode: O => I = dictionary.calcOut
