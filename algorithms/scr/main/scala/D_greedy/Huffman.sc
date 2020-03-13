@@ -1,19 +1,17 @@
-package D_greedy
-
 import java.util.concurrent.atomic.AtomicInteger
 
 import scala.collection.mutable
 import scala.collection.mutable.ListBuffer
 
 /**
-  * По данной непустой строке
-  * s длины не более 10&#94;4,
-  * состоящей из строчных букв латинского алфавита,
-  * постройте оптимальный беспрефиксный код. В первой строке выведите количество различных букв k, встречающихся в строке,
-  * и размер получившейся закодированной строки.
-  * В следующих k строках запишите коды букв в формате "letter: code".
-  * В последней строке выведите закодированную строку.
-  */
+ * По данной непустой строке
+ * s длины не более 10&#94;4,
+ * состоящей из строчных букв латинского алфавита,
+ * постройте оптимальный беспрефиксный код. В первой строке выведите количество различных букв k, встречающихся в строке,
+ * и размер получившейся закодированной строки.
+ * В следующих k строках запишите коды букв в формате "letter: code".
+ * В последней строке выведите закодированную строку.
+ */
 object Main {
   type E           = Either[Char, Tree[Char]]
   type HeapElement = (E, Int)
@@ -80,10 +78,10 @@ object Main {
   }
   object Tree {
     case class Node[T](
-      left:     Tree[T],
-      right:    Tree[T],
-      priority: Int
-    ) extends Tree[T]
+                        left:     Tree[T],
+                        right:    Tree[T],
+                        priority: Int
+                      ) extends Tree[T]
 
     case class Leaf[T](value: T, priority: Int) extends Tree[T]
     def create[T](value: (T, Int)): Tree[T] =
@@ -123,10 +121,10 @@ object Main {
       )
     }
     def treeCodes[T](
-      tree:        Tree[T],
-      treeCodeAcc: String = "",
-      acc:         Map[T, String] = Map.empty[T, String]
-    ): Map[T, String] = tree match {
+                      tree:        Tree[T],
+                      treeCodeAcc: String = "",
+                      acc:         Map[T, String] = Map.empty[T, String]
+                    ): Map[T, String] = tree match {
       case Leaf(value, _) =>
         acc.+((value, treeCodeAcc))
       case Node(left, right, _) =>
@@ -156,8 +154,7 @@ object Main {
       (x: HeapElement, y: HeapElement) => -Ordering.Int.compare(x._2, y._2)
 
     val map:        Map[E, Int] = frequency(chars)
-    val underlying: Queue       = mutable.PriorityQueue.empty[HeapElement]
-    underlying.addAll(map)
+    val underlying: Queue       = mutable.PriorityQueue.empty[HeapElement].++(map)
 
     def frequency(chars: Array[Char]): Map[E, Int] = {
       val (m, (c, freq)) =
@@ -187,7 +184,7 @@ object Main {
   }
 
   case class HuffmanDictionary()
-      extends Dictionary[String, String, Char, String] {
+    extends Dictionary[String, String, Char, String] {
     override def splitInput: String => List[Char] = _.toCharArray.toList
 
     override def splitOutput: (String, Set[String]) => List[String] =
@@ -196,12 +193,13 @@ object Main {
         val (notCollected, splitted) =
           chars.foldLeft((ListBuffer.empty[Char], ListBuffer.empty[String])) {
             case ((prevs, acc), ch) =>
-              val prevs2 = prevs.appended(ch)
-              val s      = prevs2.mkString("")
+              prevs.append(ch)
+              val s      = prevs.mkString("")
               if (codes.contains(s)) {
-                (ListBuffer.empty[Char], acc.appended(s))
+                acc.append(s)
+                (ListBuffer.empty[Char], acc)
               } else {
-                (prevs2, acc)
+                (prevs, acc)
               }
           }
         if (notCollected.nonEmpty)
@@ -243,6 +241,7 @@ object Main {
     val decoded = codec.decode(coded, inRel)
     println(decoded)
 
+
     println(codec.code("abacabad"))
     println("01001100100111")
     assert(codec.code("abacabad") == "01001100100111")
@@ -252,6 +251,10 @@ object Main {
         Map('a' -> "0", 'b' -> "10", 'c' -> "110", 'd' -> "111")
       ) == "abacabad"
     )
+
+    println(codec.code("a"))
   }
 
 }
+
+Main.main(Array())

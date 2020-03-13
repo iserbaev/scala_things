@@ -30,7 +30,7 @@ object Main {
     )
   }
   def main(args: Array[String]): Unit = {
-    val ar = StdIn.readLine().split(" ")
+    val ar = scala.io.StdIn.readLine().split(" ")
     val n = ar.head.toInt
     val W = ar.last.toInt
 
