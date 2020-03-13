@@ -1,5 +1,7 @@
 package D_greedy
 
+import java.util.concurrent.atomic.AtomicInteger
+
 import scala.collection.mutable
 import scala.collection.mutable.ListBuffer
 
@@ -157,7 +159,7 @@ object Main {
     val underlying: Queue       = mutable.PriorityQueue.empty[HeapElement]
     underlying.addAll(map)
 
-    def frequency(chars: Array[Char]): Map[E, Int] = { // TODO unique priorities
+    def frequency(chars: Array[Char]): Map[E, Int] = {
       val (m, (c, freq)) =
         chars.sorted.foldLeft((Map.empty[E, Int], ('a', 0))) {
           case ((m, (accChar, freq)), c) =>
@@ -169,7 +171,13 @@ object Main {
                 (mm, (c, 1))
             }
         }
-      m.+((Left(c), freq))
+      val counter = new AtomicInteger(0)
+      val mapFreq = m.+((Left(c), freq))
+      val result = chars.distinct.map(c => {
+        val e: E = Left(c)
+        (e, mapFreq(e) * 10 + counter.incrementAndGet())
+      })
+      result.toMap
     }
 
     override def getMin: (E, Int) = underlying.dequeue()
@@ -224,12 +232,15 @@ object Main {
   }
 
   def main(args: Array[String]): Unit = {
-    val in      = "beep boop beer!"
-    val codec   = HuffmanCodec()
-    val coded   = codec.code(in)
-    val inRel   = codec.dictionary.calculateRelationsInput(in.toCharArray.toList)
-    val decoded = codec.decode(coded, inRel)
+    val in    = "beep boop beer!"
+    val codec = HuffmanCodec()
+    val coded = codec.code(in)
+    val inRel = codec.dictionary.calculateRelationsInput(in.toCharArray.toList)
+    println(s"${inRel.size} ${in.toCharArray.length}")
+    println(inRel.toList.map(t => s"${t._1} : ${t._2}").mkString("", "\n", ""))
     println(coded)
+
+    val decoded = codec.decode(coded, inRel)
     println(decoded)
 
     println(codec.code("abacabad"))
@@ -244,31 +255,3 @@ object Main {
   }
 
 }
-
-//    val in = scala.io.StdIn.readLine()
-//    code(in)
-
-//    val tests = List(
-//      "a" -> List(1 -> 1, List('a' -> "0"), "0"),
-//      "abacabad" -> List(
-//        4 -> 14,
-//        List('a' -> "0", 'b' -> "10", 'c' -> "110", 'd' -> "111"),
-//        "01001100100111"
-//      ),
-//      "accepted" -> List(
-//        6 -> 20,
-//        List(
-//          'p' -> "110",
-//          'a' -> "111",
-//          'c' -> "10",
-//          't' -> "011",
-//          'd' -> "010",
-//          'e' -> "00"
-//        ),
-//        "11110100011001100010"
-//      )
-//    )
-
-//    code(tests.head._1)
-//    code(tests.tail.head._1)
-//    code(tests.tail.tail.head._1)
