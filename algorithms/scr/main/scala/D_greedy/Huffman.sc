@@ -153,10 +153,10 @@ object Main {
     implicit val ord: Ordering[HeapElement] =
       (x: HeapElement, y: HeapElement) => -Ordering.Int.compare(x._2, y._2)
 
-    val map:        Map[E, Int] = frequency(chars)
+    val map:        Map[E, Int] = frequency()
     val underlying: Queue       = mutable.PriorityQueue.empty[HeapElement].++(map)
 
-    def frequency(chars: Array[Char]): Map[E, Int] = {
+    def frequency(): Map[E, Int] = {
       val (m, (c, freq)) =
         chars.sorted.foldLeft((Map.empty[E, Int], ('a', 0))) {
           case ((m, (accChar, freq)), c) =>
