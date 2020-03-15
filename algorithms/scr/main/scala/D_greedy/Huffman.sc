@@ -214,10 +214,12 @@ object Main {
       chars => {
         val heap = PriorityQueueHeap(chars.toArray)
 
-        val tree: Tree[Char] =
-          Heap.treesChars(heap).getMin._1.getOrElse(sys.error("queue is empty"))
+        if (heap.size == 1) Map(chars.head -> "0") else {
+          val tree: Tree[Char] =
+            Heap.treesChars(heap).getMin._1.getOrElse(sys.error("queue is empty"))
 
-        Tree.treeCodes(tree)
+          Tree.treeCodes(tree)
+        }
       }
 
     override def combineInput: List[Char] => String = _.mkString("")
@@ -230,12 +232,12 @@ object Main {
   }
 
   def main(args: Array[String]): Unit = {
-    val in    = "beep boop beer!"
+    val in = "beep boop beer!"
     val codec = HuffmanCodec()
     val coded = codec.code(in)
     val inRel = codec.dictionary.calculateRelationsInput(in.toCharArray.toList)
-    println(s"${inRel.size} ${in.toCharArray.length}")
-    println(inRel.toList.map(t => s"${t._1} : ${t._2}").mkString("", "\n", ""))
+    println(s"${inRel.size} ${coded.toCharArray.length}")
+    println(inRel.toList.map(t => s"${t._1}: ${t._2}").mkString("", "\n", ""))
     println(coded)
 
     val decoded = codec.decode(coded, inRel)
@@ -253,8 +255,20 @@ object Main {
     )
 
     println(codec.code("a"))
-  }
 
+    val accepted = "accepted"
+    println(codec.code(accepted))
+    println(Map(
+      'p' -> "110",
+      'a' -> "111",
+      'c' -> "10",
+      't' -> "011",
+      'd' -> "010",
+      'e' -> "00"
+    ))
+    println(codec.dictionary.calculateRelationsInput(accepted.toCharArray.toList))
+    assert(codec.code(accepted) == "11110100011001100010")
+  }
 }
 
 Main.main(Array())
