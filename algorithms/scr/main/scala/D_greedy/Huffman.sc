@@ -41,35 +41,35 @@ object Main {
     }
   }
   trait Heap[T] {
-    def getMin: (T, Int)
+    def getMin: HeapElement
     def add(t: T, priority: Int): Unit
     def size: Int
   }
   object Heap {
-    def treesChars(pq: Heap[E]): Heap[E] =
-      if (pq.size >= 2) {
-        val (e1, i1) = pq.getMin
-        val (e2, i2) = pq.getMin
+    def treesChars(heap: Heap[E]): Heap[E] =
+      if (heap.size >= 2) {
+        val (e1, i1) = heap.getMin
+        val (e2, i2) = heap.getMin
         (e1, e2) match {
           case (c1: Left[Char, Tree[Char]], c2: Left[Char, Tree[Char]]) =>
-            val leaf = Tree.create((c1.value, i1), (c2.value, i2))
-            pq.add(Right(leaf), leaf.priority)
-            treesChars(pq)
+            val node = Tree.create((c1.value, i1), (c2.value, i2))
+            heap.add(Right(node), node.priority)
+            treesChars(heap)
           case (c1: Left[Char, Tree[Char]], t2: Right[Char, Tree[Char]]) =>
             val node = Tree.add(c1.value, i1, t2.value)
-            pq.add(Right(node), node.priority)
-            treesChars(pq)
+            heap.add(Right(node), node.priority)
+            treesChars(heap)
           case (t1: Right[Char, Tree[Char]], c2: Left[Char, Tree[Char]]) =>
             val node = Tree.add(c2.value, i2, t1.value)
-            pq.add(Right(node), node.priority)
-            treesChars(pq)
+            heap.add(Right(node), node.priority)
+            treesChars(heap)
           case (t1: Right[Char, Tree[Char]], t2: Right[Char, Tree[Char]]) =>
             val node = Tree.merge(t1.value, t2.value)
-            pq.add(Right(node), node.priority)
-            treesChars(pq)
+            heap.add(Right(node), node.priority)
+            treesChars(heap)
         }
       } else {
-        pq
+        heap
       }
   }
   trait Tree[T] {
@@ -232,8 +232,9 @@ object Main {
   }
 
   def main(args: Array[String]): Unit = {
-    val in = "beep boop beer!"
     val codec = HuffmanCodec()
+
+    val in = "beep boop beer!"
     val coded = codec.code(in)
     val inRel = codec.dictionary.calculateRelationsInput(in.toCharArray.toList)
     println(s"${inRel.size} ${coded.toCharArray.length}")
