@@ -41,7 +41,7 @@ object Main {
     }
   }
   trait Heap[T] {
-    def getMin: HeapElement
+    def getMin: (T,Int)
     def add(t: T, priority: Int): Unit
     def size: Int
   }
