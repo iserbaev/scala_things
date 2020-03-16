@@ -1,5 +1,3 @@
-import java.util.concurrent.atomic.AtomicInteger
-
 import scala.collection.mutable
 import scala.collection.mutable.ListBuffer
 
@@ -46,6 +44,25 @@ object Main {
     def size: Int
   }
   object Heap {
+    def frequency(chars: List[Char]): Map[E, Int] = {
+      val (m, (c, freq)) =
+        chars.sorted.foldLeft((Map.empty[E, Int], ('a', 0))) {
+          case ((m, (accChar, freq)), c) =>
+            accChar match {
+              case a if a == c =>
+                (m, (accChar, freq + 1))
+              case aa if aa != c =>
+                val mm = if (freq == 0) m else m.+((Left(accChar), freq))
+                (mm, (c, 1))
+            }
+        }
+      val mapFreq = m.+((Left(c), freq))
+      val result = chars.distinct.map(c => {
+        val e: E = Left(c)
+        (e, mapFreq(e))
+      })
+      result.toMap
+    }
     def treesChars(heap: Heap[E]): Heap[E] =
       if (heap.size >= 2) {
         val (e1, i1) = heap.getMin
@@ -148,34 +165,12 @@ object Main {
     }
   }
 
-  case class PriorityQueueHeap(val chars: Array[Char]) extends Heap[E] {
+  case class PriorityQueueHeap(chars: List[Char]) extends Heap[E] {
     type Queue = mutable.PriorityQueue[HeapElement]
     implicit val ord: Ordering[HeapElement] =
       (x: HeapElement, y: HeapElement) => -Ordering.Int.compare(x._2, y._2)
 
-    val map:        Map[E, Int] = frequency()
-    val underlying: Queue       = mutable.PriorityQueue.empty[HeapElement].++(map)
-
-    def frequency(): Map[E, Int] = {
-      val (m, (c, freq)) =
-        chars.sorted.foldLeft((Map.empty[E, Int], ('a', 0))) {
-          case ((m, (accChar, freq)), c) =>
-            accChar match {
-              case a if a == c =>
-                (m, (accChar, freq + 1))
-              case aa if aa != c =>
-                val mm = if (freq == 0) m else m.+((Left(accChar), freq))
-                (mm, (c, 1))
-            }
-        }
-      val counter = new AtomicInteger(0)
-      val mapFreq = m.+((Left(c), freq))
-      val result = chars.distinct.map(c => {
-        val e: E = Left(c)
-        (e, mapFreq(e) * 10 + counter.incrementAndGet())
-      })
-      result.toMap
-    }
+    val underlying: Queue       = mutable.PriorityQueue.empty[HeapElement].++(Heap.frequency(chars))
 
     override def getMin: (E, Int) = underlying.dequeue()
     override def add(e: E, priority: Int): Unit =
@@ -212,7 +207,7 @@ object Main {
 
     override def calculateRelationsInput: List[Char] => Map[Char, String] =
       chars => {
-        val heap = PriorityQueueHeap(chars.toArray)
+        val heap = PriorityQueueHeap(chars)
 
         if (heap.size == 1) Map(chars.head -> "0") else {
           val tree: Tree[Char] =
@@ -234,28 +229,28 @@ object Main {
   def main(args: Array[String]): Unit = {
     val codec = HuffmanCodec()
 
-    val in = "beep boop beer!"
-    val coded = codec.code(in)
-    val inRel = codec.dictionary.calculateRelationsInput(in.toCharArray.toList)
-    println(s"${inRel.size} ${coded.toCharArray.length}")
-    println(inRel.toList.map(t => s"${t._1}: ${t._2}").mkString("", "\n", ""))
-    println(coded)
-
-    val decoded = codec.decode(coded, inRel)
-    println(decoded)
-
-
-    println(codec.code("abacabad"))
-    println("01001100100111")
-    assert(codec.code("abacabad") == "01001100100111")
-    assert(
-      codec.decode(
-        "01001100100111",
-        Map('a' -> "0", 'b' -> "10", 'c' -> "110", 'd' -> "111")
-      ) == "abacabad"
-    )
-
-    println(codec.code("a"))
+//    val in = "beep boop beer!"
+//    val coded = codec.code(in)
+//    val inRel = codec.dictionary.calculateRelationsInput(in.toCharArray.toList)
+//    println(s"${inRel.size} ${coded.toCharArray.length}")
+//    println(inRel.toList.map(t => s"${t._1}: ${t._2}").mkString("", "\n", ""))
+//    println(coded)
+//
+//    val decoded = codec.decode(coded, inRel)
+//    println(decoded)
+//
+//
+//    println(codec.code("abacabad"))
+//    println("01001100100111")
+//    assert(codec.code("abacabad") == "01001100100111")
+//    assert(
+//      codec.decode(
+//        "01001100100111",
+//        Map('a' -> "0", 'b' -> "10", 'c' -> "110", 'd' -> "111")
+//      ) == "abacabad"
+//    )
+//
+//    println(codec.code("a"))
 
     val accepted = "accepted"
     println(codec.code(accepted))
