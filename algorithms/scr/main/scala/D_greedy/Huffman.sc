@@ -1,4 +1,3 @@
-import scala.collection.mutable
 import scala.collection.mutable.ListBuffer
 
 /**
@@ -11,9 +10,6 @@ import scala.collection.mutable.ListBuffer
  * В последней строке выведите закодированную строку.
  */
 object Main {
-  type E           = Either[Char, Tree[Char]]
-  type HeapElement = (E, Int)
-
   trait Dictionary[I, O, IS, OS] {
     def splitInput:              I            => List[IS]
     def splitOutput:             (O, Set[OS]) => List[OS]
@@ -37,57 +33,6 @@ object Main {
       val inSeq           = outSplitted.map(relationsOutput)
       dictionary.combineInput(inSeq)
     }
-  }
-  trait Heap[T] {
-    def getMin: (T,Int)
-    def add(t: T, priority: Int): Unit
-    def size: Int
-  }
-  object Heap {
-    def frequency(chars: List[Char]): Map[E, Int] = {
-      val (m, (c, freq)) =
-        chars.sorted.foldLeft((Map.empty[E, Int], ('a', 0))) {
-          case ((m, (accChar, freq)), c) =>
-            accChar match {
-              case a if a == c =>
-                (m, (accChar, freq + 1))
-              case aa if aa != c =>
-                val mm = if (freq == 0) m else m.+((Left(accChar), freq))
-                (mm, (c, 1))
-            }
-        }
-      val mapFreq = m.+((Left(c), freq))
-      val result = chars.distinct.map(c => {
-        val e: E = Left(c)
-        (e, mapFreq(e))
-      })
-      result.toMap
-    }
-    def treesChars(heap: Heap[E]): Heap[E] =
-      if (heap.size >= 2) {
-        val (e1, i1) = heap.getMin
-        val (e2, i2) = heap.getMin
-        (e1, e2) match {
-          case (c1: Left[Char, Tree[Char]], c2: Left[Char, Tree[Char]]) =>
-            val node = Tree.create((c1.value, i1), (c2.value, i2))
-            heap.add(Right(node), node.priority)
-            treesChars(heap)
-          case (c1: Left[Char, Tree[Char]], t2: Right[Char, Tree[Char]]) =>
-            val node = Tree.add(c1.value, i1, t2.value)
-            heap.add(Right(node), node.priority)
-            treesChars(heap)
-          case (t1: Right[Char, Tree[Char]], c2: Left[Char, Tree[Char]]) =>
-            val node = Tree.add(c2.value, i2, t1.value)
-            heap.add(Right(node), node.priority)
-            treesChars(heap)
-          case (t1: Right[Char, Tree[Char]], t2: Right[Char, Tree[Char]]) =>
-            val node = Tree.merge(t1.value, t2.value)
-            heap.add(Right(node), node.priority)
-            treesChars(heap)
-        }
-      } else {
-        heap
-      }
   }
   trait Tree[T] {
     def priority: Int
@@ -163,23 +108,76 @@ object Main {
          $acc)
          """
     }
-  }
+    type E           = Either[Char, Tree[Char]]
+    def treesChars(
+                    charsWithFrequencies: List[(Char, Int)],
+                    trees:   ListBuffer[Tree[Char]] = ListBuffer.empty[Tree[Char]]
+                  ): ListBuffer[Tree[Char]] = {
+      def resolve(
+                   ch:         List[(Char, Int)],
+                   trs:         ListBuffer[Tree[Char]],
+                   charsPriority: Boolean = true
+                 ) = (ch.headOption, trs.headOption) match {
+        case (None, None) =>
+          sys.error("Both chars and trees is empty")
+        case (None, Some(tree)) =>
+          (Right(tree) -> tree.priority, ch, trs.tail)
+        case (Some((c, i)), None) =>
+          (Left(c) -> i, ch.tail, trs)
+        case (Some((c, i)), Some(tree)) =>
+          if (i < tree.priority || (i == tree.priority && charsPriority)) {
+            (Left(c) -> i, ch.tail, trs)
+          } else {
+            (Right(tree) -> tree.priority, ch, trs.tail)
+          }
+      }
 
-  case class PriorityQueueHeap(chars: List[Char]) extends Heap[E] {
-    type Queue = mutable.PriorityQueue[HeapElement]
-    implicit val ord: Ordering[HeapElement] =
-      (x: HeapElement, y: HeapElement) => -Ordering.Int.compare(x._2, y._2)
+      val ((e1: E, i1: Int), chars1, acc1) = resolve(charsWithFrequencies, trees)
+      val ((e2: E, i2: Int), chars2, acc2) =
+        resolve(chars1, acc1, charsPriority = false)
 
-    val underlying: Queue       = mutable.PriorityQueue.empty[HeapElement].++(Heap.frequency(chars))
+      val node = (e1, e2) match {
+        case (c1: Left[Char, Tree[Char]], c2: Left[Char, Tree[Char]]) =>
+          Tree.create((c1.value, i1), (c2.value, i2))
+        case (c1: Left[Char, Tree[Char]], t2: Right[Char, Tree[Char]]) =>
+          Tree.add(c1.value, i1, t2.value)
+        case (t1: Right[Char, Tree[Char]], c2: Left[Char, Tree[Char]]) =>
+          Tree.add(c2.value, i2, t1.value)
+        case (t1: Right[Char, Tree[Char]], t2: Right[Char, Tree[Char]]) =>
+          Tree.merge(t1.value, t2.value)
+      }
 
-    override def getMin: (E, Int) = underlying.dequeue()
-    override def add(e: E, priority: Int): Unit =
-      underlying.enqueue((e, priority))
-    override def size: Int = underlying.size
+      if (acc2.isEmpty && chars2.isEmpty) {
+        ListBuffer(node)
+      } else {
+        acc2.append(node)
+        treesChars(chars2, acc2)
+      }
+    }
   }
 
   case class HuffmanDictionary()
     extends Dictionary[String, String, Char, String] {
+    def frequency(chars: List[Char]): List[(Char, Int)] = {
+      val (m, (c, freq)) =
+        chars.sorted.foldLeft((Map.empty[Char, Int], ('a', 0))) {
+          case ((m, (accChar, freq)), c) =>
+            accChar match {
+              case a if a == c =>
+                (m, (accChar, freq + 1))
+              case aa if aa != c =>
+                val mm = if (freq == 0) m else m.+((accChar, freq))
+                (mm, (c, 1))
+            }
+        }
+      val mapFreq = m.+((c, freq))
+      val result = chars.distinct
+        .map(c => {
+          (c, mapFreq(c))
+        })
+        .sortBy(_._2)
+      result
+    }
     override def splitInput: String => List[Char] = _.toCharArray.toList
 
     override def splitOutput: (String, Set[String]) => List[String] =
@@ -207,11 +205,13 @@ object Main {
 
     override def calculateRelationsInput: List[Char] => Map[Char, String] =
       chars => {
-        val heap = PriorityQueueHeap(chars)
-
-        if (heap.size == 1) Map(chars.head -> "0") else {
+        if (chars.size == 1) Map(chars.head -> "0")
+        else {
           val tree: Tree[Char] =
-            Heap.treesChars(heap).getMin._1.getOrElse(sys.error("queue is empty"))
+            Tree
+              .treesChars(frequency(chars))
+              .headOption
+              .getOrElse(sys.error("queue is empty"))
 
           Tree.treeCodes(tree)
         }
@@ -253,16 +253,21 @@ object Main {
 //    println(codec.code("a"))
 
     val accepted = "accepted"
+    println("11110100011001100010")
     println(codec.code(accepted))
-    println(Map(
-      'p' -> "110",
-      'a' -> "111",
-      'c' -> "10",
-      't' -> "011",
-      'd' -> "010",
-      'e' -> "00"
-    ))
-    println(codec.dictionary.calculateRelationsInput(accepted.toCharArray.toList))
+    println(
+      Map(
+        'p' -> "110",
+        'a' -> "111",
+        'c' -> "10",
+        't' -> "011",
+        'd' -> "010",
+        'e' -> "00"
+      )
+    )
+    println(
+      codec.dictionary.calculateRelationsInput(accepted.toCharArray.toList)
+    )
     assert(codec.code(accepted) == "11110100011001100010")
   }
 }
