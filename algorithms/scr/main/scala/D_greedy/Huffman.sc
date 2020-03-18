@@ -50,7 +50,7 @@ object Main {
       Leaf(value._1, value._2)
     def create[T](value1: (T, Int), value2: (T, Int)): Tree[T] = {
       val ((t1, p1), (t2, p2)) =
-        if (value1._2 <= value2._2) (value1, value2) else (value2, value1)
+        if (value1._2 < value2._2) (value1, value2) else (value2, value1)
       Node(
         Leaf(t1, p1),
         Leaf(t2, p2),
@@ -74,7 +74,7 @@ object Main {
 
     def merge[T](tree1: Tree[T], tree2: Tree[T]): Tree[T] = {
       val (t1, t2) =
-        if (tree1.priority <= tree2.priority) tree1 -> tree2 else tree2 -> tree1
+        if (tree1.priority < tree2.priority) tree1 -> tree2 else tree2 -> tree1
 
       Node(
         t1,
