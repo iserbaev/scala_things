@@ -205,11 +205,12 @@ object Main {
 
     override def calculateRelationsInput: List[Char] => Map[Char, String] =
       chars => {
-        if (chars.size == 1) Map(chars.head -> "0")
+        val charsWithFrequency = frequency(chars)
+        if (charsWithFrequency.size == 1) Map(charsWithFrequency.head._1 -> "0")
         else {
           val tree: Tree[Char] =
             Tree
-              .treesChars(frequency(chars))
+              .treesChars(charsWithFrequency)
               .headOption
               .getOrElse(sys.error("queue is empty"))
 
@@ -226,35 +227,36 @@ object Main {
       HuffmanDictionary()
   }
 
-  def main(args: Array[String]): Unit = {
+  def test(): Unit = {
     val codec = HuffmanCodec()
 
-//    val in = "beep boop beer!"
-//    val coded = codec.code(in)
-//    val inRel = codec.dictionary.calculateRelationsInput(in.toCharArray.toList)
-//    println(s"${inRel.size} ${coded.toCharArray.length}")
-//    println(inRel.toList.map(t => s"${t._1}: ${t._2}").mkString("", "\n", ""))
-//    println(coded)
-//
-//    val decoded = codec.decode(coded, inRel)
-//    println(decoded)
-//
-//
-//    println(codec.code("abacabad"))
-//    println("01001100100111")
-//    assert(codec.code("abacabad") == "01001100100111")
-//    assert(
-//      codec.decode(
-//        "01001100100111",
-//        Map('a' -> "0", 'b' -> "10", 'c' -> "110", 'd' -> "111")
-//      ) == "abacabad"
-//    )
-//
-//    println(codec.code("a"))
+    println("____________________________________")
+    val in = "beep boop beer!"
+    val coded = codec.code(in)
+    val inRel = codec.dictionary.calculateRelationsInput(in.toCharArray.toList)
+    println(s"${inRel.size} ${coded.toCharArray.length}")
+    println(inRel.toList.map(t => s"${t._1}: ${t._2}").mkString("", "\n", ""))
+    println(coded)
+    println(codec.decode(coded, inRel))
+    println("____________________________________")
 
+    println("____________________________________")
+    val aCoded = codec.code("a")
+    println(aCoded)
+    assert(aCoded == "0", "a coded incorrect")
+    println("____________________________________")
+
+    println("____________________________________")
+    val aaCoded = codec.code("aa")
+    println(aaCoded)
+    assert(aaCoded == "00", "aa coded incorrect")
+    println("____________________________________")
+
+    println("____________________________________")
     val accepted = "accepted"
     println("11110100011001100010")
-    println(codec.code(accepted))
+    val acceptedCode = codec.code(accepted)
+    println(acceptedCode)
     println(
       Map(
         'p' -> "110",
@@ -268,8 +270,19 @@ object Main {
     println(
       codec.dictionary.calculateRelationsInput(accepted.toCharArray.toList)
     )
-    assert(codec.code(accepted) == "11110100011001100010")
+    assert(acceptedCode == "11110100011001100010")
+    println("____________________________________")
+  }
+
+  def main(args: Array[String]): Unit = {
+    val codec = HuffmanCodec()
+    val in = scala.io.StdIn.readLine()
+    val coded = codec.code(in)
+    val inRel = codec.dictionary.calculateRelationsInput(in.toCharArray.toList)
+    println(s"${inRel.size} ${coded.toCharArray.length}")
+    println(inRel.toList.map(t => s"${t._1}: ${t._2}").mkString("", "\n", ""))
+    println(coded)
   }
 }
 
-Main.main(Array())
+Main.test()
