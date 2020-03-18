@@ -283,6 +283,22 @@ object Main {
     println(inRel.toList.map(t => s"${t._1}: ${t._2}").mkString("", "\n", ""))
     println(coded)
   }
+  def main2(args: Array[String]): Unit = {
+    val codec = HuffmanCodec()
+    val (k,l) = {
+      val arr = scala.io.StdIn.readLine().split(" ").map(_.toInt)
+      arr.head -> arr.last
+    }
+    val inRel = {
+      (1 to k).map(_ => {
+        val arr = scala.io.StdIn.readLine().split(": ")
+        arr.head.toCharArray.head -> arr.last
+      })
+    }.toMap
+    val coded = scala.io.StdIn.readLine()
+    val decoded = codec.decode(coded, inRel)
+    println(decoded)
+  }
 }
 
 Main.test()

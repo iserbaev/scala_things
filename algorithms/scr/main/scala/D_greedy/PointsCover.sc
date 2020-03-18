@@ -51,7 +51,7 @@ object Main {
           points.size -> points.toSeq
       }
   def main(args: Array[String]): Unit = {
-    val n = StdIn.readInt()
+    val n = scala.io.StdIn.readInt()
     val lrs = (1 to n).map { _ =>
       val arr = StdIn.readLine().split(" ").map(_.toLong)
       arr.head -> arr.last
