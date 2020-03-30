@@ -54,5 +54,16 @@ object Main {
     assert(sortWithInversion(Array(9, 5, 8, 9, 4, 10)) == 6)
     assert(sortWithInversion(Array(5, 7, 0, 2, 2, 0)) == 10)
   }
+
+  def testTime(): Unit = {
+    val arr = scala.util.Random.shuffle((1 to 100000).toList).toArray
+    val before = System.currentTimeMillis()
+    sortWithInversion(arr)
+    val after = System.currentTimeMillis()
+    val diff = after - before
+    println(diff)
+    assert(diff < 3000)
+  }
 }
 Main.test()
+Main.testTime()
