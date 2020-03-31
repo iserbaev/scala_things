@@ -17,12 +17,12 @@ object Main {
         acc ++ r ++ l
       case (_, _) =>
         if (l(0) <= r(0)) {
-          val (h,t) = l.splitAt(0 + 1)
+          val (h,t) = l.splitAt(1)
           sortAndMerge(t, r, acc += h(0))
         } else {
           val old = counter.get()
           counter.set(old + l.length)
-          val (h,t) = r.splitAt(0 + 1)
+          val (h,t) = r.splitAt(1)
           sortAndMerge(l, t, acc += h(0))
         }
     }
