@@ -13,17 +13,21 @@ object Main {
         sortAndMerge(splitSortAndMerge(left),splitSortAndMerge(right)).toArray
     }
     def sortAndMerge(l: Array[Int], r: Array[Int], acc: ListBuffer[Int] = ListBuffer.empty): ListBuffer[Int] = (l,r) match {
-      case (nl,nr) if (nl.isEmpty || nr.isEmpty)=>
-        acc ++ r ++ l
+      case (nl,nr) if nl.isEmpty =>
+        acc ++= nr
+      case (nl,nr) if nr.isEmpty =>
+        acc ++= nl
       case (_, _) =>
-        if (l(0) <= r(0)) {
-          val (h,t) = l.splitAt(1)
-          sortAndMerge(t, r, acc += h(0))
+        val lh = l(0)
+        val rh = r(0)
+        if (lh <= rh) {
+          val t = l.drop(1)
+          sortAndMerge(t, r, acc += lh)
         } else {
           val old = counter.get()
           counter.set(old + l.length)
-          val (h,t) = r.splitAt(1)
-          sortAndMerge(l, t, acc += h(0))
+          val t = r.drop(1)
+          sortAndMerge(l, t, acc += rh)
         }
     }
 
@@ -40,36 +44,38 @@ object Main {
 
     println(if (n < 2) 0 else result)
   }
-  def test(): Unit = {
-    assert(sortWithInversion(Array(2,3,9,2,9)) == 2)
-    assert(sortWithInversion(Array(7,6,5,4,3,2,1)) == 21)
-    assert(sortWithInversion(Array(1,2,3,5,4)) == 1)
-    assert(sortWithInversion(Array(10, 8, 6, 2, 4, 5)) == 12)
-    assert(sortWithInversion(Array(1, 9, 8, 1, 4, 1)) == 8)
-    assert(sortWithInversion(Array(6, 5, 8, 6, 0, 4)) == 10)
-    assert(sortWithInversion(Array(6, 2, 3, 7, 5, 8)) == 4)
-    assert(sortWithInversion(Array(6, 4, 5, 0, 0, 2)) == 11)
-    assert(sortWithInversion(Array(8, 9, 10, 7, 4, 0)) == 12)
-    assert(sortWithInversion(Array(10, 9, 3, 8, 3, 10)) == 8)
-    assert(sortWithInversion(Array(9, 10, 9, 5, 7, 7)) == 10)
-    assert(sortWithInversion(Array(9, 5, 8, 9, 4, 10)) == 6)
-    assert(sortWithInversion(Array(5, 7, 0, 2, 2, 0)) == 10)
-  }
-
-  def testTime(n: Int = 100000): Long = {
-    val arr = scala.util.Random.shuffle((1 to n).toList).toArray
-    val before = System.currentTimeMillis()
-    sortWithInversion(arr)
-    val after = System.currentTimeMillis()
-    val diff = after - before
-    println(diff)
-    assert(diff < 3000, s"$diff > 3000")
-    diff
-  }
 }
-Main.test()
-Main.testTime(1000)
-Main.testTime(10000)
-Main.testTime(20000)
-Main.testTime(40000)
-Main.testTime(100000)
+
+import Main.sortWithInversion
+def test(): Unit = {
+  assert(sortWithInversion(Array(2,3,9,2,9)) == 2)
+  assert(sortWithInversion(Array(7,6,5,4,3,2,1)) == 21)
+  assert(sortWithInversion(Array(1,2,3,5,4)) == 1)
+  assert(sortWithInversion(Array(10, 8, 6, 2, 4, 5)) == 12)
+  assert(sortWithInversion(Array(1, 9, 8, 1, 4, 1)) == 8)
+  assert(sortWithInversion(Array(6, 5, 8, 6, 0, 4)) == 10)
+  assert(sortWithInversion(Array(6, 2, 3, 7, 5, 8)) == 4)
+  assert(sortWithInversion(Array(6, 4, 5, 0, 0, 2)) == 11)
+  assert(sortWithInversion(Array(8, 9, 10, 7, 4, 0)) == 12)
+  assert(sortWithInversion(Array(10, 9, 3, 8, 3, 10)) == 8)
+  assert(sortWithInversion(Array(9, 10, 9, 5, 7, 7)) == 10)
+  assert(sortWithInversion(Array(9, 5, 8, 9, 4, 10)) == 6)
+  assert(sortWithInversion(Array(5, 7, 0, 2, 2, 0)) == 10)
+}
+
+def testTime(n: Int = 100000): Long = {
+  val arr = scala.util.Random.shuffle((1 to n).toList).toArray
+  val before = System.currentTimeMillis()
+  sortWithInversion(arr)
+  val after = System.currentTimeMillis()
+  val diff = after - before
+  println(diff)
+  assert(diff < 3000, s"$diff > 3000")
+  diff
+}
+test()
+testTime(1000)
+testTime(10000)
+testTime(20000)
+testTime(40000)
+testTime(100000)
