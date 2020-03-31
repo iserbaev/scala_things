@@ -5,32 +5,30 @@ import scala.collection.mutable.ListBuffer
 object Main {
   def sortWithInversion(array: Array[Int]): Long = {
     val counter = new AtomicLong(0L)
-    def splitSortAndMerge(l: List[Int]): List[Int] = l match {
-      case Nil =>
-        l
-      case List(one) =>
+    def splitSortAndMerge(l: Array[Int]): Array[Int] = l match {
+      case nil if nil.length < 2 =>
         l
       case _ =>
-        val (left,right) = l.splitAt(l.size / 2)
-        sortAndMerge(splitSortAndMerge(left),splitSortAndMerge(right))
+        val (left,right) = l.splitAt(l.length / 2)
+        sortAndMerge(splitSortAndMerge(left),splitSortAndMerge(right)).toArray
     }
-    def sortAndMerge(l: List[Int], r: List[Int], acc: ListBuffer[Int] = ListBuffer.empty): List[Int] = (l,r) match {
-      case (Nil,_) =>
-        acc.toList ++ r
-      case (_,Nil) =>
-        acc.toList ++ l
-      case (lh :: lt, rh :: rt) =>
-        if (lh <= rh) {
-          sortAndMerge(lt, r, acc += lh)
+    def sortAndMerge(l: Array[Int], r: Array[Int], acc: ListBuffer[Int] = ListBuffer.empty): ListBuffer[Int] = (l,r) match {
+      case (nl,nr) if (nl.isEmpty || nr.isEmpty)=>
+        acc ++ r ++ l
+      case (_, _) =>
+        if (l(0) <= r(0)) {
+          val (h,t) = l.splitAt(0 + 1)
+          sortAndMerge(t, r, acc += h(0))
         } else {
           val old = counter.get()
-          counter.set(old + l.size)
-          sortAndMerge(l, rt, acc += rh)
+          counter.set(old + l.length)
+          val (h,t) = r.splitAt(0 + 1)
+          sortAndMerge(l, t, acc += h(0))
         }
     }
 
-    val l = array.toList
-    println(splitSortAndMerge(l))
+    val l = array
+    splitSortAndMerge(l)
     counter.get()
   }
 
