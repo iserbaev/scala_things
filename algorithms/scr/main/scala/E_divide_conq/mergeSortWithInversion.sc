@@ -1,34 +1,37 @@
+import java.util.concurrent.atomic.AtomicLong
+
+import scala.collection.mutable.ListBuffer
 
 object Main {
-  def sortWithInversion(array: Array[Int]): Int = {
-    def splitSortAndMerge(l: List[Int], acc: Int): (List[Int],Int) = l match {
+  def sortWithInversion(array: Array[Int]): Long = {
+    val counter = new AtomicLong(0L)
+    def splitSortAndMerge(l: List[Int]): List[Int] = l match {
       case Nil =>
-        l -> acc
+        l
       case List(one) =>
-        l -> acc
+        l
       case _ =>
         val (left,right) = l.splitAt(l.size / 2)
-        val (ls,lacc) = splitSortAndMerge(left,acc)
-        val (rs,racc) = splitSortAndMerge(right,acc)
-        sortAndMerge(ls,rs,lacc + racc)
+        sortAndMerge(splitSortAndMerge(left),splitSortAndMerge(right))
     }
-    def sortAndMerge(l: List[Int], r: List[Int], acc: Int): (List[Int],Int) = (l,r) match {
+    def sortAndMerge(l: List[Int], r: List[Int], acc: ListBuffer[Int] = ListBuffer.empty): List[Int] = (l,r) match {
       case (Nil,_) =>
-        r -> acc
+        acc.toList ++ r
       case (_,Nil) =>
-        l -> acc
+        acc.toList ++ l
       case (lh :: lt, rh :: rt) =>
         if (lh <= rh) {
-          val (res,resAcc) = sortAndMerge(lt, r, acc)
-          (lh :: res, resAcc)
+          sortAndMerge(lt, r, acc += lh)
         } else {
-          val (res,resAcc) = sortAndMerge(l, rt, acc + l.size)
-          (rh :: res, resAcc)
+          val old = counter.get()
+          counter.set(old + l.size)
+          sortAndMerge(l, rt, acc += rh)
         }
     }
 
     val l = array.toList
-    splitSortAndMerge(l, 0)._2
+    println(splitSortAndMerge(l))
+    counter.get()
   }
 
   def main(args: Array[String]): Unit = {
@@ -55,15 +58,20 @@ object Main {
     assert(sortWithInversion(Array(5, 7, 0, 2, 2, 0)) == 10)
   }
 
-  def testTime(): Unit = {
-    val arr = scala.util.Random.shuffle((1 to 100000).toList).toArray
+  def testTime(n: Int = 100000): Long = {
+    val arr = scala.util.Random.shuffle((1 to n).toList).toArray
     val before = System.currentTimeMillis()
     sortWithInversion(arr)
     val after = System.currentTimeMillis()
     val diff = after - before
     println(diff)
-    assert(diff < 3000)
+    assert(diff < 3000, s"$diff > 3000")
+    diff
   }
 }
 Main.test()
-Main.testTime()
+Main.testTime(1000)
+Main.testTime(10000)
+Main.testTime(20000)
+Main.testTime(40000)
+Main.testTime(100000)
