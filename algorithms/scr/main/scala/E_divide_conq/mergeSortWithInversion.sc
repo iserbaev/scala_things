@@ -1,39 +1,47 @@
-import java.util.concurrent.atomic.AtomicLong
-
-import scala.collection.mutable.ListBuffer
 
 object Main {
+  // https://stackoverflow.com/questions/10321252/mergesort-in-scala
+  type Count = Long
   def sortWithInversion(array: Array[Int]): Long = {
-    val counter = new AtomicLong(0L)
-    def splitSortAndMerge(l: Array[Int]): Array[Int] = l match {
-      case nil if nil.length < 2 =>
-        l
-      case _ =>
-        val (left,right) = l.splitAt(l.length / 2)
-        sortAndMerge(splitSortAndMerge(left),splitSortAndMerge(right)).toArray
-    }
-    def sortAndMerge(l: Array[Int], r: Array[Int], acc: ListBuffer[Int] = ListBuffer.empty): ListBuffer[Int] = (l,r) match {
-      case (nl,nr) if nl.isEmpty =>
-        acc ++= nr
-      case (nl,nr) if nr.isEmpty =>
-        acc ++= nl
-      case (_, _) =>
-        val lh = l(0)
-        val rh = r(0)
-        if (lh <= rh) {
-          val t = l.drop(1)
-          sortAndMerge(t, r, acc += lh)
+    def countSwaps(a: Array[Int]): Count = {
+      def mergeRun(li: Int, lend: Int, rb: Int, ri: Int, rend: Int, di: Int, src: Array[Int], dst: Array[Int], swaps: Count): Count = {
+        if (ri >= rend && li >= lend) {
+          swaps
+        } else if (ri >= rend) {
+          dst(di) = src(li)
+          mergeRun(li + 1, lend, rb, ri, rend, di + 1, src, dst, ri - rb + swaps)
+        } else if (li >= lend) {
+          dst(di) = src(ri)
+          mergeRun(li, lend, rb, ri + 1, rend, di + 1, src, dst, swaps)
+        } else if (src(li) <= src(ri)) {
+          dst(di) = src(li)
+          mergeRun(li + 1, lend, rb, ri, rend, di + 1, src, dst, ri - rb + swaps)
         } else {
-          val old = counter.get()
-          counter.set(old + l.length)
-          val t = r.drop(1)
-          sortAndMerge(l, t, acc += rh)
+          dst(di) = src(ri)
+          mergeRun(li, lend, rb, ri + 1, rend, di + 1, src, dst, swaps)
         }
-    }
+      }
 
-    val l = array
-    splitSortAndMerge(l)
-    counter.get()
+      val b = new Array[Int](a.length)
+
+      def merge(run: Int, run_len: Int, lb: Int, swaps: Count): Count = {
+        if (run_len >= a.length) {
+          swaps
+        } else if (lb >= a.length) {
+          merge(run + 1, run_len * 2, 0, swaps)
+        } else {
+          val lend = math.min(lb + run_len, a.length)
+          val rb = lb + run_len
+          val rend = math.min(rb + run_len, a.length)
+          val (src, dst) = if (run % 2 == 0) (a, b) else (b, a)
+          val inc_swaps = mergeRun(lb, lend, rb, rb, rend, lb, src, dst, 0)
+          merge(run, run_len, lb + run_len * 2, inc_swaps + swaps)
+        }
+      }
+
+      merge(0, 1, 0, 0)
+    }
+    countSwaps(array)
   }
 
   def main(args: Array[String]): Unit = {
@@ -79,3 +87,4 @@ testTime(10000)
 testTime(20000)
 testTime(40000)
 testTime(100000)
+testTime(200000)
