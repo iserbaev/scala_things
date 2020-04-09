@@ -14,13 +14,13 @@ import scala.collection.Searching._
  */
 object Main {
   def solve(segmentCount: Int, pointCount: Int, segments: Array[(Int,Int)], points: Array[Int]): Unit = {
-    val sortedLeft = segments.clone()
-    Sorting.quickSort(sortedLeft)(Ordering.by(_._1))
-    val sortedRight = segments.clone()
-    Sorting.quickSort(sortedRight)(Ordering.by(_._2))
+    val sortedLeft = segments.clone().map(_._1)
+    Sorting.quickSort(sortedLeft)
+    val sortedRight = segments.clone().map(_._2)
+    Sorting.quickSort(sortedRight)
 
-    def leftCount(point: Int) = sortedLeft.lastIndexWhere{case (left,right) => left <= point}
-    def rightCount(point: Int) = sortedRight.lastIndexWhere{case (left,right) => right < point}
+    def leftCount(point: Int) = sortedLeft.lastIndexWhere{_ <= point} // TODO binary
+    def rightCount(point: Int) = sortedRight.lastIndexWhere{_ < point} // TODO binary
 
     def resultCount(point: Int) = leftCount(point) - rightCount(point)
 
