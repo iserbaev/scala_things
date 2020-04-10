@@ -13,14 +13,35 @@ import scala.collection.Searching._
  * В любом другом случае точка лежит на данном отрезке
  */
 object Main {
+  def bsPredicate(num: Int, pred: Int => Boolean, lastOccurence: Boolean = false, prevIndex: Option[Int] = None, array: Array[Int],l: Int, r: Int): Int = {
+    val index = (l + r) / 2
+    if (l > r || r < l) {
+      prevIndex.getOrElse(-1)
+    } else {
+      val am = array(index)
+      if (pred(am)) {
+        if (lastOccurence) {
+          bsPredicate(num, pred, lastOccurence, Option(index), array, index + 1, r)
+        } else {
+          index
+        }
+      } else if (am > num) {
+        bsPredicate(num, pred, lastOccurence, prevIndex, array, l, index - 1)
+      } else {
+        bsPredicate(num, pred, lastOccurence, prevIndex, array, index + 1, r)
+      }
+    }
+  }
   def solve(segmentCount: Int, pointCount: Int, segments: Array[(Int,Int)], points: Array[Int]): Unit = {
     val sortedLeft = segments.clone().map(_._1)
     Sorting.quickSort(sortedLeft)
     val sortedRight = segments.clone().map(_._2)
     Sorting.quickSort(sortedRight)
 
-    def leftCount(point: Int) = sortedLeft.lastIndexWhere{_ <= point} // TODO binary
-    def rightCount(point: Int) = sortedRight.lastIndexWhere{_ < point} // TODO binary
+    def leftCount(point: Int) =
+      bsPredicate(point, _ <= point, true, None, sortedLeft,0,sortedLeft.length - 1)
+    def rightCount(point: Int) =
+      bsPredicate(point, _ < point, true, None, sortedRight,0,sortedRight.length - 1)
 
     def resultCount(point: Int) = leftCount(point) - rightCount(point)
 
@@ -41,6 +62,7 @@ object Main {
   }
   def test(): Unit = {
     solve(2,3,Array((0,5),(7,10)),Array(1,6,11))
+    solve(2,2,Array((1,2),(2,2)),Array(1,2))
   }
 }
 Main.test()
