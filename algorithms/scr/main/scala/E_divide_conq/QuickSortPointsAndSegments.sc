@@ -14,21 +14,26 @@ import scala.collection.Searching._
  */
 object Main {
   def bsPredicate(num: Int, pred: Int => Boolean, lastOccurence: Boolean = false, prevIndex: Option[Int] = None, array: Array[Int],l: Int, r: Int): Int = {
+    println(s"check: l=$l, r=$r,num=$num, array=${array.mkString(" ")}")
     val index = (l + r) / 2
-    if (l > r || r < l) {
-      prevIndex.getOrElse(-1)
+    println(s"index $index")
+    if (l > r) {
+      prevIndex.map(_ + 1).getOrElse(0)
     } else {
       val am = array(index)
-      if (pred(am)) {
-        if (lastOccurence) {
-          bsPredicate(num, pred, lastOccurence, Option(index), array, index + 1, r)
+      println(s"am=$am")
+      if (am <= num) {
+        if (pred(am)) {
+          if (lastOccurence) {
+            bsPredicate(num, pred, lastOccurence, Option(index), array, index + 1, r)
+          } else {
+            index + 1
+          }
         } else {
-          index
+          bsPredicate(num, pred, lastOccurence, prevIndex, array, index + 1, r)
         }
-      } else if (am > num) {
-        bsPredicate(num, pred, lastOccurence, prevIndex, array, l, index - 1)
       } else {
-        bsPredicate(num, pred, lastOccurence, prevIndex, array, index + 1, r)
+        bsPredicate(num, pred, lastOccurence, prevIndex, array, l, index - 1)
       }
     }
   }
@@ -38,12 +43,21 @@ object Main {
     val sortedRight = segments.clone().map(_._2)
     Sorting.quickSort(sortedRight)
 
+    println(sortedLeft.mkString(","))
+    println(sortedRight.mkString(","))
+
     def leftCount(point: Int) =
       bsPredicate(point, _ <= point, true, None, sortedLeft,0,sortedLeft.length - 1)
     def rightCount(point: Int) =
       bsPredicate(point, _ < point, true, None, sortedRight,0,sortedRight.length - 1)
 
-    def resultCount(point: Int) = leftCount(point) - rightCount(point)
+    def resultCount(point: Int) = {
+      val l = leftCount(point)
+      val r = rightCount(point)
+      println(s"point = $point, leftCount = $l")
+      println(s"point = $point, rightCount = $r")
+      l - r
+    }
 
     println(points.map(resultCount).mkString(" "))
   }
@@ -61,8 +75,26 @@ object Main {
     solve(segmentCount, pointCount, segments, points)
   }
   def test(): Unit = {
+    // 1 0 0
     solve(2,3,Array((0,5),(7,10)),Array(1,6,11))
+
+    // 1 2
     solve(2,2,Array((1,2),(2,2)),Array(1,2))
+
+    /**
+     * 6 6
+     * 0 3
+     * 1 3
+     * 2 3
+     * 3 4
+     * 3 5
+     * 3 6
+     *
+     * 1 2 3 4 5 6
+     *
+     * Ответ 2 3 6 3 2 1
+     */
+    solve(6,6,Array((0,3),(1,3),(2,3),(3,4),(3,5),(3,6)),Array(1,2,3,4,5,6))
   }
 }
 Main.test()
