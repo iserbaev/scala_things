@@ -18,22 +18,16 @@ object Main {
     val am = array(index)
     val predResult = pred(am)
     val predInd = if (predResult) {Option(index)} else {prevIndex}
-    println(s"check: l=$l, r=$r,num=$num, array=${array.mkString(" ")}")
-    println(s"index $index, am=$am, predInd $predInd")
     if (l > r) {
-      val res = predInd.map(_ + 1).getOrElse(0)
-      println(s"return $res")
-      res
+      predInd.map(_ + 1).getOrElse(0)
     } else {
       if (am == num) {
         if (lastOccurence) {
-          println(s"lastOccurence")
           if (predResult) bsPredicate(num, pred, lastOccurence, predInd, array, index + 1, r) else {
             bsPredicate(num, pred, lastOccurence, predInd, array, l, index - 1)
           }
         } else {
-          println(s"return in lastOccurence ${index + 1}")
-          index + 1
+          bsPredicate(num, pred, lastOccurence, predInd, array, l, index - 1)
         }
       } else if (am > num) {
         bsPredicate(num, pred, lastOccurence, predInd, array, l, index - 1)
@@ -48,20 +42,13 @@ object Main {
     val sortedRight = segments.clone().map(_._2)
     Sorting.quickSort(sortedRight)
 
-    println(sortedLeft.mkString(","))
-    println(sortedRight.mkString(","))
-
     def leftCount(point: Int) =
       bsPredicate(point, _ <= point, true, None, sortedLeft,0,sortedLeft.length - 1)
     def rightCount(point: Int) =
       bsPredicate(point, _ < point, true, None, sortedRight,0,sortedRight.length - 1)
 
     def resultCount(point: Int) = {
-      val l = leftCount(point)
-      val r = rightCount(point)
-      println(s"point = $point, leftCount = $l")
-      println(s"point = $point, rightCount = $r")
-      l - r
+      leftCount(point) - rightCount(point)
     }
 
     println(points.map(resultCount).mkString(" "))
