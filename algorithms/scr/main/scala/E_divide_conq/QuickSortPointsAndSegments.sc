@@ -10,18 +10,28 @@ import scala.util.Sorting
  * В любом другом случае точка лежит на данном отрезке
  */
 object Main {
-  def bsPredicate(num: Int, pred: Int => Boolean, lastOccurence: Boolean = false, prevIndex: Option[Int] = None, array: Array[Int],l: Int, r: Int): Int = {
+  type Element = Int
+  type Index = Int
+  @scala.annotation.tailrec def binarySearchWithPredicate(
+      num: Element,
+      predicate: Element => Boolean,
+      lastOccurence: Boolean = false,
+      prevIndex: Option[Index] = None,
+      array: Array[Element],
+      l: Index,
+      r: Index
+  ): Index = {
     val index = (l + r) / 2
     val am = array(index)
-    val predResult = pred(am)
-    val predInd = if (predResult) {Option(index)} else {prevIndex}
+    val checkResult = predicate(am)
+    val checkedIndex = if (checkResult) {Option(index)} else {prevIndex}
     if (l > r) {
-      predInd.map(_ + 1).getOrElse(0)
+      checkedIndex.getOrElse(-1)
     } else {
-      if ((am == num && predResult && lastOccurence) || am < num) {
-        bsPredicate(num, pred, lastOccurence, predInd, array, index + 1, r)
+      if ((am == num && checkResult && lastOccurence) || am < num) {
+        binarySearchWithPredicate(num, predicate, lastOccurence, checkedIndex, array, index + 1, r)
       } else {
-        bsPredicate(num, pred, lastOccurence, predInd, array, l, index - 1)
+        binarySearchWithPredicate(num, predicate, lastOccurence, checkedIndex, array, l, index - 1)
       }
     }
   }
@@ -32,13 +42,11 @@ object Main {
     Sorting.quickSort(sortedRight)
 
     def leftCount(point: Int) =
-      bsPredicate(point, _ <= point, true, None, sortedLeft,0,sortedLeft.length - 1)
+      binarySearchWithPredicate(point, _ <= point, true, None, sortedLeft,0,sortedLeft.length - 1) + 1
     def rightCount(point: Int) =
-      bsPredicate(point, _ < point, true, None, sortedRight,0,sortedRight.length - 1)
-
-    def resultCount(point: Int) = {
+      binarySearchWithPredicate(point, _ < point, true, None, sortedRight,0,sortedRight.length - 1) + 1
+    def resultCount(point: Int) =
       leftCount(point) - rightCount(point)
-    }
 
     println(points.map(resultCount).mkString(" "))
   }

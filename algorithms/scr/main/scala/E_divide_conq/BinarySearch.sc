@@ -1,22 +1,28 @@
 import scala.math
 
 object Main {
-  def bsPredicate(num: Int, pred: Int => Boolean, lastOccurence: Boolean = false, prevIndex: Option[Int] = None, array: Array[Int],l: Int, r: Int): Int = {
+  type Element = Int
+  type Index = Int
+  @scala.annotation.tailrec def binarySearchWithPredicate(
+      num: Element,
+      predicate: Element => Boolean,
+      lastOccurence: Boolean = false,
+      prevIndex: Option[Index] = None,
+      array: Array[Element],
+      l: Index,
+      r: Index
+  ): Index = {
     val index = (l + r) / 2
-    if (l > r || r < l) {
-      prevIndex.getOrElse(-1)
+    val am = array(index)
+    val checkResult = predicate(am)
+    val checkedIndex = if (checkResult) {Option(index)} else {prevIndex}
+    if (l > r) {
+      checkedIndex.getOrElse(-1)
     } else {
-      val am = array(index)
-      if (pred(am)) {
-        if (lastOccurence) {
-          bsPredicate(num, pred, lastOccurence, Option(index), array, index + 1, r)
-        } else {
-          index
-        }
-      } else if (am > num) {
-        bsPredicate(num, pred, lastOccurence, prevIndex, array, l, index - 1)
+      if ((am == num && checkResult && lastOccurence) || am < num) {
+        binarySearchWithPredicate(num, predicate, lastOccurence, checkedIndex, array, index + 1, r)
       } else {
-        bsPredicate(num, pred, lastOccurence, prevIndex, array, index + 1, r)
+        binarySearchWithPredicate(num, predicate, lastOccurence, checkedIndex, array, l, index - 1)
       }
     }
   }
@@ -52,8 +58,8 @@ object Main {
   }
   def testPredicateSerach(): Unit = {
     val arr = Array(1,2,2,4,5,6,77,77,88)
-    println(bsPredicate(2, (i: Int) => i <= 2, lastOccurence = true,None, arr,0, arr.length - 1))
-    println(bsPredicate(77, (i: Int) => i <= 77, lastOccurence = true,None, arr,0, arr.length - 1))
+    println(binarySearchWithPredicate(2, (i: Int) => i <= 2, lastOccurence = true,None, arr,0, arr.length - 1))
+    println(binarySearchWithPredicate(77, (i: Int) => i <= 77, lastOccurence = true,None, arr,0, arr.length - 1))
   }
 }
 Main.test()
