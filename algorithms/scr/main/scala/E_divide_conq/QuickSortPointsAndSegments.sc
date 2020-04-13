@@ -1,7 +1,4 @@
-import scala.collection.Searching
-import scala.math
 import scala.util.Sorting
-import scala.collection.Searching._
 
 /**
  * Точка считается принадлежащей отрезку, если она находится внутри него или на границе.
@@ -21,18 +18,10 @@ object Main {
     if (l > r) {
       predInd.map(_ + 1).getOrElse(0)
     } else {
-      if (am == num) {
-        if (lastOccurence) {
-          if (predResult) bsPredicate(num, pred, lastOccurence, predInd, array, index + 1, r) else {
-            bsPredicate(num, pred, lastOccurence, predInd, array, l, index - 1)
-          }
-        } else {
-          bsPredicate(num, pred, lastOccurence, predInd, array, l, index - 1)
-        }
-      } else if (am > num) {
-        bsPredicate(num, pred, lastOccurence, predInd, array, l, index - 1)
-      } else {
+      if ((am == num && predResult && lastOccurence) || am < num) {
         bsPredicate(num, pred, lastOccurence, predInd, array, index + 1, r)
+      } else {
+        bsPredicate(num, pred, lastOccurence, predInd, array, l, index - 1)
       }
     }
   }
