@@ -14,26 +14,31 @@ import scala.collection.Searching._
  */
 object Main {
   def bsPredicate(num: Int, pred: Int => Boolean, lastOccurence: Boolean = false, prevIndex: Option[Int] = None, array: Array[Int],l: Int, r: Int): Int = {
-    println(s"check: l=$l, r=$r,num=$num, array=${array.mkString(" ")}")
     val index = (l + r) / 2
-    println(s"index $index")
+    val am = array(index)
+    val predResult = pred(am)
+    val predInd = if (predResult) {Option(index)} else {prevIndex}
+    println(s"check: l=$l, r=$r,num=$num, array=${array.mkString(" ")}")
+    println(s"index $index, am=$am, predInd $predInd")
     if (l > r) {
-      prevIndex.map(_ + 1).getOrElse(0)
+      val res = predInd.map(_ + 1).getOrElse(0)
+      println(s"return $res")
+      res
     } else {
-      val am = array(index)
-      println(s"am=$am")
-      if (am <= num) {
-        if (pred(am)) {
-          if (lastOccurence) {
-            bsPredicate(num, pred, lastOccurence, Option(index), array, index + 1, r)
-          } else {
-            index + 1
+      if (am == num) {
+        if (lastOccurence) {
+          println(s"lastOccurence")
+          if (predResult) bsPredicate(num, pred, lastOccurence, predInd, array, index + 1, r) else {
+            bsPredicate(num, pred, lastOccurence, predInd, array, l, index - 1)
           }
         } else {
-          bsPredicate(num, pred, lastOccurence, prevIndex, array, index + 1, r)
+          println(s"return in lastOccurence ${index + 1}")
+          index + 1
         }
+      } else if (am > num) {
+        bsPredicate(num, pred, lastOccurence, predInd, array, l, index - 1)
       } else {
-        bsPredicate(num, pred, lastOccurence, prevIndex, array, l, index - 1)
+        bsPredicate(num, pred, lastOccurence, predInd, array, index + 1, r)
       }
     }
   }
