@@ -17,15 +17,18 @@ def sort2(arr: Array[Int]): List[List[Int]] = {
     case ((acc, current),i) =>
       current.lastOption match {
         case Some(value) if i - value <= 2 =>
-          acc -> current.append(i)
+          current.append(i)
+          acc -> current
         case Some(_) =>
-          acc.append(current) -> ListBuffer(i)
+          acc.append(current)
+           acc -> ListBuffer(i)
         case None =>
-          acc -> current.append(i)
+          current.append(i)
+          acc -> current
       }
   }
-  val rr = res._1.appended(res._2)
-  rr.toList.map(_.toList)
+  res._1.append(res._2)
+  res._1.toList.map(_.toList)
 }
 
 
