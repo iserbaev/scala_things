@@ -59,7 +59,9 @@ object Main {
   def testPredicateSerach(): Unit = {
     val arr = Array(1,2,2,4,5,6,77,77,88)
     println(binarySearchWithPredicate(2, (i: Int) => i <= 2, lastOccurence = true,None, arr,0, arr.length - 1))
+    println(binarySearchWithPredicate(2, (i: Int) => i <= 2, lastOccurence = false,None, arr,0, arr.length - 1))
     println(binarySearchWithPredicate(77, (i: Int) => i <= 77, lastOccurence = true,None, arr,0, arr.length - 1))
+    println(binarySearchWithPredicate(77, (i: Int) => i <= 77, lastOccurence = false,None, arr,0, arr.length - 1))
   }
 }
 Main.test()
