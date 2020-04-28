@@ -2,44 +2,25 @@
 object Main {
   type Element = Int
   type Index   = Int
-  @scala.annotation.tailrec
-  def binarySearchWithPredicate(
-    predicate:     Element => Boolean,
-    lastOccurence: Boolean = false,
-    prevIndex:     Option[Index] = None,
-    array:         Array[Element],
-    l:             Index,
-    r:             Index
-  ): Index = {
-    val index       = (l + r) / 2
-    val am          = array(index)
-    val checkResult = predicate(am)
-    val checkedIndex = if (checkResult) {
-      Option(index)
+  type Count   = Int
+  def binarySearch[A](
+    num:               A,
+    array:             Array[A],
+    l:                 Index,
+    r:                 Index,
+    increased:         Boolean = true
+  )(implicit ordering: Ordering[A]): Index = {
+    val index = (l + r) / 2
+    if (l > r || r < l) {
+      -1
     } else {
-      prevIndex
-    }
-    if (l > r) {
-      checkedIndex.getOrElse(-1)
-    } else {
-      if ((checkResult && lastOccurence)) {
-        binarySearchWithPredicate(
-          predicate,
-          lastOccurence,
-          checkedIndex,
-          array,
-          index + 1,
-          r
-        )
+      val am = array(index)
+      if (ordering.equiv(am, num)) {
+        index
+      } else if (if (increased) ordering.gt(am, num) else ordering.lt(am, num)) {
+        binarySearch(num, array, l, index - 1)
       } else {
-        binarySearchWithPredicate(
-          predicate,
-          lastOccurence,
-          checkedIndex,
-          array,
-          l,
-          index - 1
-        )
+        binarySearch(num, array, index + 1, r)
       }
     }
   }
@@ -93,9 +74,18 @@ object Main {
       println(s"Result ${res.map(t).mkString(",")}")
     }
 
-    val (d,prev) = lisBottomUp2(15,Array(7, 2, 1, 3, 8, 4, 9, 1, 2, 6, 5, 9, 3, 8, 1))
-    assert(d sameElements Array(1, 1, 1, 2, 3, 3, 4, 1, 2, 4, 4, 5, 3, 5, 1))
-    assert(prev sameElements Array(-1,-1,-1,1,3,3,4,-1,2,5,5,9,8,9,-1))
+    val (d, prev) =
+      lisBottomUp2(15, Array(7, 2, 1, 3, 8, 4, 9, 1, 2, 6, 5, 9, 3, 8, 1))
+    assert(
+      d.sameElements(Array(1, 1, 1, 2, 3, 3, 4, 1, 2, 4, 4, 5, 3, 5, 1)),
+      s"d ! ${d.mkString(",")}"
+    )
+    assert(
+      prev.sameElements(
+        Array(-1, -1, -1, 1, 3, 3, 4, -1, 2, 5, 5, 9, 8, 9, -1)
+      ),
+      s"prev ! ${prev.mkString(",")}"
+    )
 
     testOne(
       Array(7, 2, 1, 3, 8, 4, 9, 1, 2, 6, 5, 9, 3, 8, 1),
