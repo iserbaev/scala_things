@@ -1,5 +1,3 @@
-import scala.math
-
 object Main {
   type Element = Int
   type Index = Int
@@ -26,18 +24,18 @@ object Main {
       }
     }
   }
-  def bs(num: Int, array: Array[Int],l: Int, r: Int): Int = {
+  def binarySearch[A](num: A, array: Array[A], l: Int, r: Int, increased: Boolean = true)(implicit ordering: Ordering[A]): Int = {
     val index = (l + r) / 2
     if (l > r || r < l) {
       -1
     } else {
       val am = array(index)
-      if (am == num) {
+      if (ordering.equiv(am,num)) {
         index
-      } else if (am > num) {
-        bs(num,array,l, index - 1)
+      } else if (if (increased) ordering.gt(am,num) else ordering.lt(am,num)) {
+        binarySearch(num,array,l, index - 1)
       } else {
-        bs(num,array,index + 1, r)
+        binarySearch(num,array,index + 1, r)
       }
     }
   }
@@ -45,7 +43,7 @@ object Main {
     val first  = scala.io.StdIn.readLine().split(" ").tail.map(_.toInt)
     val second = scala.io.StdIn.readLine().split(" ").tail.map(_.toInt)
 
-    val result = second.map(s => bs(s, first,0,first.length - 1)).map(i => if (i != -1) i + 1 else i)
+    val result = second.map(s => binarySearch(s, first,0,first.length - 1)).map(i => if (i != -1) i + 1 else i)
 
     println(result.mkString(" "))
   }
@@ -53,7 +51,7 @@ object Main {
     val first  = Array(1,5,8,12,13)
     val second = Array(8,1,23,1,11)
 
-    val result = second.map(s => bs(s, first,0,first.length - 1)).map(i => if (i != -1) i + 1 else i)
+    val result = second.map(s => binarySearch(s, first,0,first.length - 1)).map(i => if (i != -1) i + 1 else i)
     println(result.mkString(" "))
   }
   def testPredicateSerach(): Unit = {
