@@ -6,7 +6,7 @@ object Main {
     array:             Array[A],
     l:                 Index,
     r:                 Index,
-    increased:         Boolean = true
+    growing:           Boolean = true
   )(implicit ordering: Ordering[A]): Index = {
     val index = (l + r) / 2
     if (l > r || r < l) {
@@ -15,10 +15,33 @@ object Main {
       val am = array(index)
       if (ordering.equiv(am, num)) {
         index
-      } else if (if (increased) ordering.gt(am, num) else ordering.lt(am, num)) {
-        binarySearch(num, array, l, index - 1)
+      } else if (if (growing) ordering.gt(am, num) else ordering.lt(am, num)) {
+        binarySearch(num, array, l, index - 1, growing)
       } else {
-        binarySearch(num, array, index + 1, r)
+        binarySearch(num, array, index + 1, r, growing)
+      }
+    }
+  }
+  def upperBound[A](
+    num:               A,
+    array:             Array[A],
+    l:                 Index,
+    r:                 Index,
+    firstOccurrence:   Boolean = true,
+    growing:           Boolean = true,
+    resultIndex:       Option[Index] = None
+  )(implicit ordering: Ordering[A]): Index = {
+    val index = (l + r) / 2
+    if (l > r || r < l || (firstOccurrence && resultIndex.isDefined)) {
+      resultIndex.getOrElse(-1)
+    } else {
+      val am      = array(index)
+      val updated = if (ordering.gt(am, num)) Some(index) else resultIndex
+
+      if (growing) {
+        upperBound(num, array, index + 1, r, firstOccurrence, growing, updated)
+      } else {
+        upperBound(num, array, l, index - 1, firstOccurrence, growing, updated)
       }
     }
   }
@@ -42,7 +65,14 @@ object Main {
         .sameElements(Array(2, 0, -1, 0, -1))
     )
 
-    assert(binarySearch(5, first,0, first.length - 1) == 1)
+    assert(binarySearch(5, first, 0, first.length - 1) == 1)
+
+    assert(upperBound(5, first,0,first.length - 1, firstOccurrence = true,growing = true) == 2)
+    assert(upperBound(5, first,0,first.length - 1, firstOccurrence = false,growing = true) == 4)
+    assert(upperBound(5, first.reverse,0,first.length - 1, firstOccurrence = true,growing = false) == 2)
+    assert(upperBound(5, first.reverse,0,first.length - 1, firstOccurrence = false,growing = false) == 0)
+    assert(upperBound(13, first,0,first.length - 1) == -1)
+    assert(upperBound(12, first,0,first.length - 1) == 4)
   }
 }
 Main.test()
