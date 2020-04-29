@@ -1,6 +1,7 @@
 object Main {
   type Element = Int
   type Index   = Int
+  @scala.annotation.tailrec
   def binarySearch[A](
     num:               A,
     array:             Array[A],
@@ -22,6 +23,7 @@ object Main {
       }
     }
   }
+  @scala.annotation.tailrec
   def upperBound[A](
     num:               A,
     array:             Array[A],
@@ -67,12 +69,48 @@ object Main {
 
     assert(binarySearch(5, first, 0, first.length - 1) == 1)
 
-    assert(upperBound(5, first,0,first.length - 1, firstOccurrence = true,growing = true) == 2)
-    assert(upperBound(5, first,0,first.length - 1, firstOccurrence = false,growing = true) == 4)
-    assert(upperBound(5, first.reverse,0,first.length - 1, firstOccurrence = true,growing = false) == 2)
-    assert(upperBound(5, first.reverse,0,first.length - 1, firstOccurrence = false,growing = false) == 0)
-    assert(upperBound(13, first,0,first.length - 1) == -1)
-    assert(upperBound(12, first,0,first.length - 1) == 4)
+    assert(
+      upperBound(
+        5,
+        first,
+        0,
+        first.length - 1,
+        firstOccurrence = true,
+        growing         = true
+      ) == 2
+    )
+    assert(
+      upperBound(
+        5,
+        first,
+        0,
+        first.length - 1,
+        firstOccurrence = false,
+        growing         = true
+      ) == 4
+    )
+    assert(
+      upperBound(
+        5,
+        first.reverse,
+        0,
+        first.length - 1,
+        firstOccurrence = true,
+        growing         = false
+      ) == 2
+    )
+    assert(
+      upperBound(
+        5,
+        first.reverse,
+        0,
+        first.length - 1,
+        firstOccurrence = false,
+        growing         = false
+      ) == 0
+    )
+    assert(upperBound(13, first, 0, first.length - 1) == -1)
+    assert(upperBound(12, first, 0, first.length - 1) == 4)
   }
 }
 Main.test()
