@@ -3,28 +3,7 @@ object Main {
   type Element = Int
   type Index   = Int
   type Count   = Int
-  def binarySearch[A](
-    num:               A,
-    array:             Array[A],
-    l:                 Index,
-    r:                 Index,
-    increased:         Boolean = true
-  )(implicit ordering: Ordering[A]): Index = {
-    val index = (l + r) / 2
-    if (l > r || r < l) {
-      -1
-    } else {
-      val am = array(index)
-      if (ordering.equiv(am, num)) {
-        index
-      } else if (if (increased) ordering.gt(am, num) else ordering.lt(am, num)) {
-        binarySearch(num, array, l, index - 1)
-      } else {
-        binarySearch(num, array, index + 1, r)
-      }
-    }
-  }
-  def lds(ar: Array[Int]): Array[Int] = ???
+//  def lds(ar: Array[Int]): Array[Int] = ??? // TODO
 
   def lisBottomUp2(n: Int, array: Array[Element]): (Array[Int], Array[Index]) =
     array.zipWithIndex.foldLeft((Array.fill(n)(1), Array.fill(n)(-1))) {
@@ -56,7 +35,7 @@ object Main {
     scala.io.StdIn.readLine().toInt
     val array = scala.io.StdIn.readLine().split(" ").map(_.toInt)
 
-    println(lds(array))
+    println(lis(array))
   }
   def test(): String = {
     def testOne(
@@ -74,8 +53,11 @@ object Main {
       println(s"Result ${res.map(t).mkString(",")}")
     }
 
+    val array = Array(7, 2, 1, 3, 8, 4, 9, 1, 2, 6, 5, 9, 3, 8, 1)
+    val n = array.length
+
     val (d, prev) =
-      lisBottomUp2(15, Array(7, 2, 1, 3, 8, 4, 9, 1, 2, 6, 5, 9, 3, 8, 1))
+      lisBottomUp2(n, array)
     assert(
       d.sameElements(Array(1, 1, 1, 2, 3, 3, 4, 1, 2, 4, 4, 5, 3, 5, 1)),
       s"d ! ${d.mkString(",")}"
@@ -88,8 +70,8 @@ object Main {
     )
 
     testOne(
-      Array(7, 2, 1, 3, 8, 4, 9, 1, 2, 6, 5, 9, 3, 8, 1),
-      Array(1, 3, 5, 9, 13),
+      array,
+      Array(1, 3, 5, 9, 13), // (2,3,4,6,8)
       lis,
       "lis"
     )
