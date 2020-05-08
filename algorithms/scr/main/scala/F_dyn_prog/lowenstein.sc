@@ -4,8 +4,6 @@ object Main {
     val n = s1.length
     val m = s2.length
     val matrix = Array.ofDim[Int](n + 1,m + 1)
-    for (i <- 0 to n) {matrix(i)(0) = i}
-    for (j <- 0 to m) {matrix(0)(j) = j}
 
     for {
       i <- 1 to n
