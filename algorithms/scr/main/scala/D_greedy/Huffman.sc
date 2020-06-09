@@ -285,7 +285,7 @@ object Main {
   }
   def main2(args: Array[String]): Unit = {
     val codec = HuffmanCodec()
-    val (k,l) = {
+    val (k,_) = {
       val arr = scala.io.StdIn.readLine().split(" ").map(_.toInt)
       arr.head -> arr.last
     }

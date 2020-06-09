@@ -4,7 +4,6 @@ object Main {
       Option(o.getOrElse(0) + other.getOrElse(0))
   }
   def resolve(frst: Option[Int], sec: Option[Int], th: Option[Int], fth: Option[Int], prevBroken: Boolean, last: Boolean = false): (Int, Boolean) = {
-    println(s"f=$frst, sec=$sec, th=$th, fth=$fth, prevBroken = $prevBroken, last = $last")
     val arr = if (last) {
       if (prevBroken) {
         Array(
@@ -44,10 +43,8 @@ object Main {
       }
     }
 
-    println(arr.map(t => t._1 -> t._2).mkString(","))
     val max = arr.maxBy(_._1)
     val res = if (last) max._1 else max._2
-    println(s"res = $max")
     (res.get, max._2 != frst)
   }
   def stairs(arr: Array[Int]): Int = {
@@ -69,9 +66,7 @@ object Main {
         }
     }
 
-    val sum = acc.sum
-    println(s"sum of [${acc.mkString(",")}] = $sum")
-    sum
+    acc.sum
   }
 
   def main(args: Array[String]): Unit = {
@@ -94,6 +89,7 @@ object Main {
     assert(3 == stairs(Array(-1, 2, 1)),10)
     assert(2 == stairs(Array(2)),11)
     assert(-2 == stairs(Array(-2)),12)
+    assert(29 == stairs(Array(-5,8, 10, 7, -2, 4)), 13)
   }
 }
 Main.test()
