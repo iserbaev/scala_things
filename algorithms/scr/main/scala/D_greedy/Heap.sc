@@ -37,47 +37,51 @@ object Main {
   }
 }
 object Heap {
+  private implicit class ArrayOps(val a: Array[Int]) extends AnyVal {
+    def fromIndex(i: Int): Int = a(i - 1)
+  }
+  private def swapHeap(a: Array[Int], i:Int,j: Int): Array[Int] = {
+    val ai = a.fromIndex(i)
+    val aj = a.fromIndex(j)
+    a.update(i - 1,aj)
+    a.update(j - 1,ai)
+    a
+  }
   def parent(i: Int): Int = i >> 1
   def left(i: Int): Int = i << 1
   def right(i: Int): Int = (i << 1).toInt + 1
 
-  def maxHeapify(a: Array[Int], i: Int, heapSize: Int): Unit = {
+  def maxHeapify(a: Array[Int], i: Int): Array[Int] = {
+    val heapSize = a.length
     val l = left(i)
     val r = right(i)
     val largest = {
-      val ll = if (l < heapSize && a(l) > a(i)) {
+      val ll = if (l <= heapSize && a.fromIndex(l) > a.fromIndex(i)) {
         l
       } else i
 
-      if (r < heapSize && a(r) > a(ll)) {
+      if (r <= heapSize && a.fromIndex(r) > a.fromIndex(ll)) {
         r
       } else ll
     }
 
     if (largest != i) {
-      val al = a(largest)
-      val ai = a(i)
-      a.update(i,al)
-      a.update(l,ai)
+      maxHeapify(swapHeap(a,largest,i),largest)
     }
-  }
-  def swap(a: Array[Int], i:Int,j: Int):Unit = {
-    val aj = a(i)
-    val ai = a(j)
-    a.update(i,aj)
-    a.update(j,ai)
+    a
   }
   def buildMaxHeap(a: Array[Int]) = {
     val heapSize = a.length
-    ((a.length / 2) to 1 by -1).foreach(i => maxHeapify(a,i, heapSize))
+    ((heapSize / 2) to 1 by -1).foreach(i => maxHeapify(a,i))
+    a
   }
 
   def heapSort(a: Array[Int]) = {
     val length = a.length
-    buildMaxHeap(a)
-    (a.length to 2 by -2).foldLeft(length) { case (heapSize,i) =>
-      swap(a,1,i)
-      maxHeapify(a,1,heapSize - 1)
+    val heap = buildMaxHeap(a)
+    (a.length to 2 by -1).foldLeft(length) { case (heapSize,i) =>
+      swapHeap(heap,1,i)
+      maxHeapify(heap,1)
       heapSize - 1
     }
     a
@@ -86,10 +90,10 @@ object Heap {
 }
 import Heap._
 
-parent(3) == 1
-left(2) == 4
-right(2) == 5
+val heap0 = buildMaxHeap(Array(16,4,10,14,7,9,3,2,8,1))
+assert(heap0 sameElements Array(16,14,10,8,7,9,3,2,4,1))
 
-(6 to 1 by -1).toList
+val heap = buildMaxHeap(Array(4, 1, 3, 2, 16, 9, 10, 14, 8, 7))
+assert(heap sameElements Array(16,14,10,8,7,9,3,2,4,1))
 
 heapSort(Array(5,6,2,3,4,7,8,33,22,3))
