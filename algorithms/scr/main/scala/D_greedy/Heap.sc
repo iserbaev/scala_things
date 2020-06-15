@@ -79,12 +79,12 @@ object Heap {
   def heapSort(a: Array[Int]) = {
     val length = a.length
     val heap = buildMaxHeap(a)
-    (a.length to 2 by -1).foldLeft(length) { case (heapSize,i) =>
-      swapHeap(heap,1,i)
-      maxHeapify(heap,1)
-      heapSize - 1
+    val res = (a.length to 2 by -1).foldLeft((length,heap, List.empty[Int])) { case ((heapSize,h,a),i) =>
+      val swapped = swapHeap(h,1,i)
+      val nHeap = maxHeapify(swapped.init,1)
+      (heapSize - 1, nHeap, swapped.last :: a)
     }
-    a
+    res._2.head :: res._3
   }
 
 }
@@ -97,3 +97,4 @@ val heap = buildMaxHeap(Array(4, 1, 3, 2, 16, 9, 10, 14, 8, 7))
 assert(heap sameElements Array(16,14,10,8,7,9,3,2,4,1))
 
 heapSort(Array(5,6,2,3,4,7,8,33,22,3))
+heapSort(Array(16,14,10,8,7,9,3,2,4,1))
