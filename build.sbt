@@ -7,8 +7,6 @@ lazy val scalaLearn = project in file("scalaLearn")
 
 lazy val coursera = project in file("coursera")
 
-lazy val sparkLearn = project in file("sparkLearn")
-
 lazy val algorithms = project
   .in(file("algorithms"))
   .settings(commonSettings2_12())
