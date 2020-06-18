@@ -27,14 +27,30 @@ object QuickSort {
     swap(a,i + 1,r)
     i + 1
   }
+  def randomizedQuickSort(a: Array[Int], p: Index, r: Index): Unit =
+    if (p < r) {
+      val q = randomizedPartition(a, p, r)
+      randomizedQuickSort(a, p, q - 1)
+      randomizedQuickSort(a, q + 1, r)
+    }
+  def randomizedPartition(a: Array[Int], p: Index, r: Index): Index = {
+    val i = random(p,r)
+    swap(a,i,r)
+    partition(a,p,r)
+  }
+
+  def random(a: Int,b: Int): Int = {
+    val randomDiff = scala.util.Random.nextInt(b - a + 1)
+    a + randomDiff
+  }
+
+  def test(f: (Array[Int],Int,Int) => Unit, a: Array[Int], expected: Array[Int]): Unit = {
+    f(a,1,8)
+    assert(a sameElements expected)
+  }
 }
 
 import QuickSort._
 
-val a = Array(2,8,7,1,3,5,6,4)
-partition(a,1,8)
-a
-
-val b = Array(2,8,7,1,3,5,6,4)
-quickSort(b,1,8)
-b
+test(quickSort,Array(2,8,7,1,3,5,6,4), Array(1,2,3,4,5,6,7,8))
+test(randomizedQuickSort,Array(2,8,7,1,3,5,6,4), Array(1,2,3,4,5,6,7,8))
