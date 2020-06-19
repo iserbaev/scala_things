@@ -44,9 +44,29 @@ object QuickSort {
     a + randomDiff
   }
 
+  val counter = new java.util.concurrent.atomic.AtomicInteger(0)
+  def tailRecursiveQuickSort(a: Array[Int], p: Index, r: Index): Unit = { // stack depth = O(n)
+    var p1 = p
+    while (p1 < r) {
+      println(counter.incrementAndGet())
+      val q = partition(a, p1, r)
+      tailRecursiveQuickSort(a, p1, q - 1)
+      p1 = q + 1
+    }
+  }
+  def tailRecursiveQuickSort2(a: Array[Int], p: Index, r: Index): Unit = { // stack depth = O(lg n)
+    def recur(p1: Int, r1: Int): Unit = if (p1 < r1) {
+      println(counter.incrementAndGet())
+      val q = partition(a, p1, r1)
+      tailRecursiveQuickSort2(a, p1, q - 1)
+      recur(q + 1,r)
+    }
+    recur(p,r)
+  }
+
   def test(f: (Array[Int],Int,Int) => Unit, a: Array[Int], expected: Array[Int]): Unit = {
-    f(a,1,8)
-    assert(a sameElements expected)
+    f(a,1,a.length)
+    assert(a sameElements expected, s"${a.mkString("(",",",")")} != ${expected.mkString("(",",",")")}")
   }
 }
 
@@ -54,3 +74,5 @@ import QuickSort._
 
 test(quickSort,Array(2,8,7,1,3,5,6,4), Array(1,2,3,4,5,6,7,8))
 test(randomizedQuickSort,Array(2,8,7,1,3,5,6,4), Array(1,2,3,4,5,6,7,8))
+//test(tailRecursiveQuickSort,Array(2,8,7,1,3,5,6,4,12,9,10,11), Array(1,2,3,4,5,6,7,8,9,10,11,12))
+test(tailRecursiveQuickSort2,Array(2,8,7,1,3,5,6,4,12,9,10,11), Array(1,2,3,4,5,6,7,8,9,10,11,12))
