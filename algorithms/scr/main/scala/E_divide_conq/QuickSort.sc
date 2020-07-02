@@ -38,6 +38,21 @@ object QuickSort {
     swap(a,i,r)
     partition(a,p,r)
   }
+  def randomizedSelect(a: Array[Int],p: Int,r: Int,i: Int): Int = {
+    if (p == r) {
+      a(p - 1)
+    } else {
+      val q = randomizedPartition(a,p,r)
+      val k = q - p + 1
+      if (i == k) {
+        a(q - 1)
+      } else if (i < k) {
+        randomizedSelect(a,p,q-1,i)
+      } else {
+        randomizedSelect(a,q + 1,r,i - k)
+      }
+    }
+  }
 
   def random(a: Int,b: Int): Int = {
     val randomDiff = scala.util.Random.nextInt(b - a + 1)
@@ -86,6 +101,10 @@ test(randomizedQuickSort,Array(2,8,7,1,3,5,6,4), Array(1,2,3,4,5,6,7,8))
 //test(tailRecursiveQuickSort,Array(2,8,7,1,3,5,6,4,12,9,10,11), Array(1,2,3,4,5,6,7,8,9,10,11,12))
 test(tailRecursiveQuickSort2,Array(2,8,7,1,3,5,6,4,12,9,10,11), Array(1,2,3,4,5,6,7,8,9,10,11,12))
 
-val big = Random.shuffle((1 to 1000000).toList).toArray
-test(tailRecursiveQuickSort2,big, big.sorted)
-counter.get()
+//val big = Random.shuffle((1 to 1000000).toList).toArray
+//test(tailRecursiveQuickSort2,big, big.sorted)
+//counter.get()
+
+val a = Array(2,8,7,1,3,5,6,4)
+(1 to 8).foreach(i => assert(randomizedSelect(a,1,8,i) == i))
+a
