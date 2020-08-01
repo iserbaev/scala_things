@@ -10,7 +10,6 @@ sealed trait BinarySearchTree[+T] {
   def left:   Option[BinarySearchTree[T]]
   def right:  Option[BinarySearchTree[T]]
   def parent: Option[BinarySearchTree[T]]
-  def root:   Option[BinarySearchTree[T]]
 }
 
 case object Nil extends BinarySearchTree[Nothing] {
@@ -18,31 +17,18 @@ case object Nil extends BinarySearchTree[Nothing] {
   override def left:   Option[BinarySearchTree[Nothing]] = None
   override def right:  Option[BinarySearchTree[Nothing]] = None
   override def parent: Option[BinarySearchTree[Nothing]] = None
-  override def root:   Option[BinarySearchTree[Nothing]] = None
 }
 
 case class Node[+T](
-  k:  T,
-  l:  BinarySearchTree[T],
-  r:  BinarySearchTree[T],
-  p:  BinarySearchTree[T],
-  rt: BinarySearchTree[T]
+  k: T,
+  l: BinarySearchTree[T],
+  r: BinarySearchTree[T],
+  p: BinarySearchTree[T]
 ) extends BinarySearchTree[T] {
   override def key:    Option[T]                   = k.some
   override def left:   Option[BinarySearchTree[T]] = l.some
   override def right:  Option[BinarySearchTree[T]] = r.some
   override def parent: Option[BinarySearchTree[T]] = p.some
-  override def root:   Option[BinarySearchTree[T]] = rt.some
-
-  def lk = l.key.map(_.toString).getOrElse("*")
-  def rk = r.key.map(_.toString).getOrElse("*")
-
-  override def toString: String =
-    s"""
-       |       ${k}
-       |     /    \\
-       |    ${lk}      ${rk}
-       |""".stripMargin
 }
 
 object BinarySearchTree {
@@ -67,31 +53,41 @@ object BinarySearchTree {
     x match {
       case Nil =>
         x
-      case Node(k, _, _, _, _) if ordering.equiv(t, k) =>
+      case Node(k, _, _, _) if ordering.equiv(t, k) =>
         x
-      case Node(k, l, _, _, _) if ordering.lt(t, k) =>
+      case Node(k, l, _, _) if ordering.lt(t, k) =>
         treeSearch(l, t)
-      case Node(k, _, r, _, _) if ordering.gt(t, k) =>
+      case Node(k, _, r, _) if ordering.gt(t, k) =>
         treeSearch(r, t)
     }
 
-  @tailrec
-  def treeMin[T](x: BinarySearchTree[T]): BinarySearchTree[T] =
-    x.left match {
+  def treeMin[T](x: BinarySearchTree[T]): BinarySearchTree[T] = {
+    @tailrec
+    def recur(
+      xx:  BinarySearchTree[T],
+      acc: BinarySearchTree[T]
+    ): BinarySearchTree[T] = xx.left match {
       case Some(value) =>
-        treeMin(value)
+        recur(value, xx)
       case None =>
-        x
+        acc
     }
+    recur(x, x)
+  }
 
-  @tailrec
-  def treeMax[T](x: BinarySearchTree[T]): BinarySearchTree[T] =
-    x.right match {
+  def treeMax[T](x: BinarySearchTree[T]): BinarySearchTree[T] = {
+    @tailrec
+    def recur(
+      xx:  BinarySearchTree[T],
+      acc: BinarySearchTree[T]
+    ): BinarySearchTree[T] = xx.right match {
       case Some(value) =>
-        treeMax(value)
+        recur(value, xx)
       case None =>
-        x
+        acc
     }
+    recur(x, x)
+  }
 
   def treeSuccessor[T](x: BinarySearchTree[T])(
     implicit ordering:    Ordering[Option[T]]
@@ -120,30 +116,14 @@ object BinarySearchTree {
 
   def treeInsert[T](x: BinarySearchTree[T], v: T)(
     implicit ordering: Ordering[T]
-  ): BinarySearchTree[T] = {
-    @tailrec
-    def recur(
-      xx:  BinarySearchTree[T],
-      acc: BinarySearchTree[T]
-    ): BinarySearchTree[T] = xx match {
-      case Nil =>
-        acc
-      case Node(k, l, _, _, _) if ordering.lt(v, k) =>
-        recur(l, xx)
-      case Node(_, _, r, _, _) =>
-        recur(r, xx)
+  ): BinarySearchTree[T] =
+    x match {
+      case Nil => Node(v, Nil, Nil, x)
+      case pp @ Node(k, l, _, _) if ordering.lt(v, k) =>
+        pp.copy(k = k, l = treeInsert(l, v))
+      case pp @ Node(_, _, r, _) =>
+        pp.copy(r = treeInsert(r, v))
     }
-    val parent = recur(x, x)
-    val z      = Node(v, Nil, Nil, parent, Nil)
-    parent match {
-      case Nil =>
-        z.copy(rt = z)
-      case pp @ Node(k, _, _, _, _) if ordering.lt(v, k) =>
-        pp.copy(l = z)
-      case pp: Node[T] =>
-        pp.copy(r = z)
-    }
-  }
 
   def treeInserts[T](x: BinarySearchTree[T], vv: T*)(
     implicit ordering:  Ordering[T]
@@ -156,10 +136,8 @@ object BinarySearchTree {
 object TestTree extends App {
   import BinarySearchTree._
 
-  val res = treeInsert(Nil, 15)
-  println(res)
+  val res  = treeInsert(Nil, 15)
   val res2 = treeInsert(res, 6)
-  println(res2)
   val res3 = treeInsert(res2, 18)
   println(res3)
 
@@ -170,5 +148,14 @@ object TestTree extends App {
 
   val result = treeInserts(Nil, seq: _*)
   println(result)
+
+  println(inorderTreeWalk(result))
+
+  println(treeMin(result))
+  println(treeMax(result))
+
+  println(treeSuccessor(result))
+
+  println(result.key)
 
 }
