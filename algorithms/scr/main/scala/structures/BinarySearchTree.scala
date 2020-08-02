@@ -171,38 +171,28 @@ object BinarySearchTree {
 object TestTree extends App {
   import BinarySearchTree._
 
-  val res  = treeInsert(Nil, 15)
-  val res2 = treeInsert(res, 6)
-  val res3 = treeInsert(res2, 18)
-  println(res3)
+  def test(): Unit = {
+    val seq    = Seq(15, 6, 3, 7, 2, 4, 13, 9, 18, 17, 20)
+    val result = treeInserts(Nil, seq: _*)
 
-  val res4 = treeInsert(treeInsert(treeInsert(treeInsert(Nil, 7), 15), 6), 18)
-  println(res4)
+    assert(inorderTreeWalk(result).forall(seq.contains))
 
-  val seq = Seq(15, 6, 3, 7, 2, 4, 13, 9, 18, 17, 20)
+    assert(treeMin(result).key.get == seq.min)
+    assert(treeMax(result).key.get == seq.max)
 
-  val result = treeInserts(Nil, seq: _*)
-  println(result)
+    seq.foreach(i => assert(treeSearch(result, i).key.get == i))
 
-  println("inorderTreeWalk=" + inorderTreeWalk(result))
+    assert(parent(result, result.left.parentLabel).key.get == 15)
+    assert(parent(result, result.left.left.parentLabel).key.get == 6)
+    assert(parent(result, result.parentLabel).key.isEmpty)
 
-  println("treeMin = " + treeMin(result))
-  println("treeMax = " + treeMax(result))
+    assert(treeSuccessor(result, result).key.get == 17)
+    assert(treeSuccessor(result.left.right.right, result).key.get == 15)
+    assert(treePredecessor(result, result).key.get == 13)
+    assert(treePredecessor(result.left.right, result).key.get == 6)
+    assert(treePredecessor(result.right.left, result).key.get == 15)
+  }
 
-  println("treeSearch 15 = " + treeSearch(result, 15))
-  println("treeSearch 2 = " + treeSearch(result, 2))
-  println("treeSearch 17 = " + treeSearch(result, 17))
-  println("treeSearch 6 = " + treeSearch(result, 6))
-  println("treeSearch 20 = " + treeSearch(result, 20))
-
-  println("parent 6 == 15 =" + parent(result, result.left.parentLabel))
-  println("parent 3 == 6 =" + parent(result, result.left.left.parentLabel))
-  println("parent 15 == Nil =" + parent(result, result.key))
-
-  println("succ 15 == 17 =" + treeSuccessor(result, result))
-  println("succ 13 == 15 =" + treeSuccessor(result.left.right.right, result))
-  println("pred 15 == 13 =" + treePredecessor(result, result))
-  println("pred 7 == 6 =" + treePredecessor(result.left.right, result))
-  println("pred 17 == 15 =" + treePredecessor(result.right.left, result))
+  test()
 
 }
