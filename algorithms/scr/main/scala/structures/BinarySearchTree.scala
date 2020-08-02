@@ -117,7 +117,22 @@ object BinarySearchTree {
   def treePredecessor[T](x: BinarySearchTree[T])(
     implicit ordering:      Ordering[Option[T]]
   ): BinarySearchTree[T] =
-    treeSuccessor(x) // TODO
+    x.left match {
+      case value: Node[T] =>
+        treeMax(value)
+      case Nil =>
+        @tailrec
+        def recur(xx: BinarySearchTree[T]): BinarySearchTree[T] =
+          xx.parent match {
+            case value: Node[T]
+                if value.left.key.isDefined && ordering
+                  .equiv(value.left.key, xx.key) =>
+              recur(value)
+            case Nil =>
+              xx
+          }
+        recur(x.parent)
+    }
 
   def treeInsert[T](x: BinarySearchTree[T], v: T)(
     implicit ordering: Ordering[T]
@@ -160,6 +175,7 @@ object TestTree extends App {
   println("treeMax = " + treeMax(result))
 
   println("succ=" + treeSuccessor(result))
+  println("pred=" + treePredecessor(result))
 
   println(result.key)
 
