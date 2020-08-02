@@ -5,11 +5,40 @@ import cats.syntax.option._
 import scala.annotation.tailrec
 import scala.collection.immutable
 
-sealed trait BinarySearchTree[+T] {
+sealed abstract class BinarySearchTree[+T] {
   def key:         Option[T]
   def left:        BinarySearchTree[T]
   def right:       BinarySearchTree[T]
   def parentLabel: Option[T]
+
+  def fold[R](r: R)(f: (R, T) => R): R = {
+    @tailrec
+    def recur(rr: R, acc: List[BinarySearchTree[T]]): R = acc match {
+      case immutable.Nil =>
+        rr
+      case ::(head, tl) =>
+        head match {
+          case Nil =>
+            recur(rr, tl)
+          case Node(k, left, right, _) =>
+            recur(f(rr, k), left :: right :: tl)
+        }
+    }
+
+    recur(r, List(this))
+  }
+
+  def fold2[R](r: R)(f: (R, T) => R): R = {
+    // ! not tailrec
+    def recur(rr: R, bb: BinarySearchTree[T]): R = bb match {
+      case Nil =>
+        rr
+      case Node(k, left, right, _) =>
+        recur(f(recur(rr, left), k), right)
+    }
+
+    recur(r, this)
+  }
 }
 
 case object Nil extends BinarySearchTree[Nothing] {
@@ -191,6 +220,11 @@ object TestTree extends App {
     assert(treePredecessor(result, result).key.get == 13)
     assert(treePredecessor(result.left.right, result).key.get == 6)
     assert(treePredecessor(result.right.left, result).key.get == 15)
+
+    assert(seq.sum == result.fold(0)(_ + _))
+    assert(seq.product == result.fold(1)(_ * _))
+    assert(seq.sum == result.fold2(0)(_ + _))
+    assert(seq.product == result.fold2(1)(_ * _))
   }
 
   test()
