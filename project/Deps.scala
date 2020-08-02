@@ -25,7 +25,13 @@ object Deps {
     val testcontainers        = "0.34.1"
     val kafkaTestContainer    = "1.12.3"
     val postgresTestcontainer = "1.12.3"
+
+    val quickLens = "1.6.0"
   }
+
+  private lazy val lens = Seq(
+    "com.softwaremill.quicklens" %% "quicklens" % Versions.quickLens
+  )
 
   private lazy val logging = Seq(
     "com.typesafe.scala-logging" %% "scala-logging"  % Versions.scalaLogging,
@@ -98,5 +104,5 @@ object Deps {
   )
 
   lazy val algsProjectDeps
-    : Seq[ModuleID] = logging ++ testDeps ++ cats ++ catsEffect ++ catsTagless ++ conf ++ fs2 ++ shapeless ++ spire
+    : Seq[ModuleID] = logging ++ testDeps ++ cats ++ catsEffect ++ catsTagless ++ conf ++ fs2 ++ shapeless ++ spire ++ lens
 }

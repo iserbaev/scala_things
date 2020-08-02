@@ -11,6 +11,13 @@ sealed abstract class BinarySearchTree[+T] {
   def right:       BinarySearchTree[T]
   def parentLabel: Option[T]
 
+  def map[R](f: T => R): BinarySearchTree[R] = this match {
+    case Nil =>
+      Nil
+    case Node(k, left, right, parentLabel) =>
+      Node(f(k), left.map(f), right.map(f), parentLabel.map(f))
+  }
+
   def fold[R](r: R)(f: (R, T) => R): R = {
     @tailrec
     def recur(rr: R, acc: List[BinarySearchTree[T]]): R = acc match {
@@ -225,6 +232,8 @@ object TestTree extends App {
     assert(seq.product == result.fold(1)(_ * _))
     assert(seq.sum == result.fold2(0)(_ + _))
     assert(seq.product == result.fold2(1)(_ * _))
+
+    assert(result.map(_ + 1).fold(0)(_ + _) == seq.map(_ + 1).sum)
   }
 
   test()
