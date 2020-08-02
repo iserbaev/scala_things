@@ -7,16 +7,17 @@ import scala.collection.immutable
 
 sealed trait BinarySearchTree[+T] {
   def key:    Option[T]
-  def left:   Option[BinarySearchTree[T]]
-  def right:  Option[BinarySearchTree[T]]
-  def parent: Option[BinarySearchTree[T]]
+  def left:   BinarySearchTree[T]
+  def right:  BinarySearchTree[T]
+  def parent: BinarySearchTree[T]
 }
 
 case object Nil extends BinarySearchTree[Nothing] {
-  override def key:    Option[Nothing]                   = None
-  override def left:   Option[BinarySearchTree[Nothing]] = None
-  override def right:  Option[BinarySearchTree[Nothing]] = None
-  override def parent: Option[BinarySearchTree[Nothing]] = None
+  override def key: Option[Nothing] = None
+
+  override def left:   BinarySearchTree[Nothing] = Nil
+  override def right:  BinarySearchTree[Nothing] = Nil
+  override def parent: BinarySearchTree[Nothing] = Nil
 }
 
 case class Node[+T](
@@ -25,10 +26,10 @@ case class Node[+T](
   r: BinarySearchTree[T],
   p: BinarySearchTree[T]
 ) extends BinarySearchTree[T] {
-  override def key:    Option[T]                   = k.some
-  override def left:   Option[BinarySearchTree[T]] = l.some
-  override def right:  Option[BinarySearchTree[T]] = r.some
-  override def parent: Option[BinarySearchTree[T]] = p.some
+  override def key:    Option[T]           = k.some
+  override def left:   BinarySearchTree[T] = l
+  override def right:  BinarySearchTree[T] = r
+  override def parent: BinarySearchTree[T] = p
 }
 
 object BinarySearchTree {
@@ -37,10 +38,16 @@ object BinarySearchTree {
     def recur(ts: List[BinarySearchTree[T]], acc: List[T]): List[T] = ts match {
       case immutable.Nil => acc
       case ::(head, tl) =>
-        recur(
-          List(head.left, head.right).flatten ++ tl,
-          head.key.map(_ :: acc).getOrElse(acc)
-        )
+        (head.left, head.right) match {
+          case (Nil, Nil) =>
+            recur(tl, head.key.map(_ :: acc).getOrElse(acc))
+          case (Nil, value) =>
+            recur(value :: tl, head.key.map(_ :: acc).getOrElse(acc))
+          case (value, Nil) =>
+            recur(value :: tl, head.key.map(_ :: acc).getOrElse(acc))
+          case (value, value1) =>
+            recur(value :: value1 :: tl, head.key.map(_ :: acc).getOrElse(acc))
+        }
     }
 
     recur(List(x), List.empty)
@@ -67,10 +74,11 @@ object BinarySearchTree {
       xx:  BinarySearchTree[T],
       acc: BinarySearchTree[T]
     ): BinarySearchTree[T] = xx.left match {
-      case Some(value) =>
-        recur(value, xx)
-      case None =>
+      case Nil =>
         acc
+      case value: Node[T] =>
+        recur(value, value)
+
     }
     recur(x, x)
   }
@@ -81,10 +89,10 @@ object BinarySearchTree {
       xx:  BinarySearchTree[T],
       acc: BinarySearchTree[T]
     ): BinarySearchTree[T] = xx.right match {
-      case Some(value) =>
-        recur(value, xx)
-      case None =>
+      case Nil =>
         acc
+      case value =>
+        recur(value, value)
     }
     recur(x, x)
   }
@@ -93,20 +101,20 @@ object BinarySearchTree {
     implicit ordering:    Ordering[Option[T]]
   ): BinarySearchTree[T] =
     x.right match {
-      case Some(value) =>
+      case value: Node[T] =>
         treeMin(value)
-      case None =>
+      case Nil =>
         @tailrec
         def recur(xx: BinarySearchTree[T]): BinarySearchTree[T] =
           xx.parent match {
-            case Some(value)
-                if value.right.isDefined && ordering
-                  .equiv(value.right.get.key, xx.key) =>
-              recur(xx.parent.get)
-            case None =>
+            case value: Node[T]
+                if value.right.key.isDefined && ordering
+                  .equiv(value.right.key, xx.key) =>
+              recur(value)
+            case Nil =>
               xx
           }
-        x.parent.map(recur).getOrElse(Nil)
+        recur(x.parent)
     }
 
   def treePredecessor[T](x: BinarySearchTree[T])(
@@ -149,12 +157,12 @@ object TestTree extends App {
   val result = treeInserts(Nil, seq: _*)
   println(result)
 
-  println(inorderTreeWalk(result))
+  println("inorderTreeWalk=" + inorderTreeWalk(result))
 
-  println(treeMin(result))
-  println(treeMax(result))
+  println("treeMin = " + treeMin(result))
+  println("treeMax = " + treeMax(result))
 
-  println(treeSuccessor(result))
+  println("succ=" + treeSuccessor(result))
 
   println(result.key)
 
