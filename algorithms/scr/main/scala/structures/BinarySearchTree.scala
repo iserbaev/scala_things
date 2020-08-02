@@ -21,15 +21,12 @@ case object Nil extends BinarySearchTree[Nothing] {
 }
 
 case class Node[+T](
-  k: T,
-  l: BinarySearchTree[T],
-  r: BinarySearchTree[T],
-  p: BinarySearchTree[T]
+  k:      T,
+  left:   BinarySearchTree[T],
+  right:  BinarySearchTree[T],
+  parent: BinarySearchTree[T]
 ) extends BinarySearchTree[T] {
-  override def key:    Option[T]           = k.some
-  override def left:   BinarySearchTree[T] = l
-  override def right:  BinarySearchTree[T] = r
-  override def parent: BinarySearchTree[T] = p
+  override def key: Option[T] = k.some
 }
 
 object BinarySearchTree {
@@ -128,9 +125,9 @@ object BinarySearchTree {
     x match {
       case Nil => Node(v, Nil, Nil, x)
       case pp @ Node(k, l, _, _) if ordering.lt(v, k) =>
-        pp.copy(k = k, l = treeInsert(l, v))
+        pp.copy(left = treeInsert(l, v))
       case pp @ Node(_, _, r, _) =>
-        pp.copy(r = treeInsert(r, v))
+        pp.copy(right = treeInsert(r, v))
     }
 
   def treeInserts[T](x: BinarySearchTree[T], vv: T*)(
