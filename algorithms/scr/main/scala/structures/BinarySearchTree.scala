@@ -183,24 +183,70 @@ object BinarySearchTree {
 
   def treeInsert[T](
     x:           BinarySearchTree[T],
-    v:           T,
+    v:           BinarySearchTree[T],
     parentLabel: Option[T] = None
   )(
     implicit ordering: Ordering[T]
   ): BinarySearchTree[T] =
-    x match {
-      case Nil => Node(v, Nil, Nil, parentLabel)
-      case pp @ Node(k, l, _, _) if ordering.lt(v, k) =>
-        pp.copy(left = treeInsert(l, v, pp.key))
-      case pp @ Node(_, _, r, _) =>
-        pp.copy(right = treeInsert(r, v, pp.key))
+    (x, v) match {
+      case (Nil, Nil) =>
+        Nil
+      case (Nil, n @ Node(_, _, _, _)) =>
+        n.copy(parentLabel = parentLabel)
+      case (n @ Node(_, _, _, _), Nil) =>
+        n.copy(parentLabel = parentLabel)
+      case (pp @ Node(pk, pl, _, _), n @ Node(nk, _, _, _))
+          if ordering.lt(nk, pk) =>
+        pp.copy(left = treeInsert(pl, n, pp.key), parentLabel = parentLabel)
+      case (pp @ Node(_, _, r, _), n @ Node(_, _, _, _)) =>
+        pp.copy(right = treeInsert(r, n, pp.key), parentLabel = parentLabel)
     }
 
   def treeInserts[T](x: BinarySearchTree[T], vv: T*)(
     implicit ordering:  Ordering[T]
   ): BinarySearchTree[T] = vv.toSeq.foldLeft(x) {
     case (xx, v) =>
-      treeInsert(xx, v)
+      treeInsert(xx, Node(v, Nil, Nil, None))
+  }
+
+  def treeDelete[T](x: BinarySearchTree[T], v: T)(
+    implicit ordering: Ordering[T]
+  ): BinarySearchTree[T] = {
+//    @tailrec
+    def recur(xx: BinarySearchTree[T]): BinarySearchTree[T] = xx match {
+      case Nil =>
+        xx
+      case Node(zk, zl, zr, parentLabel) if ordering.equiv(zk, v) =>
+        (zl, zr) match {
+          case (Nil, Nil) =>
+            Nil
+          case (Nil, node @ Node(_, _, _, _)) =>
+            node.copy(parentLabel = parentLabel)
+          case (node @ Node(_, _, _, _), Nil) =>
+            node.copy(parentLabel = parentLabel)
+          case (l @ Node(_, _, _, _), r @ Node(rk, rl, rr, _)) =>
+            rl match {
+              case Nil =>
+                Node(rk, l.copy(parentLabel = Some(rk)), rr, parentLabel)
+              case Node(yk, yl, yr, _) =>
+                val tree = Node(
+                  yk,
+                  l.copy(parentLabel = Some(yk)),
+                  r.copy(parentLabel = Some(yk)),
+                  parentLabel
+                )
+                val t2 = treeInsert(tree, yl, parentLabel)
+                treeInsert(t2, yr, parentLabel)
+            }
+
+        }
+      case Node(zk, zl, zr, parentLabel) if ordering.lt(zk, v) =>
+        Node(zk, zl, recur(zr), parentLabel)
+      case Node(zk, zl, zr, parentLabel) if ordering.gt(zk, v) =>
+        Node(zk, recur(zl), zr, parentLabel)
+    }
+
+    recur(x)
   }
 }
 
@@ -208,6 +254,18 @@ object TestTree extends App {
   import BinarySearchTree._
 
   def test(): Unit = {
+
+    /**
+      *                        15
+      *                     /     \
+      *                    6      18
+      *                   / \    /  \
+      *                  3   7  17   20
+      *                 / \   \
+      *                2   4  13
+      *                      /
+      *                     9
+      */
     val seq    = Seq(15, 6, 3, 7, 2, 4, 13, 9, 18, 17, 20)
     val result = treeInserts(Nil, seq: _*)
 
@@ -234,6 +292,12 @@ object TestTree extends App {
     assert(seq.product == result.fold2(1)(_ * _))
 
     assert(result.map(_ + 1).fold(0)(_ + _) == seq.map(_ + 1).sum)
+
+    assert(treeDelete(result, 3).fold(0)(_ + _) == (seq.sum - 3))
+
+    val resW15 = treeDelete(result, 15)
+    assert(treeSearch(resW15, 15).key.isEmpty)
+    println(resW15)
   }
 
   test()
