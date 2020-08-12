@@ -5,7 +5,7 @@ import cats.syntax.option._
 import scala.annotation.tailrec
 import scala.collection.immutable
 
-sealed abstract class BinarySearchTree[+T] {
+sealed trait BinarySearchTree[+T] {
   def key:         Option[T]
   def left:        BinarySearchTree[T]
   def right:       BinarySearchTree[T]
