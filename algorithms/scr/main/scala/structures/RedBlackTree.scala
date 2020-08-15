@@ -44,7 +44,7 @@ sealed trait RedBlackTree[+T] {
         s"$k - if Node is red then children must be black"
       )
 
-      List(second.toOption, fourth.toOption).flatten
+      List(second.merge, fourth.merge)
   }
 
   def validate: List[String] =
@@ -89,6 +89,48 @@ sealed trait RedBlackTree[+T] {
       Nil
     case Node(color, k, left, right, parentLabel) =>
       Node(color, f(k), left.map(f), right.map(f), parentLabel.map(f))
+  }
+}
+
+object RedBlackTree {
+  def leftRotate[T](root: RedBlackTree[T], keyToRotate: T)(
+    implicit ordering:    Ordering[T]
+  ): RedBlackTree[T] = {
+    @tailrec
+    def recur(a: RedBlackTree[T]): RedBlackTree[T] = a match {
+      case Nil => Nil
+      case x @ Node(xcolor, xk, xl, xr, xpl)
+          if ordering.equiv(xk, keyToRotate) =>
+        xr match {
+          case Nil => x
+          case Node(ycolor, yk, yl, yr, _) =>
+            yl match {
+              case Nil =>
+                Node(ycolor, yk, Node(xcolor, xk, xl, Nil, Some(yk)), yr, xpl)
+              case yln @ Node(_, _, _, _, _) =>
+                Node(
+                  ycolor,
+                  yk,
+                  Node(
+                    xcolor,
+                    xk,
+                    xl,
+                    yln.copy(parentLabel = Some(xk)),
+                    Some(yk)
+                  ),
+                  yr,
+                  xpl
+                )
+            }
+
+        }
+      case Node(_, lk, _, right, _) if ordering.lt(lk, keyToRotate) =>
+        recur(right)
+      case Node(_, _, left, _, _) =>
+        recur(left)
+    }
+
+    recur(root)
   }
 }
 
