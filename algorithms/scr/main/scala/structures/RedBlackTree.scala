@@ -30,9 +30,9 @@ sealed trait RedBlackTree[+T] {
     * @return
     */
   private def validateCurrent: List[String] = this match {
-    case Nil =>
+    case RBTNil =>
       List.empty
-    case Node(color, k, left, right, parentLabel) =>
+    case RBTNode(color, k, left, right, parentLabel) =>
       val second = Either.cond(
         (parentLabel.isEmpty && color.isBlack) || parentLabel.isDefined,
         s"$k - 2 passed",
@@ -57,9 +57,9 @@ sealed trait RedBlackTree[+T] {
         rr
       case ::(head, tl) =>
         head match {
-          case Nil =>
+          case RBTNil =>
             recur(rr, tl)
-          case Node(_, _, left, right, _) =>
+          case RBTNode(_, _, left, right, _) =>
             recur(f(rr, head), left :: right :: tl)
         }
     }
@@ -74,9 +74,9 @@ sealed trait RedBlackTree[+T] {
         rr
       case ::(head, tl) =>
         head match {
-          case Nil =>
+          case RBTNil =>
             recur(rr, tl)
-          case Node(_, k, left, right, _) =>
+          case RBTNode(_, k, left, right, _) =>
             recur(f(rr, k), left :: right :: tl)
         }
     }
@@ -85,10 +85,10 @@ sealed trait RedBlackTree[+T] {
   }
 
   def map[R](f: T => R): RedBlackTree[R] = this match {
-    case Nil =>
-      Nil
-    case Node(color, k, left, right, parentLabel) =>
-      Node(color, f(k), left.map(f), right.map(f), parentLabel.map(f))
+    case RBTNil =>
+      RBTNil
+    case RBTNode(color, k, left, right, parentLabel) =>
+      RBTNode(color, f(k), left.map(f), right.map(f), parentLabel.map(f))
   }
 }
 
@@ -96,22 +96,27 @@ object RedBlackTree {
   def leftRotate[T](root: RedBlackTree[T], keyToRotate: T)(
     implicit ordering:    Ordering[T]
   ): RedBlackTree[T] = {
-    @tailrec
     def recur(a: RedBlackTree[T]): RedBlackTree[T] = a match {
-      case Nil => Nil
-      case x @ Node(xcolor, xk, xl, xr, xpl)
+      case RBTNil => RBTNil
+      case x @ RBTNode(xcolor, xk, xl, xr, xpl)
           if ordering.equiv(xk, keyToRotate) =>
         xr match {
-          case Nil => x
-          case Node(ycolor, yk, yl, yr, _) =>
+          case RBTNil => x
+          case RBTNode(ycolor, yk, yl, yr, _) =>
             yl match {
-              case Nil =>
-                Node(ycolor, yk, Node(xcolor, xk, xl, Nil, Some(yk)), yr, xpl)
-              case yln @ Node(_, _, _, _, _) =>
-                Node(
+              case RBTNil =>
+                RBTNode(
                   ycolor,
                   yk,
-                  Node(
+                  RBTNode(xcolor, xk, xl, RBTNil, Some(yk)),
+                  yr,
+                  xpl
+                )
+              case yln @ RBTNode(_, _, _, _, _) =>
+                RBTNode(
+                  ycolor,
+                  yk,
+                  RBTNode(
                     xcolor,
                     xk,
                     xl,
@@ -124,25 +129,73 @@ object RedBlackTree {
             }
 
         }
-      case Node(_, lk, _, right, _) if ordering.lt(lk, keyToRotate) =>
-        recur(right)
-      case Node(_, _, left, _, _) =>
-        recur(left)
+      case RBTNode(color, k, l, r, parentLabel)
+          if ordering.lt(k, keyToRotate) =>
+        RBTNode(color, k, l, recur(r), parentLabel)
+      case RBTNode(color, k, l, r, parentLabel) =>
+        RBTNode(color, k, recur(l), r, parentLabel)
+    }
+
+    recur(root)
+  }
+
+  def rightRotate[T](root: RedBlackTree[T], keyToRotate: T)(
+    implicit ordering:     Ordering[T]
+  ): RedBlackTree[T] = {
+    def recur(a: RedBlackTree[T]): RedBlackTree[T] = a match {
+      case RBTNil => RBTNil
+      case y @ RBTNode(ycolor, yk, yl, yr, yparentLabel)
+          if ordering.equiv(keyToRotate, yk) =>
+        yl match {
+          case RBTNil => y
+          case RBTNode(xcolor, xk, xl, xr, _) =>
+            xr match {
+              case RBTNil =>
+                RBTNode(
+                  xcolor,
+                  xk,
+                  xl,
+                  RBTNode(ycolor, yk, RBTNil, yr, Some(xk)),
+                  yparentLabel
+                )
+              case xrn @ RBTNode(_, _, _, _, _) =>
+                RBTNode(
+                  xcolor,
+                  xk,
+                  xl,
+                  RBTNode(
+                    ycolor,
+                    yk,
+                    xrn.copy(parentLabel = Some(yk)),
+                    yr,
+                    Some(xk)
+                  ),
+                  yparentLabel
+                )
+            }
+        }
+
+      case RBTNode(color, xk, xl, xr, parentLabel)
+          if ordering.lt(keyToRotate, xk) =>
+        RBTNode(color, xk, recur(xl), xr, parentLabel)
+      case RBTNode(color, xk, xl, xr, parentLabel)
+          if ordering.gt(keyToRotate, xk) =>
+        RBTNode(color, xk, xl, recur(xr), parentLabel)
     }
 
     recur(root)
   }
 }
 
-case object Nil extends RedBlackTree[Nothing] {
+case object RBTNil extends RedBlackTree[Nothing] {
   override def color:       RBColor               = Black
   override def key:         Option[Nothing]       = None
-  override def left:        RedBlackTree[Nothing] = Nil
-  override def right:       RedBlackTree[Nothing] = Nil
+  override def left:        RedBlackTree[Nothing] = RBTNil
+  override def right:       RedBlackTree[Nothing] = RBTNil
   override def parentLabel: Option[Nothing]       = None
 }
 
-case class Node[+T](
+case class RBTNode[+T](
   color:       RBColor,
   k:           T,
   left:        RedBlackTree[T],
@@ -150,4 +203,104 @@ case class Node[+T](
   parentLabel: Option[T]
 ) extends RedBlackTree[T] {
   override def key: Option[T] = Some(k)
+}
+
+object TestApp extends App {
+  val testTree = RBTNode(
+    Black,
+    8,
+    RBTNode(
+      Red,
+      4,
+      RBTNode(
+        Black,
+        2,
+        RBTNode(
+          Red,
+          1,
+          RBTNil,
+          RBTNil,
+          Some(2)
+        ),
+        RBTNode(
+          Red,
+          3,
+          RBTNil,
+          RBTNil,
+          Some(2)
+        ),
+        Some(4)
+      ),
+      RBTNode(
+        Black,
+        6,
+        RBTNode(
+          Red,
+          5,
+          RBTNil,
+          RBTNil,
+          Some(6)
+        ),
+        RBTNode(
+          Red,
+          7,
+          RBTNil,
+          RBTNil,
+          Some(6)
+        ),
+        Some(4)
+      ),
+      Some(8)
+    ),
+    RBTNode(
+      Red,
+      12,
+      RBTNode(
+        Black,
+        10,
+        RBTNode(
+          Red,
+          9,
+          RBTNil,
+          RBTNil,
+          Some(10)
+        ),
+        RBTNode(
+          Red,
+          11,
+          RBTNil,
+          RBTNil,
+          Some(10)
+        ),
+        Some(12)
+      ),
+      RBTNode(
+        Black,
+        14,
+        RBTNode(
+          Red,
+          13,
+          RBTNil,
+          RBTNil,
+          Some(14)
+        ),
+        RBTNode(
+          Red,
+          15,
+          RBTNil,
+          RBTNil,
+          Some(14)
+        ),
+        Some(12)
+      ),
+      Some(8)
+    ),
+    None
+  )
+
+  val validate = testTree.validate
+  println(validate)
+
+  val result = RedBlackTree.leftRotate(testTree, 4)
+  println(result)
 }
