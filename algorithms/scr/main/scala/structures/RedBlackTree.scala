@@ -11,6 +11,12 @@ sealed trait RBColor {
 
   def isRed: Boolean = !isBlack
 }
+object RBColor {
+  def resolve(parent: RBColor, current: RBColor): RBColor = parent match {
+    case Red   => Black
+    case Black => Red
+  }
+}
 case object Red extends RBColor
 case object Black extends RBColor
 
@@ -20,6 +26,53 @@ sealed trait RedBlackTree[+T] {
   def left:        RedBlackTree[T]
   def right:       RedBlackTree[T]
   def parentLabel: Option[T]
+
+  def colorBalance: RedBlackTree[T] = this match {
+    case RBTNil => RBTNil
+    case RBTNode(color, k, left, right, parentLabel) =>
+      val (l, r) = (left, right) match {
+        case (RBTNil, RBTNil) => (RBTNil, RBTNil)
+        case (RBTNil, RBTNode(_, ak, aleft, aright, aparentLabel)) =>
+          (
+            RBTNil,
+            RBTNode(
+              Black,
+              ak,
+              aleft,
+              aright,
+              aparentLabel
+            )
+          )
+        case (RBTNode(_, ak, aleft, aright, aparentLabel), RBTNil) =>
+          (
+            RBTNode(
+              Black,
+              ak,
+              aleft,
+              aright,
+              aparentLabel
+            ),
+            RBTNil
+          )
+        case (
+            RBTNode(acolor, ak, aleft, aright, aparentLabel),
+            RBTNode(_, bk, bleft, bright, bparentLabel)
+            ) =>
+          val resolved = RBColor.resolve(color, acolor)
+          (
+            RBTNode(resolved, ak, aleft, aright, aparentLabel),
+            RBTNode(resolved, bk, bleft, bright, bparentLabel)
+          )
+      }
+
+      RBTNode(
+        color,
+        k,
+        l.colorBalance,
+        r.colorBalance,
+        parentLabel
+      )
+  }
 
   /**
     * 1. Each Node can be red or black
@@ -136,7 +189,7 @@ object RedBlackTree {
         RBTNode(color, k, recur(l), r, parentLabel)
     }
 
-    recur(root)
+    recur(root).colorBalance
   }
 
   def rightRotate[T](root: RedBlackTree[T], keyToRotate: T)(
