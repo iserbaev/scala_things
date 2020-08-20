@@ -3,7 +3,7 @@ import sbt._
 
 object Settings {
   def commonSettings2_13() = Seq(
-    scalaVersion := "2.13.1",
+    scalaVersion := "2.13.3",
     Compile / scalacOptions ++= compilerSettings_2_13, // https://gist.github.com/guilgaly/b73ad98384051ecdc7be39b1f053fc87
     addCompilerPlugin(
       ("org.typelevel" %% "kind-projector" % "0.11.0").cross(CrossVersion.full)

@@ -2,22 +2,21 @@ import sbt._
 
 object Deps {
   private object Versions {
-    val cats        = "2.0.0"
+    val cats        = "2.1.1"
     val catsTagless = "0.11"
     val shapeless   = "2.3.3"
 
     val scalaLogging = "3.9.2"
     val logback      = "1.2.3"
 
-    val fs2 = "2.2.1"
+    val fs2 = "2.4.3"
 
-    val circe         = "0.11.1"
-    val http4sVersion = "0.20.13"
+    val circe         = "0.13.0"
+    val http4sVersion = "0.21.7"
 
-    val doobieVersion = "0.8.6"
+    val doobieVersion = "0.9.0"
 
-    val kafkaStreams = "2.3.0"
-    val fs2_kafka    = "0.20.2"
+    val fs2_kafka = "1.0.0"
 
     val spire = "0.17.0-M1"
 
@@ -96,7 +95,7 @@ object Deps {
     "co.fs2" %% "fs2-reactive-streams" % Versions.fs2 // optional reactive streams interop
   )
   private lazy val fs2_kafka = Seq(
-    "com.ovoenergy" %% "fs2-kafka" % Versions.fs2_kafka
+    "com.github.fd4s" %% "fs2-kafka" % Versions.fs2_kafka
   )
 
   private lazy val spire = Seq(
