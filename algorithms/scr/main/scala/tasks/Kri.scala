@@ -3,7 +3,6 @@ package tasks
 import java.util.UUID
 
 import scala.annotation.tailrec
-import scala.collection.SortedMap
 
 object Kri extends App {
   val a = Option(1)
