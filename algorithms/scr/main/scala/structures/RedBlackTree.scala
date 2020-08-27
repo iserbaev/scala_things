@@ -5,20 +5,20 @@ import scala.collection.immutable
 
 sealed trait RBColor {
   def isBlack: Boolean = this match {
-    case Red   => false
-    case Black => true
+    case RBColor.Red   => false
+    case RBColor.Black => true
   }
 
   def isRed: Boolean = !isBlack
 }
 object RBColor {
-  def resolve(parent: RBColor, current: RBColor): RBColor = parent match {
+  def resolve(parent: RBColor): RBColor = parent match {
     case Red   => Black
     case Black => Red
   }
+  case object Red extends RBColor
+  case object Black extends RBColor
 }
-case object Red extends RBColor
-case object Black extends RBColor
 
 sealed trait RedBlackTree[+T] {
   def color:       RBColor
@@ -36,7 +36,7 @@ sealed trait RedBlackTree[+T] {
           (
             RBTNil,
             RBTNode(
-              Black,
+              RBColor.Black,
               ak,
               aleft,
               aright,
@@ -46,7 +46,7 @@ sealed trait RedBlackTree[+T] {
         case (RBTNode(_, ak, aleft, aright, aparentLabel), RBTNil) =>
           (
             RBTNode(
-              Black,
+              RBColor.Black,
               ak,
               aleft,
               aright,
@@ -55,10 +55,10 @@ sealed trait RedBlackTree[+T] {
             RBTNil
           )
         case (
-            RBTNode(acolor, ak, aleft, aright, aparentLabel),
+            RBTNode(_, ak, aleft, aright, aparentLabel),
             RBTNode(_, bk, bleft, bright, bparentLabel)
             ) =>
-          val resolved = RBColor.resolve(color, acolor)
+          val resolved = RBColor.resolve(color)
           (
             RBTNode(resolved, ak, aleft, aright, aparentLabel),
             RBTNode(resolved, bk, bleft, bright, bparentLabel)
@@ -241,7 +241,7 @@ object RedBlackTree {
 }
 
 case object RBTNil extends RedBlackTree[Nothing] {
-  override def color:       RBColor               = Black
+  override def color:       RBColor               = RBColor.Black
   override def key:         Option[Nothing]       = None
   override def left:        RedBlackTree[Nothing] = RBTNil
   override def right:       RedBlackTree[Nothing] = RBTNil
@@ -259,6 +259,7 @@ case class RBTNode[+T](
 }
 
 object TestApp extends App {
+  import RBColor._
   val testTree = RBTNode(
     Black,
     8,
