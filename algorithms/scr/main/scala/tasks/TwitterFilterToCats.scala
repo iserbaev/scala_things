@@ -36,9 +36,23 @@ object TwitterFilterToCats extends App {
   val rC: CatsFilter[String, Unit] = (r, k) =>
     fC1(r, identityC).flatMap(fC2(_, identityC)).flatMap(s => k.apply(s))
 
+  def catsServiceToTwitter[Req, Rep](
+    cs: CatsService[Req, Rep]
+  ): Service[Req, Rep] = cs.apply
+  def twTCatsService[Req, Rep](serv: Service[Req, Rep]): CatsService[Req, Rep] =
+    Kleisli(serv.apply)
+  def catsFilterToTwitter[Req, Rep](
+    cf: CatsFilter[Req, Rep]
+  ): Filter[Req, Rep] = (req, serv) => cf.apply(req, twTCatsService(serv))
+
   val s = "low"
 
   Await.result(rT(s, printT), Duration.Inf)
   Await.result(rC(s, printC), Duration.Inf)
+
+  Await.result(
+    catsFilterToTwitter(rC)(s, catsServiceToTwitter(printC)),
+    Duration.Inf
+  )
 
 }
