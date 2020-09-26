@@ -28,7 +28,7 @@ object Statement_2 {
         copy(notProcessed = notProcessed + 1)
 
       def run(nextArrival: Long): State = {
-        val (resultArrival, logs, acc) =
+        val (_, logs, acc) =
           durations.foldLeft((arrival, processingLogs, IndexedSeq.empty[Long])) {
             case ((currentArrival, logs, acc), d) =>
               if (currentArrival <= nextArrival) {
@@ -43,8 +43,8 @@ object Statement_2 {
           }
 
         val resultLogs = logs ++ Seq.fill[Long](notProcessed)(-1)
-        if (acc.isEmpty) Vacant(resultArrival, resultLogs)
-        else Worked(resultArrival, acc, resultLogs, 0)
+        if (acc.isEmpty) Vacant(nextArrival, resultLogs)
+        else Worked(nextArrival, acc, resultLogs, 0)
       }
     }
     case class Vacant(arrival: Long, processingLogs: IndexedSeq[Long])
@@ -52,31 +52,21 @@ object Statement_2 {
       override def durations: IndexedSeq[Long] = IndexedSeq.empty
     }
 
+    @scala.annotation.tailrec
     def process(bufferSize: Int, state: State, next: Packet): State =
       state match {
-        case v: Vacant if next.duration == 0 =>
-          Vacant(next.arrival, v.processingLogs.:+(next.arrival))
         case v: Vacant =>
-          Worked(next.arrival, IndexedSeq(next.duration), v.processingLogs, 0)
-        case w: Worked
-            if next.arrival == w.arrival & w.durations.length <= bufferSize =>
-          w.addPacket(next)
-        case w: Worked
-            if next.arrival == w.arrival & w.durations.length > bufferSize =>
-          w.skipPacket
+          if (next.duration == 0)
+            Vacant(next.arrival, v.processingLogs.:+(next.arrival))
+          else
+            Worked(next.arrival, IndexedSeq(next.duration), v.processingLogs, 0)
+        case w: Worked if next.arrival == w.arrival =>
+          if (w.durations.length < bufferSize)
+            w.addPacket(next)
+          else
+            w.skipPacket
         case w: Worked if next.arrival != w.arrival =>
-          val result = w.run(next.arrival)
-          if (result.durations.length >= bufferSize) {
-            Worked(next.arrival, result.durations, result.processingLogs, 1)
-          } else {
-            Worked(
-              next.arrival,
-              result.durations.:+(next.duration),
-              result.processingLogs,
-              0
-            )
-          }
-
+          process(bufferSize, w.run(next.arrival), next)
       }
   }
 
