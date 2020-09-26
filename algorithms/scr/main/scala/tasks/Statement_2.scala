@@ -21,11 +21,17 @@ object Statement_2 {
       processingLogs: IndexedSeq[Long],
       notProcessed:   Int
     ) extends State {
+      def addPacket(next: Packet): State =
+        copy(durations = durations.:+(next.duration))
+
+      def skipPacket: State =
+        copy(notProcessed = notProcessed + 1)
+
       def run(nextArrival: Long): State = {
-        val (_, logs, acc) =
+        val (resultArrival, logs, acc) =
           durations.foldLeft((arrival, processingLogs, IndexedSeq.empty[Long])) {
             case ((currentArrival, logs, acc), d) =>
-              if (currentArrival + d <= nextArrival) {
+              if (currentArrival <= nextArrival) {
                 (currentArrival + d, logs.:+(currentArrival), acc)
               } else {
                 (
@@ -37,8 +43,8 @@ object Statement_2 {
           }
 
         val resultLogs = logs ++ Seq.fill[Long](notProcessed)(-1)
-        if (acc.isEmpty) Vacant(nextArrival, resultLogs)
-        else Worked(nextArrival, acc, resultLogs, 0)
+        if (acc.isEmpty) Vacant(resultArrival, resultLogs)
+        else Worked(resultArrival, acc, resultLogs, 0)
       }
     }
     case class Vacant(arrival: Long, processingLogs: IndexedSeq[Long])
@@ -53,26 +59,22 @@ object Statement_2 {
         case v: Vacant =>
           Worked(next.arrival, IndexedSeq(next.duration), v.processingLogs, 0)
         case w: Worked
-            if next.arrival == w.arrival & w.durations.length < bufferSize =>
-          w.copy(durations = w.durations.:+(next.duration))
+            if next.arrival == w.arrival & w.durations.length <= bufferSize =>
+          w.addPacket(next)
         case w: Worked
-            if next.arrival == w.arrival & w.durations.length >= bufferSize =>
-          w.copy(notProcessed = w.notProcessed + 1)
+            if next.arrival == w.arrival & w.durations.length > bufferSize =>
+          w.skipPacket
         case w: Worked if next.arrival != w.arrival =>
           val result = w.run(next.arrival)
           if (result.durations.length >= bufferSize) {
             Worked(next.arrival, result.durations, result.processingLogs, 1)
           } else {
-            if (next.duration == 0) {
-              Vacant(next.arrival, result.processingLogs.:+(next.arrival))
-            } else {
-              Worked(
-                next.arrival,
-                result.durations.:+(next.duration),
-                result.processingLogs,
-                0
-              )
-            }
+            Worked(
+              next.arrival,
+              result.durations.:+(next.duration),
+              result.processingLogs,
+              0
+            )
           }
 
       }
