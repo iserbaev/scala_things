@@ -63,12 +63,16 @@ object Statement_2 {
           if (result.durations.length >= bufferSize) {
             Worked(next.arrival, result.durations, result.processingLogs, 1)
           } else {
-            Worked(
-              next.arrival,
-              result.durations.:+(next.duration),
-              result.processingLogs,
-              0
-            )
+            if (next.duration == 0) {
+              Vacant(next.arrival, result.processingLogs.:+(next.arrival))
+            } else {
+              Worked(
+                next.arrival,
+                result.durations.:+(next.duration),
+                result.processingLogs,
+                0
+              )
+            }
           }
 
       }
@@ -111,10 +115,7 @@ object TestApp extends App {
       tmp.head.toLong -> tmp.last.toLong
     })
 
-    val result = Statement_2
-      .process(bufferSize, n, arrivalWithDurations)
-
-    println(result)
+    val result = Statement_2.process(bufferSize, n, arrivalWithDurations)
     println(result.logs)
     assert(result.logs == expected)
   }
@@ -144,5 +145,15 @@ object TestApp extends App {
        |1 3""".stripMargin
   val t2expected = "0 0 0 1 2 -1 -1 -1"
   test(t2, t2expected)
+
+  val t3 =
+    s"""1 5
+       |999999 1
+       |1000000 0
+       |1000000 1
+       |1000000 0
+       |1000000 0""".stripMargin
+  val t3expected = "999999 1000000 1000000 -1 -1"
+  test(t3, t3expected)
 
 }
