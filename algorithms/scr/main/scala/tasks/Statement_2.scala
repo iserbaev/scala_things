@@ -11,7 +11,7 @@ object Statement_2 {
       if (processingLogs.nonEmpty) {
         processingLogs.mkString(" ")
       } else {
-        "0"
+        ""
       }
   }
   object State {
@@ -29,9 +29,9 @@ object Statement_2 {
                 (currentArrival + d, logs.:+(currentArrival), acc)
               } else {
                 (
-                  nextArrival + 1,
+                  currentArrival + d,
                   logs,
-                  acc.:+(d - (nextArrival - currentArrival))
+                  acc.:+(currentArrival + d)
                 )
               }
           }
@@ -156,4 +156,14 @@ object TestApp extends App {
   val t3expected = "999999 1000000 1000000 -1 -1"
   test(t3, t3expected)
 
+  val t4 =
+    s"""3 6
+       |0 7
+       |0 0
+       |2 0
+       |3 3
+       |4 0
+       |5 0""".stripMargin
+  val t4expected = "0 7 7 -1 -1 -1"
+  test(t4, t4expected)
 }
