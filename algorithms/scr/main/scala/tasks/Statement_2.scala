@@ -16,29 +16,26 @@ object Statement_2 {
   }
   object State {
     case class Worked(
-      arrival:           Long,
-      durations:         IndexedSeq[Long],
-      processingLogs:    IndexedSeq[Long],
-      notProcessedCount: Int
+      arrival:        Long,
+      durations:      IndexedSeq[Long],
+      processingLogs: IndexedSeq[Long],
+      notProcessed:   Int
     ) extends State {
-      def run(quant: Long): State = {
+      def run(nextArrival: Long): State = {
+        val quant = nextArrival - arrival
         val (logs, acc) =
           durations.foldLeft((processingLogs, IndexedSeq.empty[Long])) {
             case ((logs, acc), d) =>
               if (d <= quant) {
-                logs.:+(d) -> acc
+                logs.:+(arrival + d - 1) -> acc
               } else {
                 logs -> acc.:+(d - quant)
               }
           }
 
-        val resultLogs: IndexedSeq[Long] = logs ++ Seq.fill[Long](
-            notProcessedCount
-          )(
-            -1
-          )
-        if (acc.isEmpty) Vacant(arrival, resultLogs)
-        else Worked(arrival, acc, resultLogs, 0)
+        val resultLogs = logs ++ Seq.fill[Long](notProcessed)(-1)
+        if (acc.isEmpty) Vacant(nextArrival, resultLogs)
+        else Worked(nextArrival, acc, resultLogs, 0)
       }
     }
     case class Vacant(arrival: Long, processingLogs: IndexedSeq[Long])
@@ -57,9 +54,9 @@ object Statement_2 {
           w.copy(durations = w.durations.:+(next.duration))
         case w: Worked
             if next.arrival == w.arrival & w.durations.length >= bufferSize =>
-          w.copy(notProcessedCount = w.notProcessedCount + 1)
+          w.copy(notProcessed = w.notProcessed + 1)
         case w: Worked if next.arrival != w.arrival =>
-          val result = w.run(next.arrival - w.arrival)
+          val result = w.run(next.arrival)
           if (result.durations.length >= bufferSize) {
             Worked(next.arrival, result.durations, result.processingLogs, 1)
           } else {
