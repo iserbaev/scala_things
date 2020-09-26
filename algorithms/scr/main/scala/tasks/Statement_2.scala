@@ -22,14 +22,17 @@ object Statement_2 {
       notProcessed:   Int
     ) extends State {
       def run(nextArrival: Long): State = {
-        val quant = nextArrival - arrival
-        val (logs, acc) =
-          durations.foldLeft((processingLogs, IndexedSeq.empty[Long])) {
-            case ((logs, acc), d) =>
-              if (d <= quant) {
-                logs.:+(arrival + d - 1) -> acc
+        val (_, logs, acc) =
+          durations.foldLeft((arrival, processingLogs, IndexedSeq.empty[Long])) {
+            case ((currentArrival, logs, acc), d) =>
+              if (currentArrival + d <= nextArrival) {
+                (currentArrival + d, logs.:+(currentArrival), acc)
               } else {
-                logs -> acc.:+(d - quant)
+                (
+                  nextArrival + 1,
+                  logs,
+                  acc.:+(d - (nextArrival - currentArrival))
+                )
               }
           }
 
