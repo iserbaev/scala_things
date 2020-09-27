@@ -53,7 +53,7 @@ object Statement_2 {
           val remaining = running
             .copy(arrival = next.arrival, duration = running.duration - quant)
           val updatedPackets =
-            packets.map(_.copy(arrival = next.arrival)).:+(next)
+            packets.map(_.copy(arrival = next.arrival))
           Worked(remaining, updatedPackets, processingLogs, notProcessed)
         }
       }
