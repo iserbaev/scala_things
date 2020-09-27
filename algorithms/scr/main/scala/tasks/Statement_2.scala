@@ -8,8 +8,10 @@ object Statement_2 {
     def packets:        IndexedSeq[Packet]
     def processingLogs: IndexedSeq[Long]
     def notProcessed:   Int
+    def fillLogs: IndexedSeq[Long] =
+      processingLogs ++ Seq.fill[Long](notProcessed)(-1)
     def logs: String = {
-      val resultLogs = processingLogs ++ Seq.fill[Long](notProcessed)(-1)
+      val resultLogs = fillLogs
       if (resultLogs.nonEmpty) {
         resultLogs.mkString(" ")
       } else {
@@ -204,4 +206,25 @@ object TestApp extends App {
        |5 0""".stripMargin
   val t4expected = "0 7 7 -1 -1 -1"
   test(t4, t4expected)
+
+  val t5 =
+    s"""2 6
+       |0 2
+       |0 0
+       |2 0
+       |3 0
+       |4 0
+       |5 0""".stripMargin
+  val t5expected = "0 2 2 3 4 5"
+  test(t5, t5expected)
+
+  val t6 =
+    s"""2 5
+       |2 9
+       |4 8
+       |10 9
+       |15 2
+       |19 1""".stripMargin
+  val t6expected = "2 11 -1 19 21"
+  test(t6, t6expected)
 }
