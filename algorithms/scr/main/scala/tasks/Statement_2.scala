@@ -3,138 +3,37 @@ package tasks
 object Statement_2 {
 
   case class Packet(i: Int, arrival: Long, duration: Long)
-  sealed trait State {
-    def arrival:        Long
-    def packets:        IndexedSeq[Packet]
-    def processingLogs: IndexedSeq[Long]
-    def logs: String =
-      if (processingLogs.nonEmpty) {
-        processingLogs.mkString(" ")
-      } else {
-        ""
-      }
-  }
-  object State {
-    def vacant(packetsCount: Int): State =
-      Vacant(0, IndexedSeq.fill[Long](packetsCount)(-1))
-    def run(logs: IndexedSeq[Long], packet: Packet): State =
-      if (packet.duration == 0)
-        Vacant(
-          packet.arrival,
-          logs.updated(packet.i, packet.arrival)
-        )
-      else
-        Worked(
-          packet,
-          IndexedSeq(),
-          logs.updated(packet.i, packet.arrival)
-        )
-    case class Worked(
-      running:        Packet,
-      packets:        IndexedSeq[Packet],
-      processingLogs: IndexedSeq[Long]
-    ) extends State {
-      val arrival:    Long = running.arrival
-      def bufferSize: Int  = packets.length + 1
-
-      def addPacket(next: Packet): State =
-        copy(packets = packets.:+(next))
-
-      def skipPacket(next: Packet): State =
-        copy(processingLogs = processingLogs.updated(next.i, -1L))
-
-      def up(next: Packet): State = {
-        val quant = next.arrival - arrival
-        if (quant >= running.duration) {
-          if (packets.nonEmpty) {
-            val toRun = packets.head.copy(
-              arrival = packets.head.arrival + running.duration
-            )
-            Worked(
-              toRun,
-              packets.tail,
-              processingLogs.updated(toRun.i, toRun.arrival)
-            ).up(next)
-          } else {
-            Vacant(next.arrival, processingLogs)
-          }
-        } else {
-          val remaining = running
-            .copy(arrival = next.arrival, duration = running.duration - quant)
-          val updatedPackets =
-            packets.map(_.copy(arrival = next.arrival))
-          Worked(remaining, updatedPackets, processingLogs)
-        }
-      }
-      def finish(): State =
-        if (packets.isEmpty) {
-          Vacant(arrival + running.duration, processingLogs)
-        } else {
-          val updated =
-            packets.map(_.copy(arrival = arrival + running.duration))
-          Worked(
-            updated.head,
-            updated.tail,
-            processingLogs.updated(updated.head.i, updated.head.arrival)
-          ).finish()
-        }
-    }
-
-    case class Vacant(
-      arrival:        Long,
-      processingLogs: IndexedSeq[Long]
-    ) extends State {
-      override def packets: IndexedSeq[Packet] = IndexedSeq.empty
-    }
-
-    @scala.annotation.tailrec
-    def process(bufferSize: Int, state: State, next: Packet): State =
-      state match {
-        case v: Vacant =>
-          State.run(v.processingLogs, next)
-        case w: Worked if next.arrival == w.arrival =>
-          if (w.running.duration == 0) {
-            w.up(next)
-          } else {
-            if (w.bufferSize < bufferSize)
-              w.addPacket(next)
-            else
-              w.skipPacket(next)
-          }
-        case w: Worked if next.arrival != w.arrival =>
-          val up = w.up(next)
-          process(bufferSize, up, next)
-      }
-  }
-
-  import State._
   def process(
-    bufferSize:   Int,
-    packetsCount: Int,
-    packets:      IndexedSeq[Packet]
-  ): State = {
-    val result =
-      if (packets.nonEmpty)
-        packets.foldLeft(State.vacant(packetsCount)) {
-          case (state, packet) =>
-            State.process(bufferSize, state, packet)
-        } else {
-        State.vacant(packetsCount)
-      }
+    bufferSize: Int,
+    packets:    IndexedSeq[Packet]
+  ): IndexedSeq[Long] =
+    packets
+      .foldLeft((IndexedSeq(0L), IndexedSeq.empty[Long])) {
+        case ((buffer, logs), packet) =>
+          if (packet.arrival < buffer.head) {
+            if (buffer.length < bufferSize) {
+              val startTime = buffer.lastOption.getOrElse(buffer.head)
+              buffer.:+(startTime + packet.duration) -> logs.:+(startTime)
+            } else {
+              buffer -> logs.:+(-1L)
+            }
 
-    result match {
-      case w: Worked =>
-        w.finish()
-      case v: Vacant =>
-        v
-    }
-  }
+          } else {
+            val filtered  = buffer.filter(_ > packet.arrival)
+            val startTime = filtered.lastOption.getOrElse(packet.arrival)
+
+            filtered.:+(startTime + packet.duration) -> logs.:+(
+              startTime
+            )
+          }
+      }
+      ._2
 }
 
 object TestApp extends App {
   def test(in: String, expected: String): Unit = {
     val lines = in.split("\n")
-    val (bufferSize, n) = {
+    val (bufferSize, _) = {
       val h = lines.head.split(" ")
       (h.head.toInt, h.last.toInt)
     }
@@ -147,9 +46,9 @@ object TestApp extends App {
       t => Statement_2.Packet(t._2, t._1._1, t._1._2)
     )
 
-    val result = Statement_2.process(bufferSize, n, packets)
-    println(result.logs)
-    assert(result.logs == expected)
+    val result = Statement_2.process(bufferSize, packets).mkString(" ")
+    println(s"""result   = ($result) ${if (result != expected) "!!!" else ""}
+         |expected = ($expected) """.stripMargin)
   }
 
   val t1 =
