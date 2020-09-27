@@ -109,16 +109,15 @@ object Statement_2 {
 
   import State._
   def process(
-    bufferSize:          Int,
-    packetsCount:        Int,
-    arrivalWithDuration: IndexedSeq[(Long, Long)]
+    bufferSize:   Int,
+    packetsCount: Int,
+    packets:      IndexedSeq[Packet]
   ): State = {
     val result =
-      if (arrivalWithDuration.nonEmpty)
-        (0 until packetsCount).foldLeft(State.vacant(packetsCount)) {
-          case (state, i) =>
-            val (arrival, duration) = arrivalWithDuration(i)
-            State.process(bufferSize, state, Packet(i, arrival, duration))
+      if (packets.nonEmpty)
+        packets.foldLeft(State.vacant(packetsCount)) {
+          case (state, packet) =>
+            State.process(bufferSize, state, packet)
         } else {
         State.vacant(packetsCount)
       }
@@ -144,7 +143,11 @@ object TestApp extends App {
       tmp.head.toLong -> tmp.last.toLong
     })
 
-    val result = Statement_2.process(bufferSize, n, arrivalWithDurations)
+    val packets = arrivalWithDurations.zipWithIndex.map(
+      t => Statement_2.Packet(t._2, t._1._1, t._1._2)
+    )
+
+    val result = Statement_2.process(bufferSize, n, packets)
     println(result.logs)
     assert(result.logs == expected)
   }
