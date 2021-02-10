@@ -4,7 +4,7 @@ import scala.annotation.tailrec
 import scala.collection.mutable.{ArrayStack => ScalaStack}
 
 // statements #1
-object Stack {
+object StackBalanced {
   def isBalanced(str: String): String = {
     val open  = Seq('(', '[', '{')
     val close = Seq(')', ']', '}')
@@ -61,7 +61,7 @@ object Stack {
 
 object Test extends App {
   def test(str: String, expected: String = "Success") = {
-    val res = Stack.isBalanced(str)
+    val res = StackBalanced.isBalanced(str)
     println(s"$str -> $expected")
     assert(res == expected, s"$res != $str -> $expected")
   }
