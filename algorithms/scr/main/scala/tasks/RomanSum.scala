@@ -128,4 +128,7 @@ object SumTest extends App {
   testConvert("MCMXC", 1990)
   testConvert("MMVIII", 2008)
   testConvert("MDCLXVI", 1666)
+  testConvert("MMMCMXCVIII", 3998)
+
+  testSum("MCMXC","MMVIII","MMMCMXCVIII")
 }
