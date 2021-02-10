@@ -13,7 +13,7 @@ import scala.util.{Failure, Success, Try}
 //  * I, C and M can only be repeated three times in succession
 //* Numbers bigger than MMMCMXCIX are out of scope of this exercise
 
-case class Roman(s: String)  {
+case class Roman(s: String) extends AnyVal {
   def validate(): Unit = {
     require(s.toUpperCase.count(_ == 'V') <= 1, "V can only be once in a number")
     require(s.toUpperCase.count(_ == 'L') <= 1, "L can only be once in a number")
@@ -90,7 +90,9 @@ object RomanCalculator extends App {
   }
 
   def calculateRomanSum(): Try[String] = Try {
-    println("type first roman number, put enter, and then second roman number. After validating and calc sum will print")
+    println(
+      """Type first roman number, hit enter, and then second roman number.
+        |After validating and calc sum will print""".stripMargin)
     val input1: String = io.StdIn.readLine()
     val input2: String = io.StdIn.readLine()
 
@@ -125,6 +127,9 @@ object SumTest extends App {
     assert(res.toArabic == expected, s"$res != $expected")
   }
 
+  Roman.mapping.foreach {
+    case (c, i) => testConvert(c.toString, i)
+  }
   testConvert("MCMXC", 1990)
   testConvert("MMVIII", 2008)
   testConvert("MDCLXVI", 1666)
