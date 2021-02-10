@@ -51,18 +51,6 @@ object Roman {
 object RomanCalculator extends App {
   import Roman._
 
-  sealed trait Command {
-    def value: String
-  }
-  object Command {
-    case object RomanSum extends Command {
-      val value = "romanSum"
-    }
-    case object Exit extends Command {
-      val value = "exit"
-    }
-  }
-
   def runApp(): Unit = {
     val preamble =
       s"""
