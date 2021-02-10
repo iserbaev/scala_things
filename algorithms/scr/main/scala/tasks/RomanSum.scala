@@ -19,7 +19,7 @@ case class Roman(s: String) extends AnyVal {
     require(s.toUpperCase.count(_ == 'L') <= 1, "L can only be once in a number")
     require(s.toUpperCase.count(_ == 'D') <= 1, "D can only be once in a number")
 
-    require(!s.toUpperCase.contains("MMMM"), "M can only be repeated three times in succession")
+    require(!s.toUpperCase.contains("MMMM"), "M can only be repeated three times in succession") // dummy
     require(!s.toUpperCase.contains("CCCC"), "C can only be repeated three times in succession")
     require(!s.toUpperCase.contains("IIII"), "I can only be repeated three times in succession")
   }
