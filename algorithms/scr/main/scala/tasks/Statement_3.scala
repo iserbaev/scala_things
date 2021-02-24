@@ -141,7 +141,7 @@ object Statement_3 {
   }
 }
 
-object TestApp extends App {
+object TestApp2 extends App {
   def test(in: String, expected: String): Unit = {
     val lines = in.split("\n")
     val (bufferSize, n) = {
