@@ -4,35 +4,66 @@ import scala.collection.mutable.ArrayBuffer
 
 object Statement_5 {
 
-  def maxInWindow(n: Int, a: Seq[Int], m: Int): Seq[Int] = {
-    def slice(max: Int, i: Int, element: Int): (Int, Int) =
-      if (i < m) {
-        (max.max(element), i + 1)
-      } else {
-        (element, 1)
-      }
-    val acc =
-      a.tail
-        .foldLeft(
-          ((a.head, m), (a.head, 1), ArrayBuffer(a.head))
-        ) {
-          case (((max0, i0), (max1, i1), acc), e) =>
-            if (i0 < m) {
-              val max = slice(max0, i0, e)
-              acc.append(max._1)
-              (max, slice(max1, i1, e), acc)
-            } else {
-              val max = slice(max1, i1, e)
-              acc.append(max._1)
-              (max, (e, 1), acc)
-            }
-        }
-        ._3
+  case class MaxWindow(windowSize: Int) {
+    type ElElIdxMaxMaxIdx = (Int, Int, Int, Int)
 
-    acc.drop(m - 1)
+    private val buf = ArrayBuffer[ElElIdxMaxMaxIdx]()
+
+    def max: Int =
+      buf.last._3
+
+    private def lastIdx = buf.length - 1
+
+    def add(e: Int): Unit =
+      if (buf.nonEmpty) {
+        val (_, _, prevMax, prevMaxIdx) = buf.last
+        val newIdx                      = lastIdx + 1
+        if (prevMax <= e) {
+          buf.append((e, newIdx, e, newIdx))
+        } else {
+          if (prevMaxIdx > (newIdx - windowSize))
+            buf.append((e, newIdx, prevMax, prevMaxIdx))
+          else {
+            val (newMax, newMaxIdx) = {
+              val from =
+                if (lastIdx + 1 < windowSize) 0
+                else newIdx - windowSize + 1
+              val to    = lastIdx + 1
+              val slice = buf.slice(from, to)
+              val (ee, eeIdx, _, _) =
+                if (slice.nonEmpty) slice.maxBy(_._1)
+                else (e, newIdx, e, newIdx)
+
+              if (e >= ee) (e, newIdx)
+              else (ee, eeIdx)
+            }
+            buf.append((e, newIdx, newMax, newMaxIdx))
+          }
+        }
+      } else {
+        buf.append((e, 0, e, 0))
+      }
+
+  }
+
+  def maxInWindow(n: Int, a: Array[Int], m: Int): Seq[Int] = {
+    val result =
+      if (a.length <= m) Seq(a.max)
+      else {
+        val maxWindow = MaxWindow(m)
+        a.foldLeft(ArrayBuffer.empty[Int]) {
+          case (acc, e) =>
+            maxWindow.add(e)
+            acc.append(maxWindow.max)
+            acc
+        }
+      }
+
+    result.slice(m - 1, n)
   }
 
 }
+
 object TestApp5 extends App {
   def test(a: String, m: Int, expected: String): Unit = {
     val aa = a.split(" ").map(_.toInt)
