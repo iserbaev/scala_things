@@ -1,6 +1,7 @@
 package tasks
 
 import scala.collection.mutable.ArrayBuffer
+import scala.util.Random
 
 object Statement_5 {
 
@@ -60,14 +61,37 @@ object Statement_5 {
         .slice(m - 1, n)
     }
 
+  def main(args: Array[String]): Unit = {
+    val n  = scala.io.StdIn.readInt()
+    val ar = scala.io.StdIn.readLine().split(" ").map(_.toInt)
+    val m  = scala.io.StdIn.readInt()
+
+    val res = maxInWindow(n, ar, m)
+    val sb  = new StringBuilder()
+    res.foreach { i =>
+      sb.append(i)
+      sb.append(' ')
+    }
+    println(sb.result())
+  }
+
 }
 
 object TestApp5 extends App {
   def test(a: String, m: Int, expected: String): Unit = {
     val aa = a.split(" ").map(_.toInt)
+    val result: String = t(m, aa)
+    if (result != expected) println(s"($result) != ($expected)")
+  }
+
+  private def t(m: Int, aa: Array[Int]) = {
+    val before = System.currentTimeMillis()
     val result =
       Statement_5.maxInWindow(aa.length, aa, m).mkString(" ")
-    if (result != expected) println(s"($result) != ($expected)")
+
+    val after = System.currentTimeMillis()
+    println(s"Time = ${after - before} MS, n = ${aa.length}, m = $m")
+    result
   }
 
   test("2 1 5", 1, "2 1 5")
@@ -94,4 +118,20 @@ object TestApp5 extends App {
 
   test("1 4 5 6 1 1 1 1", 4, "6 6 6 6 1")
   test("1 4 5 6 1 1 1 1", 4, "6 6 6 6 1")
+
+  val a = (1 to 100).map(_     => Random.nextInt()).toArray
+  val b = (1 to 1000).map(_    => Random.nextInt()).toArray
+  val c = (1 to 10000).map(_   => Random.nextInt()).toArray
+  val d = (1 to 100000).map(_  => Random.nextInt()).toArray
+  val e = (1 to 1000000).map(_ => Random.nextInt()).toArray
+
+  val mm = (1 to 100).toArray
+
+  mm.foreach { m =>
+    t(m, a)
+    t(m, b)
+    t(m, c)
+    t(m, d)
+    t(m, e)
+  }
 }
