@@ -46,21 +46,19 @@ object Statement_5 {
 
   }
 
-  def maxInWindow(n: Int, a: Array[Int], m: Int): Seq[Int] = {
-    val result =
-      if (a.length <= m) Seq(a.max)
-      else {
-        val maxWindow = MaxWindow(m)
-        a.foldLeft(ArrayBuffer.empty[Int]) {
+  def maxInWindow(n: Int, a: Array[Int], m: Int): Seq[Int] =
+    if (a.length <= m) Seq(a.max)
+    else if (m == n) Seq(a.max)
+    else {
+      val maxWindow = MaxWindow(m)
+      a.foldLeft(ArrayBuffer.empty[Int]) {
           case (acc, e) =>
             maxWindow.add(e)
             acc.append(maxWindow.max)
             acc
         }
-      }
-
-    result.slice(m - 1, n)
-  }
+        .slice(m - 1, n)
+    }
 
 }
 
@@ -94,5 +92,6 @@ object TestApp5 extends App {
     "83 83 77 77 48 72 72 72 72 72 58"
   )
 
+  test("1 4 5 6 1 1 1 1", 4, "6 6 6 6 1")
   test("1 4 5 6 1 1 1 1", 4, "6 6 6 6 1")
 }
