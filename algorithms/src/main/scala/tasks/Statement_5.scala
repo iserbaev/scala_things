@@ -99,6 +99,7 @@ object TestApp5 extends App {
     result
   }
 
+  val beforeAll = System.currentTimeMillis()
   test("2 1 5", 1, "2 1 5")
   test("2 7 3 1 5 2 6 2", 4, "7 7 5 6 6")
   test(
@@ -139,4 +140,8 @@ object TestApp5 extends App {
     t(m, d)
     t(m, e)
   }
+
+  val afterAll = System.currentTimeMillis()
+
+  println(s"All test timeline = ${afterAll - beforeAll} MS")
 }
