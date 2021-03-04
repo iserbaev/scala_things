@@ -15,7 +15,7 @@ object Statement_5 {
 
     private def lastIdx = buf.length - 1
 
-    private def maxInSlice(
+    private def maxInWindow(
       from: Int,
       to:   Int,
       e:    Int,
@@ -42,7 +42,7 @@ object Statement_5 {
               if (lastIdx + 1 < windowSize) 0 else newIdx - windowSize + 1
             val to = lastIdx + 1
 
-            val (newMax, newMaxIdx) = maxInSlice(from, to, e, newIdx)
+            val (newMax, newMaxIdx) = maxInWindow(from, to, e, newIdx)
             buf.append((e, newIdx, newMax, newMaxIdx))
           }
         }
