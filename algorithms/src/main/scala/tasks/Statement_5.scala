@@ -28,7 +28,7 @@ object Statement_5 {
       } else (e, eIdx)
     }
 
-    def add(e: Int): Unit =
+    def add(e: Int): MaxWindow = {
       if (buf.nonEmpty) {
         val (_, _, prevMax, prevMaxIdx) = buf.last
         val newIdx                      = lastIdx + 1
@@ -49,22 +49,36 @@ object Statement_5 {
       } else {
         buf.append((e, 0, e, 0))
       }
+      this
+    }
+
+    def printResult(): Unit = {
+      var from = windowSize - 2
+      val to   = lastIdx
+
+      if (buf.length < windowSize) println(buf.last._3)
+      else {
+        while (from < to) {
+          from = from + 1
+          print(buf(from)._3)
+          print(' ')
+        }
+      }
+    }
+
+    def result: Seq[Int] =
+      if (buf.length < windowSize) Seq(buf.last._3)
+      else buf.slice(windowSize - 1, buf.length).map(_._3)
 
   }
 
-  def maxInWindow(n: Int, a: Array[Int], m: Int): Seq[Int] =
-    if (a.length <= m) Seq(a.max)
-    else if (m == n) Seq(a.max)
-    else {
-      val maxWindow = MaxWindow(m)
-      a.foldLeft(ArrayBuffer.empty[Int]) {
-          case (acc, e) =>
-            maxWindow.add(e)
-            acc.append(maxWindow.max)
-            acc
-        }
-        .slice(m - 1, n)
-    }
+  def maxInWindow(n: Int, a: Array[Int], m: Int): MaxWindow =
+    if (a.length <= m || m == n)
+      MaxWindow(m).add(a.max)
+    else
+      a.foldLeft(MaxWindow(m)) {
+        case (acc, e) => acc.add(e)
+      }
 
   def main(args: Array[String]): Unit = {
     val n  = scala.io.StdIn.readInt()
@@ -72,12 +86,7 @@ object Statement_5 {
     val m  = scala.io.StdIn.readInt()
 
     val res = maxInWindow(n, ar, m)
-    val sb  = new StringBuilder()
-    res.foreach { i =>
-      sb.append(i)
-      sb.append(' ')
-    }
-    println(sb.result())
+    res.printResult()
   }
 
 }
@@ -92,7 +101,7 @@ object TestApp5 extends App {
   private def t(m: Int, aa: Array[Int]) = {
     val before = System.currentTimeMillis()
     val result =
-      Statement_5.maxInWindow(aa.length, aa, m).mkString(" ")
+      Statement_5.maxInWindow(aa.length, aa, m).result.mkString(" ")
 
     val after = System.currentTimeMillis()
     println(s"Time = ${after - before} MS, n = ${aa.length}, m = $m")
