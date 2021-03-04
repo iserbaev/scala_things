@@ -15,6 +15,19 @@ object Statement_5 {
 
     private def lastIdx = buf.length - 1
 
+    private def maxInSlice(
+      from: Int,
+      to:   Int,
+      e:    Int,
+      eIdx: Int
+    ): (Int, Int) = {
+      val slice = buf.slice(from, to)
+      if (slice.nonEmpty) {
+        val max = slice.maxBy(_._1)
+        if (max._1 > e) (max._1 -> max._2) else (e, eIdx)
+      } else (e, eIdx)
+    }
+
     def add(e: Int): Unit =
       if (buf.nonEmpty) {
         val (_, _, prevMax, prevMaxIdx) = buf.last
@@ -25,19 +38,11 @@ object Statement_5 {
           if (prevMaxIdx > (newIdx - windowSize))
             buf.append((e, newIdx, prevMax, prevMaxIdx))
           else {
-            val (newMax, newMaxIdx) = {
-              val from =
-                if (lastIdx + 1 < windowSize) 0
-                else newIdx - windowSize + 1
-              val to    = lastIdx + 1
-              val slice = buf.slice(from, to)
-              val (ee, eeIdx, _, _) =
-                if (slice.nonEmpty) slice.maxBy(_._1)
-                else (e, newIdx, e, newIdx)
+            val from =
+              if (lastIdx + 1 < windowSize) 0 else newIdx - windowSize + 1
+            val to = lastIdx + 1
 
-              if (e >= ee) (e, newIdx)
-              else (ee, eeIdx)
-            }
+            val (newMax, newMaxIdx) = maxInSlice(from, to, e, newIdx)
             buf.append((e, newIdx, newMax, newMaxIdx))
           }
         }
