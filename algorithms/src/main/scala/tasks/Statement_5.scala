@@ -53,7 +53,7 @@ object Statement_5 {
       var from = windowSize - 2
       val to   = lastIdx
 
-      if (buf.length < windowSize) println(buf.last._3)
+      if (buf.length < windowSize) println(max)
       else {
         while (from < to) {
           from = from + 1
@@ -64,12 +64,12 @@ object Statement_5 {
     }
 
     def result: Seq[Int] =
-      if (buf.length < windowSize) Seq(buf.last._3)
+      if (buf.length < windowSize) Seq(max)
       else buf.slice(windowSize - 1, buf.length).map(_._3)
 
   }
 
-  def maxInWindow(n: Int, a: Array[Int], m: Int): MaxWindow =
+  def maxWindow(n: Int, a: Array[Int], m: Int): MaxWindow =
     if (a.length <= m || m == n)
       MaxWindow(m).add(a.max)
     else
@@ -82,7 +82,7 @@ object Statement_5 {
     val ar = scala.io.StdIn.readLine().split(" ").map(_.toInt)
     val m  = scala.io.StdIn.readInt()
 
-    val res = maxInWindow(n, ar, m)
+    val res = maxWindow(n, ar, m)
     res.printResult()
   }
 
@@ -98,7 +98,7 @@ object TestApp5 extends App {
   private def t(m: Int, aa: Array[Int]) = {
     val before = System.currentTimeMillis()
     val result =
-      Statement_5.maxInWindow(aa.length, aa, m).result.mkString(" ")
+      Statement_5.maxWindow(aa.length, aa, m).result.mkString(" ")
 
     val after = System.currentTimeMillis()
     println(s"Time = ${after - before} MS, n = ${aa.length}, m = $m")
