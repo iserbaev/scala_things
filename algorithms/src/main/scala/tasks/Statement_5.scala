@@ -2,71 +2,73 @@ package tasks
 
 import scala.collection.mutable.ArrayBuffer
 import scala.util.Random
+import scala.collection.mutable.{ArrayStack => ScalaStack}
 
 object Statement_5 {
+  case class MaxStack(size: Int) {
+    private val underlying = ScalaStack[(Int, Int)]()
 
-  case class MaxWindow(windowSize: Int) {
-    type ElElIdxMaxMaxIdx = (Int, Int, Int, Int)
+    def length: Int = underlying.length
+    def apply(i: Int): (Int, Int) = underlying(i)
 
-    private val buf = ArrayBuffer[ElElIdxMaxMaxIdx]()
+    def isFull:  Boolean = underlying.size >= size
+    def nonFull: Boolean = !isFull
 
-    def max: Int =
-      buf.last._3
+    def isEmpty:  Boolean = underlying.isEmpty
+    def nonEmpty: Boolean = !isEmpty
 
-    private def lastIdx = buf.length - 1
+    def clear(): Unit = underlying.clear()
 
-    private def maxInWindow(
-      from:  Int,
-      newEl: Int
-    ): (Int, Int) = {
-      val slice = buf.slice(from, lastIdx + 1)
-      if (slice.nonEmpty) {
-        val max = slice.maxBy(_._1)
-        if (max._1 > newEl) (max._1, max._2) else (newEl, lastIdx + 1)
-      } else (newEl, lastIdx + 1)
+    def push(e: Int): Unit = {
+      if (isFull) throw new IndexOutOfBoundsException("MaxStack is full")
+      val max = if (isEmpty) e else math.max(e, underlying.top._2)
+      underlying.push((e, max))
     }
 
-    def add(e: Int): MaxWindow = {
-      if (buf.nonEmpty) {
-        val (_, _, prevMax, prevMaxIdx) = buf.last
-        val newIdx                      = lastIdx + 1
-        if (prevMax <= e) {
-          buf.append((e, newIdx, e, newIdx))
-        } else {
-          if (prevMaxIdx > (newIdx - windowSize))
-            buf.append((e, newIdx, prevMax, prevMaxIdx))
-          else {
-            val from =
-              if (lastIdx + 1 < windowSize) 0 else newIdx - windowSize + 1
+    def pop(): (Int, Int) = underlying.pop()
 
-            val (newMax, newMaxIdx) = maxInWindow(from, e)
-            buf.append((e, newIdx, newMax, newMaxIdx))
-          }
+    def topMaxOption: Option[Int] =
+      if (isEmpty) None else Some(underlying.top._2)
+
+    def popSafely: Option[(Int, Int)] =
+      if (isEmpty) None else Some(underlying.pop)
+
+    def result: Seq[(Int, Int)] = underlying
+  }
+
+  case class MaxWindow(windowSize: Int) {
+    private val input  = MaxStack(windowSize)
+    private val output = MaxStack(windowSize)
+    private val buf    = ArrayBuffer[Int]()
+
+    def add(e: Int): MaxWindow = {
+      input.push(e)
+      if (input.isFull && output.isEmpty) {
+        while (input.nonEmpty) {
+          output.push(input.pop()._1)
         }
-      } else {
-        buf.append((e, 0, e, 0))
       }
+
+      if (input.length + output.length == windowSize) {
+        buf.append(
+          math.max(
+            input.topMaxOption.getOrElse(Int.MinValue),
+            output.topMaxOption.getOrElse(Int.MinValue)
+          )
+        )
+        output.popSafely
+      }
+
       this
     }
 
-    def printResult(): Unit = {
-      var from = windowSize - 2
-      val to   = lastIdx
-
-      if (buf.length < windowSize) println(max)
+    def printResult(): Unit =
+      if (buf.length < windowSize) println(buf.last)
       else {
-        while (from < to) {
-          from = from + 1
-          print(buf(from)._3)
-          print(' ')
-        }
+        print(result.mkString(" "))
       }
-    }
 
-    def result: Seq[Int] =
-      if (buf.length < windowSize) Seq(max)
-      else buf.slice(windowSize - 1, buf.length).map(_._3)
-
+    def result: Seq[Int] = buf
   }
 
   def maxWindow(n: Int, a: Array[Int], m: Int): MaxWindow =
