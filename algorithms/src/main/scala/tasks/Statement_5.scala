@@ -62,30 +62,25 @@ object Statement_5 {
       this
     }
 
-    def printResult(): Unit =
-      if (buf.length < windowSize) println(buf.last)
-      else {
-        print(result.mkString(" "))
-      }
-
     def result: Seq[Int] = buf
   }
 
-  def maxWindow(n: Int, a: Array[Int], m: Int): MaxWindow =
+  def maxWindow(n: Int, a: Array[Int], m: Int): Seq[Int] =
     if (a.length <= m || m == n)
-      MaxWindow(m).add(a.max)
+      Seq(a.max)
     else
       a.foldLeft(MaxWindow(m)) {
-        case (acc, e) => acc.add(e)
-      }
+          case (acc, e) => acc.add(e)
+        }
+        .result
 
   def main(args: Array[String]): Unit = {
     val n  = scala.io.StdIn.readInt()
     val ar = scala.io.StdIn.readLine().split(" ").map(_.toInt)
     val m  = scala.io.StdIn.readInt()
 
-    val res = maxWindow(n, ar, m)
-    res.printResult()
+    val result = maxWindow(n, ar, m)
+    print(result.mkString(" "))
   }
 
 }
@@ -100,7 +95,7 @@ object TestApp5 extends App {
   private def t(m: Int, aa: Array[Int]) = {
     val before = System.currentTimeMillis()
     val result =
-      Statement_5.maxWindow(aa.length, aa, m).result.mkString(" ")
+      Statement_5.maxWindow(aa.length, aa, m).mkString(" ")
 
     val after = System.currentTimeMillis()
     println(s"Time = ${after - before} MS, n = ${aa.length}, m = $m")
@@ -131,7 +126,7 @@ object TestApp5 extends App {
   )
 
   test("1 4 5 6 1 1 1 1", 4, "6 6 6 6 1")
-  test("1 4 5 6 1 1 1 1", 4, "6 6 6 6 1")
+  test("1 0 2 2 2 2 0 0", 4, "2 2 2 2 2")
 
   val a = (1 to 100).map(_     => Random.nextInt()).toArray
   val b = (1 to 1000).map(_    => Random.nextInt()).toArray
