@@ -1,5 +1,6 @@
 package structures
 
+import scala.collection.mutable.ArrayBuffer
 import scala.math.Ordering.Implicits._
 import scala.reflect.ClassTag
 
@@ -18,8 +19,9 @@ case class Heap[A: ClassTag](maxSize: Int)(implicit val ord: Ordering[A]) {
     }
   }
 
+  private val swapCounter = new ArrayBuffer[String]()
   private def swapHeap(a: Array[A], i: Int, j: Int): Array[A] = {
-    println(s"swap ${i - 1} ${j - 1}")
+    swapCounter += s"${i - 1} ${j - 1}"
     val ai = a.fromIndex(i)
     val aj = a.fromIndex(j)
     a.update(i - 1, aj)
@@ -54,7 +56,8 @@ case class Heap[A: ClassTag](maxSize: Int)(implicit val ord: Ordering[A]) {
     a
   }
 
-  def result: List[A] = buffer.toList
+  def result: List[A]      = buffer.toList
+  def swaps:  List[String] = swapCounter.result().toList
 
   def heapSort(a: Array[A]): List[A] = {
     val length = a.length
@@ -94,5 +97,5 @@ object TestHeap extends App {
 
   def test() = ???
 
-  println(minHeap)
+  println(minHeap.swaps)
 }
