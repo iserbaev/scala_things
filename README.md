@@ -1,6 +1,8 @@
 # scala learn
 
-1. horstmann
-2. coursera
-3. stepic https://stepik.org/course/217/syllabus
-4. kormen
+structures and algoritms from 
+- horstmann
+- coursera
+- stepik https://stepik.org/course/217/syllabus
+- stepik https://stepik.org/course/1547/syllabus
+- kormen
