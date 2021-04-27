@@ -1,7 +1,5 @@
 package tasks
 
-import scala.collection.mutable.ArrayBuffer
-
 /**
   * По данным n процессорам и m задач определите, для каждой из задач, каким процессором она будет обработана.
   *
@@ -13,43 +11,49 @@ import scala.collection.mutable.ArrayBuffer
 object Statement_6 {
   import scala.collection.mutable
 
-  case class Processor(processorIndex: Int, startTime: Int, completeTime: Int)
+  case class Processor(processorIndex: Int, startTime: Long, completeTime: Long)
   object Processor {
-    val minDurationOrdering: Ordering[Processor] =
-      Ordering.by[Processor, Int](_.completeTime)(Ordering.Int.reverse)
+    val minDurationOrdering: Ordering[Processor] = new Ordering[Processor] {
+      override def compare(self: Processor, that: Processor): Int =
+        self.completeTime.compareTo(that.completeTime) match {
+          case 0 =>
+            self.processorIndex.compare(that.processorIndex) match {
+              case 0 => 0
+              case c => -c
+            }
+          case c => -c
+        }
+    }
   }
   case class Pool(size: Int) {
-    private var availableProcessorIndex = 0
-    private val tasksTimes =
-      mutable.PriorityQueue.empty[Processor](Processor.minDurationOrdering)
+    private val builder =
+      mutable.PriorityQueue.newBuilder[Processor](Processor.minDurationOrdering)
+    (0 until size).map(i => builder += Processor(i, 0, 0))
 
-    private def isAvailable: Boolean = availableProcessorIndex < size
+    private val processors = builder.result()
 
     def addTask(duration: Int): Processor =
-      if (isAvailable) {
-        val task = Processor(
-          processorIndex = availableProcessorIndex,
-          startTime      = 0,
-          completeTime   = duration
-        )
-        tasksTimes.enqueue(task)
-        if (duration > 0) {
-          availableProcessorIndex += 1
-        }
-        task
-      } else {
-        val completed = tasksTimes.dequeue()
+      if (duration > 0) {
+        val completed = processors.dequeue()
         val task = Processor(
           processorIndex = completed.processorIndex,
           startTime      = completed.completeTime,
           completeTime   = completed.completeTime + duration
         )
-        tasksTimes.enqueue(task)
+        processors.enqueue(task)
+        task
+      } else {
+        val available = processors.head
+        val task = Processor(
+          processorIndex = available.processorIndex,
+          startTime      = available.completeTime,
+          completeTime   = available.completeTime + duration
+        )
         task
       }
 
     def getAll: Seq[Processor] =
-      tasksTimes.dequeueAll
+      processors.dequeueAll
   }
 
 }
