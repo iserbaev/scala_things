@@ -66,7 +66,7 @@ object Statement_7 {
 
 }
 
-object Main {
+object Main7 {
 
   import tasks.Statement_7.MergeTable
 
@@ -75,7 +75,7 @@ object Main {
     require(t.length == 2)
     t.head.toInt -> t.last.toInt
   }
-  def main(args: Array[String]) {
+  def main(args: Array[String]) = {
     val m = scala.io.StdIn.readLine().split(" ").last.toInt
     val sizes:      Array[Int]      = scala.io.StdIn.readLine().split(" ").map(_.toInt)
     val mergeTasks: Seq[(Int, Int)] = (1 to m).map(_ => readTuple)
