@@ -48,9 +48,12 @@ class DisjointSetRank() {
         }
       }
     } else {
-      maxes += currentMax
+      updateMaxes()
     }
   }
+
+  private def updateMaxes() =
+    maxes += currentMax
 
   private def updateParent(destination: Int, source: Int): Unit = {
     val destinationValue = sizes(destination)
@@ -62,7 +65,7 @@ class DisjointSetRank() {
     sizes.update(destination, sum)
     sizes.update(source, 0)
     if (sum > currentMax) currentMax = sum
-    maxes += currentMax
+    updateMaxes()
   }
 
   def result: IndexedSeq[Int] = maxes.result()
