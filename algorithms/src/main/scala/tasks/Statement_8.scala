@@ -63,7 +63,7 @@ object Test8 extends App {
     sizes:      Array[Int],
     mergeTasks: Seq[(Int, Int)],
     expected:   Seq[Int]
-  ): Unit = {
+  ): Long = {
     val start  = System.currentTimeMillis()
     val result = Main8.process(sizes, mergeTasks).result
 
@@ -73,7 +73,7 @@ object Test8 extends App {
     }
     val end = System.currentTimeMillis()
 
-    println(s"duration = ${end - start} MS")
+    end - start
   }
 
   test(
@@ -111,13 +111,20 @@ object Test8 extends App {
     Seq(11, 13, 13, 13, 16, 29)
   )
 
-  val n = 1000000
-  val r = 10000
+  performanceTest(10000, 1000, 10)
+  performanceTest(100000, 10000, 100)
 
-  test(
-    (0 to n).map(_ => r).toArray,
-    (0 until n).map(x => (x + 1) -> (Random.nextInt(x + 1).abs + 1)),
-    Seq.empty
-  )
+  private def performanceTest(n: Int, r: Int, mult: Int): Unit = {
+    val seed = new Random(123456)
+    val duration = (0 to mult).map { _ =>
+      test(
+        (0 to n).map(_ => r).toArray,
+        (0 until n).map(x => (x + 1) -> (seed.nextInt(x + 1).abs + 1)),
+        Seq.empty
+      )
+    }.sum
+
+    println(s"duration = $duration MS")
+  }
 
 }
