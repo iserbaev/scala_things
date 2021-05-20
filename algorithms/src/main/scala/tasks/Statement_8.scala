@@ -57,17 +57,23 @@ object Main8 {
 }
 
 object Test8 extends App {
+  import scala.util.Random
+
   def test(
     sizes:      Array[Int],
     mergeTasks: Seq[(Int, Int)],
     expected:   Seq[Int]
   ): Unit = {
+    val start  = System.currentTimeMillis()
     val result = Main8.process(sizes, mergeTasks).result
 
     expected.zipWithIndex.foreach {
       case (a, index) =>
         require(result(index) == a, s"${result(index)} != $a")
     }
+    val end = System.currentTimeMillis()
+
+    println(s"duration = ${end - start} MS")
   }
 
   test(
@@ -103,6 +109,15 @@ object Test8 extends App {
       (3, 1)
     ),
     Seq(11, 13, 13, 13, 16, 29)
+  )
+
+  val n = 1000000
+  val r = 10000
+
+  test(
+    (0 to n).map(_ => r).toArray,
+    (0 until n).map(x => (x + 1) -> (Random.nextInt(x + 1).abs + 1)),
+    Seq.empty
   )
 
 }
