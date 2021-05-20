@@ -2,13 +2,24 @@ package tasks
 
 import structures.DisjointSetRank
 
-import java.io.{BufferedReader, InputStreamReader}
-
 object Main8 {
-  def readTuple: (Int, Int) = {
-    val t = scala.io.StdIn.readLine().split(" ")
-    require(t.length == 2)
-    t.head.toInt -> t.last.toInt
+  import java.io.{BufferedReader, InputStreamReader}
+  import java.util.StringTokenizer
+  import scala.collection.mutable.ArrayBuffer
+
+  def readTuple(s: String): (Int, Int) = {
+    val t = new StringTokenizer(s)
+    t.nextToken().toInt -> t.nextToken().toInt
+  }
+
+  def readSeq(s: String): IndexedSeq[Int] = {
+    val t      = new StringTokenizer(s)
+    val buffer = new ArrayBuffer[Int]()
+
+    while (t.hasMoreTokens) {
+      buffer.append(t.nextToken().toInt)
+    }
+    buffer
   }
 
   def main(args: Array[String]) = {
@@ -16,9 +27,12 @@ object Main8 {
       new InputStreamReader(System.in)
     )
 
-    val m = br.readLine().split(" ").last.toInt
-    val sizes:      Array[Int]      = Stream.continually(br.read()).toArray
-    val mergeTasks: Seq[(Int, Int)] = (1 to m).map(_ => readTuple)
+    val (_, m) = readTuple(br.readLine())
+    val sizes: IndexedSeq[Int] = readSeq(br.readLine())
+    val mergeTasks: Seq[(Int, Int)] =
+      (1 to m).map(_ => readTuple(br.readLine()))
+
+    br.close()
 
     val dse: DisjointSetRank = process(sizes, mergeTasks)
 
@@ -26,7 +40,7 @@ object Main8 {
   }
 
   def process(
-    sizes:      Array[Int],
+    sizes:      IndexedSeq[Int],
     mergeTasks: Seq[(Int, Int)]
   ): DisjointSetRank = {
     val dse = new DisjointSetRank()
