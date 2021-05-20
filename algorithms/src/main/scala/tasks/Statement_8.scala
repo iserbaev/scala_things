@@ -2,6 +2,8 @@ package tasks
 
 import structures.DisjointSetRank
 
+import java.io.{BufferedReader, InputStreamReader}
+
 object Main8 {
   def readTuple: (Int, Int) = {
     val t = scala.io.StdIn.readLine().split(" ")
@@ -10,8 +12,12 @@ object Main8 {
   }
 
   def main(args: Array[String]) = {
-    val m = scala.io.StdIn.readLine().split(" ").last.toInt
-    val sizes:      Array[Int]      = scala.io.StdIn.readLine().split(" ").map(_.toInt)
+    val br: BufferedReader = new BufferedReader(
+      new InputStreamReader(System.in)
+    )
+
+    val m = br.readLine().split(" ").last.toInt
+    val sizes:      Array[Int]      = Stream.continually(br.read()).toArray
     val mergeTasks: Seq[(Int, Int)] = (1 to m).map(_ => readTuple)
 
     val dse: DisjointSetRank = process(sizes, mergeTasks)
