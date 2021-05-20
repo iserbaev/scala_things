@@ -5,6 +5,7 @@ import structures.DisjointSetRank
 object Main8 {
   import java.io.{BufferedReader, InputStreamReader}
   import java.util.StringTokenizer
+  import scala.collection.mutable
   import scala.collection.mutable.ArrayBuffer
 
   def readTuple(s: String): (Int, Int) = {
@@ -12,10 +13,11 @@ object Main8 {
     t.nextToken().toInt -> t.nextToken().toInt
   }
 
-  def readSeq(s: String): IndexedSeq[Int] = {
+  def readSeq(s: String): mutable.IndexedSeq[Int] = {
     val t      = new StringTokenizer(s)
     val buffer = new ArrayBuffer[Int]()
 
+    buffer.append(0)
     while (t.hasMoreTokens) {
       buffer.append(t.nextToken().toInt)
     }
@@ -27,10 +29,9 @@ object Main8 {
       new InputStreamReader(System.in)
     )
 
-    val (_, m) = readTuple(br.readLine())
-    val sizes: IndexedSeq[Int] = readSeq(br.readLine())
-    val mergeTasks: Seq[(Int, Int)] =
-      (1 to m).map(_ => readTuple(br.readLine()))
+    val (_, m)     = readTuple(br.readLine())
+    val sizes      = readSeq(br.readLine())
+    val mergeTasks = (1 to m).map(_ => readTuple(br.readLine()))
 
     br.close()
 
@@ -40,11 +41,13 @@ object Main8 {
   }
 
   def process(
-    sizes:      IndexedSeq[Int],
+    sizes:      mutable.IndexedSeq[Int],
     mergeTasks: Seq[(Int, Int)]
   ): DisjointSetRank = {
-    val dse = new DisjointSetRank()
-    sizes.zipWithIndex.foreach { case (a, index) => dse.makeSet(index + 1, a) }
+    val dse = new DisjointSetRank(sizes)
+    (1 until sizes.length).foreach { index =>
+      dse.makeSet(index)
+    }
     mergeTasks.foreach {
       case (i, j) =>
         dse.union(i, j)
@@ -68,7 +71,7 @@ object Test8 extends App {
   }
 
   test(
-    Array(1, 1, 1, 1, 1),
+    Array(0, 1, 1, 1, 1, 1),
     Array(
       (3, 5),
       (2, 4),
@@ -80,7 +83,7 @@ object Test8 extends App {
   )
 
   test(
-    Array(6, 5, 3, 7),
+    Array(0, 6, 5, 3, 7),
     Array(
       (1, 4),
       (2, 1),
@@ -90,7 +93,7 @@ object Test8 extends App {
   )
 
   test(
-    Array(2, 11, 5, 1, 7, 3),
+    Array(0, 2, 11, 5, 1, 7, 3),
     Array(
       (6, 6),
       (1, 2),

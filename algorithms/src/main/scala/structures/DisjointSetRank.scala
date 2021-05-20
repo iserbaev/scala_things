@@ -2,18 +2,17 @@ package structures
 
 import scala.collection.mutable
 
-class DisjointSetRank() {
+class DisjointSetRank(val origin: mutable.IndexedSeq[Int]) {
   private val parent     = mutable.Map.empty[Int, Int]
-  private val sizes      = mutable.Map.empty[Int, Int]
   private val rank       = mutable.Map.empty[Int, Int]
   private val maxes      = IndexedSeq.newBuilder[Int]
   private var currentMax = Int.MinValue
 
-  def makeSet(index: Int, value: Int): Unit = {
+  def makeSet(index: Int): Unit = {
     parent += ((index, index))
-    sizes += ((index, value))
-    if (value > currentMax) currentMax = value
     rank += ((index, 0))
+
+    if (origin(index) > currentMax) currentMax = origin(index)
   }
 
   def find(index: Int): Int = {
@@ -53,14 +52,15 @@ class DisjointSetRank() {
   }
 
   private def updateParent(destination: Int, source: Int): Unit = {
-    val destinationValue = sizes(destination)
-    val sourceValue      = sizes(source)
+    parent.update(source, destination)
+
+    val destinationValue = origin(destination)
+    val sourceValue      = origin(source)
 
     val sum = destinationValue + sourceValue
 
-    parent.update(source, destination)
-    sizes.update(destination, sum)
-    sizes.update(source, 0)
+    origin.update(destination, sum)
+    origin.update(source, 0)
     if (sum > currentMax) currentMax = sum
     maxes += currentMax
   }
