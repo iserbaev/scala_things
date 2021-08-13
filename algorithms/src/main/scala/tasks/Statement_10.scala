@@ -11,16 +11,12 @@ object Main10 {
     def args:     Array[String]
     def validate: Boolean
     def run(store: mutable.Map[Int, String]): mutable.Map[Int, String]
-    def run(store: Array[String]):            Unit
   }
   object Command {
     case class Add(args: Array[String]) extends Command {
       def validate: Boolean = args.length == 3
       def run(store: mutable.Map[Int, String]): mutable.Map[Int, String] =
         store.+((num.toInt, name))
-
-      def run(store: Array[String]): Unit =
-        store.update(num.toInt, name)
 
       val cmd:  String = "add"
       val num:  String = args(1)
@@ -34,9 +30,6 @@ object Main10 {
         store
       }
 
-      def run(store: Array[String]): Unit =
-        Option(store.apply(num.toInt)).getOrElse("not found")
-
       val cmd: String = "find"
       val num: String = args(1)
     }
@@ -45,9 +38,6 @@ object Main10 {
 
       def run(store: mutable.Map[Int, String]): mutable.Map[Int, String] =
         store.-(num.toInt)
-
-      def run(store: Array[String]): Unit =
-        store.update(num.toInt, null)
 
       val cmd: String = "find"
       val num: String = args(1)
@@ -75,18 +65,14 @@ object Main10 {
 
     val n = br.read()
 
-    (1 to n)
-      .flatMap(_ => Option(br.readLine()))
-      .flatMap(Command.parse)
-      .foldLeft(mutable.Map.empty[Int, String]) {
-        case (acc, command) =>
-          command.run(acc)
-      }
+    val cmds = (1 to n).flatMap(_ => Option(br.readLine()))
+
+    process(cmds)
 
     br.close()
   }
 
-  def process(arr: Array[String]) =
+  def process(arr: Seq[String]) =
     arr
       .flatMap(Command.parse)
       .foldLeft(mutable.Map.empty[Int, String]) {
@@ -112,5 +98,31 @@ object Test10 extends App {
     "find 76213"
   )
 
-  Main10.process(cmds.toArray)
+  val cmds2 = Seq(
+    "find 3839442",
+    "add 123456 me",
+    "add 0 granny",
+    "find 0",
+    "find 123456",
+    "del 0",
+    "del 0",
+    "find 0"
+  )
+
+  val cmds3 = Seq(
+    "add 1 A",
+    "find 1",
+    "add 1 B",
+    "find 1",
+    "del 1",
+    "find 1"
+  )
+
+  Main10.process(cmds)
+
+  println("------------")
+  Main10.process(cmds2)
+  println("------------")
+  Main10.process(cmds3)
+  println("------------")
 }
