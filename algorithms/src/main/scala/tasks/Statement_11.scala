@@ -1,5 +1,7 @@
 package tasks
 
+import tasks.Main11.TC_String
+
 import java.io.{BufferedReader, InputStreamReader}
 import scala.collection.mutable
 
@@ -151,4 +153,21 @@ object Test11 extends App {
   println("------------")
   Main11.process(test_2, table)
   println("------------")
+
+  val multiplier: BigInt = BigInt(263)
+  val prime:      Int    = 1000000007
+  def hash(a: String, m: Int = 5): Int =
+    ((a.toCharArray.zipWithIndex.map {
+      case (c, index) =>
+        (c.toInt * (multiplier.pow(index))) % prime
+    }.sum % prime) % m).toInt
+
+  require(hash("qaxndhusptgrewo", m = 25) == 7)
+  require(hash("uiljkwhypgmfdst", m = 250) == 72)
+  require(hash("pweiknqgcxazjyh", m = 2500) == 263)
+  require(hash("ilvpygszwdeurjn", m = 25000) == 9134)
+  require(hash("xnzrvwcutfgbqje", m = 250000) == 170995)
+  require(hash("rpqlfogsamhjkic", m = 2500000) == 954764)
+  require(hash("zhjutqslrpyfcoa", m = 25000000) == 9581368)
+  require(hash("kxlcfgpezjmuynv", m = 250000000) == 127141737)
 }
