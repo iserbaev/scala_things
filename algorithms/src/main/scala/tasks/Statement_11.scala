@@ -1,7 +1,5 @@
 package tasks
 
-import tasks.Main11.TC_String
-
 import java.io.{BufferedReader, InputStreamReader}
 import scala.collection.mutable
 
@@ -22,36 +20,51 @@ object Main11 {
 
   case class TC_String(m: Int) extends TC[String] {
 
-    private val multiplier: Double = 263d
+    private val multiplier: BigInt = BigInt(263)
     private val prime:      Int    = 1000000007
 
-    private val underlying: mutable.IndexedSeq[mutable.Map[String, String]] =
-      scala.collection.mutable.IndexedSeq.fill(m)(mutable.TreeMap.empty)
+    private val underlying: mutable.IndexedSeq[(List[String], Set[String])] =
+      scala.collection.mutable.IndexedSeq.fill(m)((List.empty, Set.empty))
 
-    //h(world) = ((119 + 111 × 263 + 114 × 2632 + 108 × 2633+ 100 × 2634) mod 1 000 000 007) mod 5 = 4
     def hash(a: String): Int =
       ((a.toCharArray.zipWithIndex.map {
         case (c, index) =>
-          c.toInt * scala.math.pow(multiplier, index.toDouble)
+          (c.toInt * (multiplier.pow(index)))
       }.sum % prime) % m).toInt
 
     def add(a: String): Unit = {
-      val idx = hash(a)
-      underlying.update(idx, underlying(idx).updated(a, a))
+      val idx    = hash(a)
+      val (l, s) = underlying(idx)
+      if (s.contains(a)) ()
+      else {
+        underlying.update(
+          idx,
+          (a :: l, s + a)
+        )
+      }
     }
 
     def del(a: String): Unit = {
-      val idx = hash(a)
-      underlying.update(idx, underlying(idx) -= a)
+      val idx    = hash(a)
+      val (l, s) = underlying(idx)
+      if (s.contains(a)) {
+        underlying.update(idx, (rm(l, a), s - a))
+      }
+    }
+
+    private def rm[A](xs: List[A], value: A): List[A] = xs match {
+      case `value` :: tail => tail
+      case x :: tail       => x :: rm(tail, value)
+      case _               => Nil
     }
 
     def find(a: String): Boolean = {
       val idx = hash(a)
-      underlying(idx).isDefinedAt(a)
+      underlying(idx)._2.contains(a)
     }
 
     def check(i: Int): Iterable[String] =
-      underlying(i).values
+      underlying(i)._1
   }
 
   def main(args: Array[String]) = {
@@ -59,8 +72,8 @@ object Main11 {
       new InputStreamReader(System.in)
     )
 
-    val n = br.read()
-    val m = br.read()
+    val m = br.readLine().toInt
+    val n = br.readLine().toInt
 
     val cmds = (1 to n).flatMap(_ => Option(br.readLine()))
 
@@ -132,7 +145,7 @@ object Test11 extends App {
     "yes"
   )
 
-  val table = TC_String(5)
+  val table = tasks.Main11.TC_String(5)
   Main11.process(test_1, table)
 
   println("------------")
