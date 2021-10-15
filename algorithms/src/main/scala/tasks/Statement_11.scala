@@ -28,10 +28,13 @@ object Main11 {
     private val underlying: mutable.IndexedSeq[(List[String], Set[String])] =
       scala.collection.mutable.IndexedSeq.fill(m)((List.empty, Set.empty))
 
+    private val multipliers: IndexedSeq[BigInt] =
+      (0 until 16).map(index => multiplier.pow(index))
+
     def hash(a: String): Int =
       ((a.toCharArray.zipWithIndex.map {
         case (c, index) =>
-          (c.toInt * (multiplier.pow(index)))
+          (c.toInt * multipliers.applyOrElse(index, multiplier.pow))
       }.sum % prime) % m).toInt
 
     def add(a: String): Unit = {
