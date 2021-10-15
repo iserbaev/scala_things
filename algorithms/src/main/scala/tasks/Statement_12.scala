@@ -29,14 +29,13 @@ object Main12 {
     val patternHash = patternCodes.sum
 
     val p = Int.MaxValue
-    def hash(ints:          Seq[Int]): Int = ints.sum % p
-    def recalcHash(oldHash: Int, oldCode: Int, newCode: Int): Int =
-      (oldHash - oldCode % p) + newCode % p
+    def hash(ints: Seq[Int]): Int = ints.sum % p
+
+    def recalcHash(oldHash: Int, oldHead: Int, newLast: Int): Int =
+      (oldHash - oldHead % p) + newLast % p
 
     def isEqual(window: ArrayBuffer[Int], windowHash: Int) =
-      patternHash == windowHash && patternCodes.mkString("") == window.mkString(
-        ""
-      )
+      patternHash == windowHash && patternCodes.sameElements(window)
 
     if (patternSize > textSize) ()
     else if (patternSize == textSize) {
