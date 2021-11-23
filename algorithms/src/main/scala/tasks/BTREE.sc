@@ -1,3 +1,4 @@
+// !NOT TESTED
 sealed abstract class BTree[+T] {
   def value:   T
   def left:    BTree[T]

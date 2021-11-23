@@ -1,6 +1,6 @@
 package structures
 
-import cats.syntax.option._
+import structures.BinarySearchTree.{BNil, Node}
 
 import scala.annotation.tailrec
 import scala.collection.immutable
@@ -12,8 +12,8 @@ sealed trait BinarySearchTree[+T] {
   def parentLabel: Option[T]
 
   def map[R](f: T => R): BinarySearchTree[R] = this match {
-    case Nil =>
-      Nil
+    case BNil =>
+      BNil
     case Node(k, left, right, parentLabel) =>
       Node(f(k), left.map(f), right.map(f), parentLabel.map(f))
   }
@@ -25,7 +25,7 @@ sealed trait BinarySearchTree[+T] {
         rr
       case ::(head, tl) =>
         head match {
-          case Nil =>
+          case BNil =>
             recur(rr, tl)
           case Node(k, left, right, _) =>
             recur(f(rr, k), left :: right :: tl)
@@ -38,7 +38,7 @@ sealed trait BinarySearchTree[+T] {
   def fold2[R](r: R)(f: (R, T) => R): R = {
     // ! not tailrec
     def recur(rr: R, bb: BinarySearchTree[T]): R = bb match {
-      case Nil =>
+      case BNil =>
         rr
       case Node(k, left, right, _) =>
         recur(f(recur(rr, left), k), right)
@@ -48,35 +48,66 @@ sealed trait BinarySearchTree[+T] {
   }
 }
 
-case object Nil extends BinarySearchTree[Nothing] {
-  override def key: Option[Nothing] = None
-
-  override def left:        BinarySearchTree[Nothing] = Nil
-  override def right:       BinarySearchTree[Nothing] = Nil
-  override def parentLabel: Option[Nothing]           = None
-}
-
-case class Node[+T](
-  k:           T,
-  left:        BinarySearchTree[T],
-  right:       BinarySearchTree[T],
-  parentLabel: Option[T]
-) extends BinarySearchTree[T] {
-  override def key: Option[T] = k.some
-}
-
 object BinarySearchTree {
+  case object BNil extends BinarySearchTree[Nothing] {
+    override def key: Option[Nothing] = None
+
+    override def left:        BinarySearchTree[Nothing] = BNil
+    override def right:       BinarySearchTree[Nothing] = BNil
+    override def parentLabel: Option[Nothing]           = None
+  }
+
+  case class Node[+T](
+    k:           T,
+    left:        BinarySearchTree[T],
+    right:       BinarySearchTree[T],
+    parentLabel: Option[T]
+  ) extends BinarySearchTree[T] {
+    override def key: Option[T] = Some(k)
+  }
+
+  def preOrder[T](b: BinarySearchTree[T], runNode: Node[T] => Unit): Unit =
+    b match {
+      case BNil =>
+        ()
+      case n @ Node(_, left, right, _) =>
+        runNode(n)
+        preOrder(left, runNode)
+        preOrder(right, runNode)
+    }
+
+  def inOrder[T](b: BinarySearchTree[T], runNode: Node[T] => Unit): Unit =
+    b match {
+      case BNil =>
+        ()
+      case n @ Node(_, left, right, _) =>
+        inOrder(left, runNode)
+        runNode(n)
+        inOrder(right, runNode)
+    }
+
+  def postOrder[T](b: BinarySearchTree[T], runNode: Node[T] => Unit): Unit =
+    b match {
+      case BNil =>
+        ()
+      case n @ Node(_, left, right, _) =>
+        postOrder(left, runNode)
+        postOrder(right, runNode)
+        runNode(n)
+    }
+
   def inorderTreeWalk[T](x: BinarySearchTree[T]): List[T] = {
     @tailrec
     def recur(ts: List[BinarySearchTree[T]], acc: List[T]): List[T] = ts match {
-      case immutable.Nil => acc
+      case immutable.Nil =>
+        acc
       case ::(head, tl) =>
         (head.left, head.right) match {
-          case (Nil, Nil) =>
+          case (BNil, BNil) =>
             recur(tl, head.key.map(_ :: acc).getOrElse(acc))
-          case (Nil, value) =>
+          case (BNil, value) =>
             recur(value :: tl, head.key.map(_ :: acc).getOrElse(acc))
-          case (value, Nil) =>
+          case (value, BNil) =>
             recur(value :: tl, head.key.map(_ :: acc).getOrElse(acc))
           case (value, value1) =>
             recur(value :: value1 :: tl, head.key.map(_ :: acc).getOrElse(acc))
@@ -92,7 +123,7 @@ object BinarySearchTree {
     implicit ordering: Ordering[T]
   ): BinarySearchTree[T] =
     x match {
-      case Nil =>
+      case BNil =>
         x
       case Node(k, _, _, _) if ordering.equiv(t, k) =>
         x
@@ -108,7 +139,7 @@ object BinarySearchTree {
       xx:  BinarySearchTree[T],
       acc: BinarySearchTree[T]
     ): BinarySearchTree[T] = xx.left match {
-      case Nil =>
+      case BNil =>
         acc
       case value: Node[T] =>
         recur(value, value)
@@ -123,7 +154,7 @@ object BinarySearchTree {
       xx:  BinarySearchTree[T],
       acc: BinarySearchTree[T]
     ): BinarySearchTree[T] = xx.right match {
-      case Nil =>
+      case BNil =>
         acc
       case value =>
         recur(value, value)
@@ -135,7 +166,7 @@ object BinarySearchTree {
   def parent[T](root:  BinarySearchTree[T], parentLabel: Option[T])(
     implicit ordering: Ordering[T]
   ): BinarySearchTree[T] =
-    parentLabel.map(BinarySearchTree.treeSearch(root, _)).getOrElse(Nil)
+    parentLabel.map(BinarySearchTree.treeSearch(root, _)).getOrElse(BNil)
 
   def treeSuccessor[T](x: BinarySearchTree[T], root: BinarySearchTree[T])(
     implicit opt:         Ordering[Option[T]],
@@ -144,7 +175,7 @@ object BinarySearchTree {
     x.right match {
       case value: Node[T] =>
         treeMin(value)
-      case Nil =>
+      case BNil =>
         @tailrec
         def recur(
           y:  BinarySearchTree[T],
@@ -166,7 +197,7 @@ object BinarySearchTree {
     x.left match {
       case value: Node[T] =>
         treeMax(value)
-      case Nil =>
+      case BNil =>
         @tailrec
         def recur(
           y:  BinarySearchTree[T],
@@ -189,11 +220,11 @@ object BinarySearchTree {
     implicit ordering: Ordering[T]
   ): BinarySearchTree[T] =
     (x, v) match {
-      case (Nil, Nil) =>
-        Nil
-      case (Nil, n @ Node(_, _, _, _)) =>
+      case (BNil, BNil) =>
+        BNil
+      case (BNil, n @ Node(_, _, _, _)) =>
         n.copy(parentLabel = parentLabel)
-      case (n @ Node(_, _, _, _), Nil) =>
+      case (n @ Node(_, _, _, _), BNil) =>
         n.copy(parentLabel = parentLabel)
       case (pp @ Node(pk, pl, _, _), n @ Node(nk, _, _, _))
           if ordering.lt(nk, pk) =>
@@ -206,7 +237,7 @@ object BinarySearchTree {
     implicit ordering:  Ordering[T]
   ): BinarySearchTree[T] = vv.toSeq.foldLeft(x) {
     case (xx, v) =>
-      treeInsert(xx, Node(v, Nil, Nil, None))
+      treeInsert(xx, Node(v, BNil, BNil, None))
   }
 
   def treeDelete[T](x: BinarySearchTree[T], v: T)(
@@ -214,19 +245,19 @@ object BinarySearchTree {
   ): BinarySearchTree[T] = {
 //    @tailrec
     def recur(xx: BinarySearchTree[T]): BinarySearchTree[T] = xx match {
-      case Nil =>
+      case BNil =>
         xx
       case Node(zk, zl, zr, parentLabel) if ordering.equiv(zk, v) =>
         (zl, zr) match {
-          case (Nil, Nil) =>
-            Nil
-          case (Nil, node @ Node(_, _, _, _)) =>
+          case (BNil, BNil) =>
+            BNil
+          case (BNil, node @ Node(_, _, _, _)) =>
             node.copy(parentLabel = parentLabel)
-          case (node @ Node(_, _, _, _), Nil) =>
+          case (node @ Node(_, _, _, _), BNil) =>
             node.copy(parentLabel = parentLabel)
           case (l @ Node(_, _, _, _), r @ Node(rk, rl, rr, _)) =>
             rl match {
-              case Nil =>
+              case BNil =>
                 Node(rk, l.copy(parentLabel = Some(rk)), rr, parentLabel)
               case Node(yk, yl, yr, _) =>
                 val tree = Node(
@@ -267,7 +298,7 @@ object TestTree extends App {
       *                     9
       */
     val seq    = Seq(15, 6, 3, 7, 2, 4, 13, 9, 18, 17, 20)
-    val result = treeInserts(Nil, seq: _*)
+    val result = treeInserts(BNil, seq: _*)
 
     assert(inorderTreeWalk(result).forall(seq.contains))
 
