@@ -65,11 +65,11 @@ object Main13 {
       val tree    = mkTree(headRow, None)
       val runNode: BinarySearchTree.Node[String] => Unit = n =>
         print(s"${n.k} ")
-      BinarySearchTree.inOrder(tree, runNode)
+      BinarySearchTree.inOrder(tree)(runNode)
       println()
-      BinarySearchTree.preOrder(tree, runNode)
+      BinarySearchTree.preOrder(tree)(runNode)
       println()
-      BinarySearchTree.postOrder(tree, runNode)
+      BinarySearchTree.postOrder(tree)(runNode)
     }
   }
 }

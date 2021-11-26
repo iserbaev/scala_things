@@ -3,13 +3,14 @@ package structures
 import structures.BinarySearchTree.{BNil, Node}
 
 import scala.annotation.tailrec
-import scala.collection.immutable
+import scala.collection.mutable.{ArrayBuffer, ListBuffer}
 
 sealed trait BinarySearchTree[+T] {
   def key:         Option[T]
   def left:        BinarySearchTree[T]
   def right:       BinarySearchTree[T]
   def parentLabel: Option[T]
+  def size:        Int
 
   def map[R](f: T => R): BinarySearchTree[R] = this match {
     case BNil =>
@@ -21,7 +22,7 @@ sealed trait BinarySearchTree[+T] {
   def fold[R](r: R)(f: (R, T) => R): R = {
     @tailrec
     def recur(rr: R, acc: List[BinarySearchTree[T]]): R = acc match {
-      case immutable.Nil =>
+      case Nil =>
         rr
       case ::(head, tl) =>
         head match {
@@ -55,6 +56,7 @@ object BinarySearchTree {
     override def left:        BinarySearchTree[Nothing] = BNil
     override def right:       BinarySearchTree[Nothing] = BNil
     override def parentLabel: Option[Nothing]           = None
+    override def size:        Int                       = 0
   }
 
   case class Node[+T](
@@ -63,59 +65,82 @@ object BinarySearchTree {
     right:       BinarySearchTree[T],
     parentLabel: Option[T]
   ) extends BinarySearchTree[T] {
-    override def key: Option[T] = Some(k)
+    override def key:  Option[T] = Some(k)
+    override def size: Int       = 1 + left.size + right.size
   }
 
-  def preOrder[T](b: BinarySearchTree[T], runNode: Node[T] => Unit): Unit =
+  def preOrder[T](b: BinarySearchTree[T])(runNode: Node[T] => Unit): Unit =
     b match {
       case BNil =>
         ()
       case n @ Node(_, left, right, _) =>
         runNode(n)
-        preOrder(left, runNode)
-        preOrder(right, runNode)
+        preOrder(left)(runNode)
+        preOrder(right)(runNode)
     }
 
-  def inOrder[T](b: BinarySearchTree[T], runNode: Node[T] => Unit): Unit =
+  def inOrder[T](b: BinarySearchTree[T])(runNode: Node[T] => Unit): Unit =
     b match {
       case BNil =>
         ()
       case n @ Node(_, left, right, _) =>
-        inOrder(left, runNode)
+        inOrder(left)(runNode)
         runNode(n)
-        inOrder(right, runNode)
+        inOrder(right)(runNode)
     }
 
-  def postOrder[T](b: BinarySearchTree[T], runNode: Node[T] => Unit): Unit =
+  def inOrderTraversal[T](
+    b:   BinarySearchTree[T],
+    acc: ListBuffer[T]
+  ): ListBuffer[T] =
     b match {
       case BNil =>
-        ()
-      case n @ Node(_, left, right, _) =>
-        postOrder(left, runNode)
-        postOrder(right, runNode)
-        runNode(n)
-    }
-
-  def inorderTreeWalk[T](x: BinarySearchTree[T]): List[T] = {
-    @tailrec
-    def recur(ts: List[BinarySearchTree[T]], acc: List[T]): List[T] = ts match {
-      case immutable.Nil =>
         acc
-      case ::(head, tl) =>
-        (head.left, head.right) match {
-          case (BNil, BNil) =>
-            recur(tl, head.key.map(_ :: acc).getOrElse(acc))
-          case (BNil, value) =>
-            recur(value :: tl, head.key.map(_ :: acc).getOrElse(acc))
-          case (value, BNil) =>
-            recur(value :: tl, head.key.map(_ :: acc).getOrElse(acc))
-          case (value, value1) =>
-            recur(value :: value1 :: tl, head.key.map(_ :: acc).getOrElse(acc))
-        }
+      case n @ Node(_, left, right, _) =>
+        inOrderTraversal(left, acc)
+        acc.append(n.k)
+        inOrderTraversal(right, acc)
     }
 
-    recur(List(x), List.empty)
+  def postOrder[T](b: BinarySearchTree[T])(runNode: Node[T] => Unit): Unit =
+    b match {
+      case BNil =>
+        ()
+      case n @ Node(_, left, right, _) =>
+        postOrder(left)(runNode)
+        postOrder(right)(runNode)
+        runNode(n)
+    }
+
+  def inorderTreeWalk[T](x: BinarySearchTree[T]): List[T] =
+    inOrderTraversal(x, ListBuffer.empty).toList
+
+  def isValid[T](x:    BinarySearchTree[T])(
+    implicit ordering: Ordering[T]
+  ): Boolean = {
+    val isValid = ArrayBuffer(true)
+    inOrderValidate(x, ArrayBuffer[BinarySearchTree[T]](BNil), isValid)
+    isValid.head
   }
+
+  def inOrderValidate[T](
+    root:    BinarySearchTree[T],
+    prev:    ArrayBuffer[BinarySearchTree[T]],
+    isValid: ArrayBuffer[Boolean]
+  )(
+    implicit ordering: Ordering[T]
+  ): Unit =
+    root match {
+      case BNil =>
+        ()
+      case Node(k, left, right, _) =>
+        inOrderValidate(left, prev, isValid)
+        if (prev.head.key.nonEmpty && ordering.gteq(prev.head.key.get, k)) {
+          isValid.update(0, false)
+        }
+        prev.update(0, root)
+        inOrderValidate(right, prev, isValid)
+    }
 
   // O(log n)
   @tailrec
