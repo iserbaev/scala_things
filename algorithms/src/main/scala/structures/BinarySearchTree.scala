@@ -115,6 +115,10 @@ object BinarySearchTree {
   def inorderTreeWalk[T](x: BinarySearchTree[T]): List[T] =
     inOrderTraversal(x, ListBuffer.empty).toList
 
+  /** Проверка что для любой вершины её ключ
+    *   - больше всех ключей из её левого поддерева и
+    *   - не меньше всех ключей из правого поддерева
+    */
   def isValid[T](x:    BinarySearchTree[T])(
     implicit ordering: Ordering[T]
   ): Boolean = {
@@ -134,8 +138,11 @@ object BinarySearchTree {
       case BNil =>
         ()
       case Node(k, left, right, _) =>
+        if (left.key.nonEmpty && ordering.equiv(k, left.key.get)) {
+          isValid.update(0, false)
+        }
         inOrderValidate(left, prev, isValid)
-        if (prev.head.key.nonEmpty && ordering.gteq(prev.head.key.get, k)) {
+        if (prev.head.key.nonEmpty && ordering.gt(prev.head.key.get, k)) {
           isValid.update(0, false)
         }
         prev.update(0, root)
