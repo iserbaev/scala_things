@@ -73,13 +73,6 @@ object Test14 extends App {
   val INCORRECT = "INCORRECT"
   val CORRECT   = "CORRECT"
 
-  val test1 = IndexedSeq(
-    "2 -1 1",
-    "5 2 -1",
-    "3 -1 3",
-    "5 -1 -1"
-  )
-
   val test2 = IndexedSeq("0")
 
   val test3 = IndexedSeq(
@@ -104,8 +97,7 @@ object Test14 extends App {
   def test(lines: IndexedSeq[String], expected: String): Unit =
     assert(Main14.process(lines) == expected)
 
-//  test(test1, INCORRECT)
-//  test(test2, CORRECT)
-//  test(test3, CORRECT)
+  test(test2, CORRECT)
+  test(test3, CORRECT)
   test(test4, CORRECT)
 }
