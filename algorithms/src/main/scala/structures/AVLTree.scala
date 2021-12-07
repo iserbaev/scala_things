@@ -2,6 +2,7 @@ package structures
 
 import scala.collection.mutable
 import scala.collection.Traversable
+import scala.collection.mutable.ListBuffer
 
 /**
   * An immutable AVL Tree implementation formerly used by mutable.TreeSet
@@ -269,4 +270,47 @@ object AVLTree {
         result
       }
   }
+
+  def preOrder[T](b: AVLTree[T])(runNode: AVLTree[T] => Unit): Unit =
+    b match {
+      case Leaf =>
+        ()
+      case n @ Node(_, left, right) =>
+        runNode(n)
+        preOrder(left)(runNode)
+        preOrder(right)(runNode)
+    }
+
+  def inOrder[T](b: AVLTree[T])(runNode: AVLTree[T] => Unit): Unit =
+    b match {
+      case Leaf =>
+        ()
+      case n @ Node(_, left, right) =>
+        inOrder(left)(runNode)
+        runNode(n)
+        inOrder(right)(runNode)
+    }
+
+  def inOrderTraversal[T](
+    b:   AVLTree[T],
+    acc: ListBuffer[T]
+  ): ListBuffer[T] =
+    b match {
+      case Leaf =>
+        acc
+      case n @ Node(_, left, right) =>
+        inOrderTraversal(left, acc)
+        acc.append(n.data)
+        inOrderTraversal(right, acc)
+    }
+
+  def postOrder[T](b: AVLTree[T])(runNode: AVLTree[T] => Unit): Unit =
+    b match {
+      case Leaf =>
+        ()
+      case n @ Node(_, left, right) =>
+        postOrder(left)(runNode)
+        postOrder(right)(runNode)
+        runNode(n)
+    }
 }

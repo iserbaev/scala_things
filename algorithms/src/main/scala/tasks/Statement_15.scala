@@ -1,9 +1,8 @@
 package tasks
 
-import structures.{AVLTree, BinarySearchTree}
+import structures.AVLTree
 
 import java.io.{BufferedReader, InputStreamReader}
-import scala.collection.mutable
 
 /**
   * Реализуйте структуру данных для хранения множества целых чисел,
@@ -38,7 +37,7 @@ object Main15 {
       br.readLine()
     }.toIndexedSeq
 
-    println(process(rows))
+    process(rows)
 
     br.close()
   }
@@ -46,25 +45,26 @@ object Main15 {
   private val intOrdering = Ordering.Int
   private def fx(x:  Int, s: Int): Int = (x + s) % 1000000001
   def process(lines: IndexedSeq[String]) = {
-    val copy          = mutable.SortedMap[Int, Int]()
-    val resultBuilder = Seq.newBuilder[String]
     val init: AVLTree[Int] = AVLTree.Leaf
+
     lines.foldLeft((init, 0)) {
       case ((tree, s0), line) =>
         val ar        = line.split(" ")
         val (head, i) = (ar.head, ar(1).toInt)
         def r         = ar(2).toInt
+
         head match {
           case "+" =>
             val hash = fx(i, s0)
+
             val resultTree = if (!tree.contains(hash, intOrdering)) {
-              copy.+=((hash, i))
               tree.insert(hash, intOrdering)
             } else tree
+
             resultTree -> s0
           case "-" =>
             val hash = fx(i, s0)
-            copy.remove(hash)
+
             val resultTree =
               if (tree.contains(hash, intOrdering))
                 tree.remove(hash, intOrdering)
@@ -73,31 +73,37 @@ object Main15 {
             resultTree -> s0
           case "?" =>
             val hash = fx(i, s0)
+
             if (tree.contains(hash, intOrdering)) {
-              resultBuilder.+=("Found")
               println("Found")
             } else {
-              resultBuilder.+=("Not found")
               println("Not found")
             }
+
             tree -> s0
           case "s" =>
-            val hash_l   = fx(i, s0)
-            val hash_r   = fx(r, s0)
-            val iterator = copy.range(hash_l, hash_r + 1).keys
+            val hash_l = fx(i, s0)
+            val hash_r = fx(r, s0)
+            var sum    = 0
 
-            val s = iterator.sum
-            println(s)
-            resultBuilder.+=(s.toString)
-            tree -> s
+            AVLTree.inOrder(tree) {
+              case AVLTree.Leaf =>
+                ()
+              case AVLTree.Node(data, _, _) =>
+                if (hash_l <= data && data <= hash_r)
+                  sum = sum + data
+                else ()
+            }
+
+            println(sum)
+
+            tree -> sum
           case other =>
             throw new IllegalArgumentException(
               s"$other command illegal in ${line}"
             )
         }
     }
-
-    resultBuilder.result()
   }
 }
 
