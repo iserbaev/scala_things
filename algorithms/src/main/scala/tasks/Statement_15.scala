@@ -137,7 +137,7 @@ object Test15 extends App {
 
   def test(lines: IndexedSeq[String], expected: Seq[String]): Unit = {
     val result = Main15.process(lines)
-    assert(result == expected)
+    assert(result._1 == expected)
   }
 
   test(test1._1, test1._2)
