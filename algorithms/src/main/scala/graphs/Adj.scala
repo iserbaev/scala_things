@@ -15,24 +15,24 @@ object Color {
   * @param d расстояние от корня до текущей вершины
   * @param parent индекс предшественника
   */
-case class Repr[V](v: V, color: Color, d: Int, parent: Option[V]) {
-  def setColor(c:    Color): Repr[V] = copy(color  = c)
-  def setDistance(i: Int):   Repr[V] = copy(d      = i)
-  def setParent(v:   V):     Repr[V] = copy(parent = Some(v))
+case class Meta[V](v: V, color: Color, d: Int, parent: Option[V]) {
+  def setColor(c:    Color): Meta[V] = copy(color  = c)
+  def setDistance(i: Int):   Meta[V] = copy(d      = i)
+  def setParent(v:   V):     Meta[V] = copy(parent = Some(v))
 }
-object Repr {
-  def apply[V](value: V): Repr[V] =
-    new Repr[V](value, Color.White, -1, None)
+object Meta {
+  def apply[V](value: V): Meta[V] =
+    new Meta[V](value, Color.White, -1, None)
 }
 
 /** Adjacency list representation (список смежности)
   * Для каждой вершины u Adj[u] состоит из всех вершин смежных с u в графе G
   */
-case class Adj[V](g: Map[V, List[V]], repr: Map[V, Repr[V]]) {
-  def map(f: Repr[V] => Repr[V]): Adj[V] =
+case class Adj[V](g: Map[V, List[V]], repr: Map[V, Meta[V]]) {
+  def map(f: Meta[V] => Meta[V]): Adj[V] =
     Adj(g, repr.map { case (k, r) => k -> f(r) })
 
-  def update(v: V)(f: Repr[V] => Repr[V]): Adj[V] =
+  def update(v: V)(f: Meta[V] => Meta[V]): Adj[V] =
     Adj(g, repr = repr.updated(v, f(repr(v))))
 
   def adjacent(u: V, v: V): Boolean =
@@ -43,28 +43,31 @@ object Adj {
 
   def apply[V](edgesMappings: Map[String, List[V]]): Adj[V] = {
 
-    val (gMap, reprSet) = edgesMappings.values.foldLeft(
-      (mutable.Map.empty[V, List[V]], mutable.Map.empty[V, Repr[V]])
+    val (gMap, reprMap) = edgesMappings.values.foldLeft(
+      (mutable.Map.empty[V, List[V]], mutable.Map.empty[V, Meta[V]])
     ) {
       case ((gi, repri), pair) =>
-        val (v1, v2) = pair.head -> pair(1)
-        gi.update(v1, v2 :: gi.getOrElse(v1, List.empty))
-        gi.update(v2, v1 :: gi.getOrElse(v2, List.empty))
-        repri.update(v1, Repr(v1))
-        repri.update(v2, Repr(v2))
+        if (pair.nonEmpty) {
+          require(pair.length == 2, s"pair.length != 2, fact =  ${pair.length}")
+          val (v1, v2) = pair.head -> pair(1)
+          gi.update(v1, v2 :: gi.getOrElse(v1, List.empty))
+          gi.update(v2, v1 :: gi.getOrElse(v2, List.empty))
+          repri.update(v1, Meta(v1))
+          repri.update(v2, Meta(v2))
+        }
 
         gi -> repri
     }
 
-    new Adj(gMap.toMap, reprSet.toMap)
+    new Adj(gMap.toMap, reprMap.toMap)
   }
 
-  def bfs[V](g: Adj[V], s: Repr[V]): Adj[V] = {
+  def bfs[V](g: Adj[V], s: Meta[V]): Adj[V] = {
     val clean =
       g.map(vrepr => vrepr.copy(color = White, d = 0, parent = None))
     val head = s.copy(color = Grey, d = 0, parent = None)
 
-    val queue = mutable.Queue.empty[Repr[V]]
+    val queue = mutable.Queue.empty[Meta[V]]
     queue.enqueue(head)
 
     var adj = clean
@@ -96,11 +99,15 @@ object TestAdj extends App {
       "c" -> List(2, 4),
       "d" -> List(4, 5),
       "e" -> List(2, 3),
-      "f" -> List(3, 4)
+      "f" -> List(3, 4),
+      "g" -> List(6, 7),
+      "h" -> List()
     )
   )
 
   println(adj)
 
   println(Adj.bfs(adj, adj.repr.head._2))
+
+  // TODO check for 3 trees
 }
