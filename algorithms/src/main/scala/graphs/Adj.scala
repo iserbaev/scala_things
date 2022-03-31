@@ -1,5 +1,6 @@
 package graphs
 
+import java.util.concurrent.atomic.AtomicInteger
 import scala.collection.mutable
 
 sealed trait Color
@@ -12,17 +13,28 @@ object Color {
 /** Представление вершины графа
   * @param v значение
   * @param color цвет
-  * @param d расстояние от корня до текущей вершины
-  * @param parent индекс предшественника
+  * @param distance расстояние от корня до текущей вершины
+  * @param parent значение родителя
+  * @param open метка открытия вершины
+  * @param close метка завершения работы с вершиной
   */
-case class Meta[V](v: V, color: Color, d: Int, parent: Option[V]) {
-  def setColor(c:    Color): Meta[V] = copy(color  = c)
-  def setDistance(i: Int):   Meta[V] = copy(d      = i)
-  def setParent(v:   V):     Meta[V] = copy(parent = Some(v))
+case class Meta[V](
+  v:        V,
+  color:    Color,
+  distance: Int,
+  parent:   Option[V],
+  open:     Option[Int],
+  close:    Option[Int]
+) {
+  def setColor(c:    Color): Meta[V] = copy(color    = c)
+  def setDistance(i: Int):   Meta[V] = copy(distance = i)
+  def setParent(v:   V):     Meta[V] = copy(parent   = Some(v))
+  def setOpen(t:     Int):   Meta[V] = copy(open     = Some(t))
+  def setClose(t:    Int):   Meta[V] = copy(close    = Some(t))
 }
 object Meta {
   def apply[V](value: V): Meta[V] =
-    new Meta[V](value, Color.White, -1, None)
+    new Meta[V](value, Color.White, -1, None, None, None)
 }
 
 /** Adjacency list representation (список смежности)
@@ -37,6 +49,8 @@ case class Adj[V](g: Map[V, List[V]], repr: Map[V, Meta[V]]) {
 
   def adjacent(u: V, v: V): Boolean =
     g(u).contains(v)
+
+  def values: List[V] = repr.keys.toList
 }
 object Adj {
   import Color._
@@ -64,8 +78,8 @@ object Adj {
 
   def bfs[V](g: Adj[V], s: Meta[V]): Adj[V] = {
     val clean =
-      g.map(vrepr => vrepr.copy(color = White, d = 0, parent = None))
-    val head = s.copy(color = Grey, d = 0, parent = None)
+      g.map(vrepr => vrepr.copy(color = White, distance = 0, parent = None))
+    val head = s.copy(color = Grey, distance = 0, parent = None)
 
     val queue = mutable.Queue.empty[Meta[V]]
     queue.enqueue(head)
@@ -78,7 +92,7 @@ object Adj {
         .map { v =>
           if (v.color == White && adj.adjacent(u.v, v.v)) {
             val visited =
-              v.setColor(Grey).setDistance(u.d + 1).setParent(u.v)
+              v.setColor(Grey).setDistance(u.distance + 1).setParent(u.v)
             queue.enqueue(visited)
             visited
           } else v
@@ -88,6 +102,40 @@ object Adj {
     }
 
     adj
+  }
+
+  def dfs[V](adj: Adj[V]): Adj[V] = {
+    val clean =
+      adj.map(vrepr => vrepr.copy(color = White, distance = 0, parent = None))
+
+    val time = new AtomicInteger(0)
+
+    clean.repr.values.foldLeft(clean) {
+      case (a, u) =>
+        if (u.color == White) {
+          dfsVisit(a, u, time)
+        } else a
+    }
+  }
+
+  private def dfsVisit[V](
+    adj:  Adj[V],
+    u:    Meta[V],
+    time: AtomicInteger
+  ): Adj[V] = {
+    val head = u.setOpen(time.incrementAndGet()).setColor(Grey)
+
+    val recur = adj.update(head.v)(_ => head).repr.values.foldLeft(adj) {
+      case (a, v) =>
+        if (v.color == White && adj.adjacent(head.v, v.v)) {
+          val updated = a.update(v.v)(_.setParent(head.v))
+          dfsVisit(updated, v, time)
+        } else a
+    }
+
+    recur.update(head.v)(
+      _ => head.setColor(Black).setClose(time.incrementAndGet())
+    )
   }
 }
 
