@@ -106,16 +106,18 @@ object Adj {
 
   def dfs[V](adj: Adj[V]): Adj[V] = {
     val clean =
-      adj.map(vrepr => vrepr.copy(color = White, distance = 0, parent = None))
+      adj.map(vrepr => vrepr.copy(color = White, parent = None))
 
     val time = new AtomicInteger(0)
 
-    clean.repr.values.foldLeft(clean) {
+    val result = clean.repr.values.foldLeft(clean) {
       case (a, u) =>
         if (u.color == White) {
           dfsVisit(a, u, time)
         } else a
     }
+
+    result
   }
 
   private def dfsVisit[V](
@@ -123,13 +125,13 @@ object Adj {
     u:    Meta[V],
     time: AtomicInteger
   ): Adj[V] = {
-    val head = u.setOpen(time.incrementAndGet()).setColor(Grey)
+    val head    = u.setOpen(time.incrementAndGet()).setColor(Grey)
+    val updated = adj.update(head.v)(_ => head)
 
-    val recur = adj.update(head.v)(_ => head).repr.values.foldLeft(adj) {
+    val recur = updated.repr.values.foldLeft(updated) {
       case (a, v) =>
-        if (v.color == White && adj.adjacent(head.v, v.v)) {
-          val updated = a.update(v.v)(_.setParent(head.v))
-          dfsVisit(updated, v, time)
+        if (v.color == White && a.adjacent(head.v, v.v)) {
+          dfsVisit(a, v, time)
         } else a
     }
 
@@ -146,16 +148,18 @@ object TestAdj extends App {
       "b" -> List(1, 2),
       "c" -> List(2, 4),
       "d" -> List(4, 5),
-      "e" -> List(2, 3),
-      "f" -> List(3, 4),
-      "g" -> List(6, 7),
-      "h" -> List()
+      "e" -> List(2, 3)
+//      "f" -> List(3, 4),
+//      "g" -> List(6, 7),
+//      "h" -> List()
     )
   )
 
   println(adj)
 
   println(Adj.bfs(adj, adj.repr.head._2))
+
+  println(Adj.dfs(adj))
 
   // TODO check for 3 trees
 }
