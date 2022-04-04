@@ -50,7 +50,7 @@ case class Adj[V](g: Map[V, List[V]], repr: Map[V, Meta[V]]) {
   def adjacent(u: V, v: V): Boolean =
     g(u).contains(v)
 
-  def values: List[V] = repr.keys.toList
+  def values: List[V] = g.keys.toList
 }
 object Adj {
   import Color._
