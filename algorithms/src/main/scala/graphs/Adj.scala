@@ -3,163 +3,131 @@ package graphs
 import java.util.concurrent.atomic.AtomicInteger
 import scala.collection.mutable
 
-sealed trait Color
-object Color {
-  case object White extends Color
-  case object Grey extends Color
-  case object Black extends Color
-}
-
-/** Представление вершины графа
-  * @param v значение
-  * @param color цвет
-  * @param distance расстояние от корня до текущей вершины
-  * @param parent значение родителя
-  * @param open метка открытия вершины
-  * @param close метка завершения работы с вершиной
-  */
-case class Meta[V](
-  v:        V,
-  color:    Color,
-  distance: Int,
-  parent:   Option[V],
-  open:     Option[Int],
-  close:    Option[Int]
-) {
-  def setColor(c:    Color): Meta[V] = copy(color    = c)
-  def setDistance(i: Int):   Meta[V] = copy(distance = i)
-  def setParent(v:   V):     Meta[V] = copy(parent   = Some(v))
-  def setOpen(t:     Int):   Meta[V] = copy(open     = Some(t))
-  def setClose(t:    Int):   Meta[V] = copy(close    = Some(t))
-}
-object Meta {
-  def apply[V](value: V): Meta[V] =
-    new Meta[V](value, Color.White, -1, None, None, None)
-}
-
 /** Adjacency list representation (список смежности)
   * Для каждой вершины u Adj[u] состоит из всех вершин смежных с u в графе G
   */
-case class Adj[V](g: Map[V, List[V]], repr: Map[V, Meta[V]]) {
-  def map(f: Meta[V] => Meta[V]): Adj[V] =
-    Adj(g, repr.map { case (k, r) => k -> f(r) })
-
-  def update(v: V)(f: Meta[V] => Meta[V]): Adj[V] =
-    Adj(g, repr = repr.updated(v, f(repr(v))))
+case class Adj[V](g: Map[V, List[V]]) {
+  import Adj._
+  import Color._
 
   def adjacent(u: V, v: V): Boolean =
     g(u).contains(v)
 
-  def values: List[V] = g.keys.toList
+  val values: List[V] = g.keys.toList
+
+  def dfs: DFSMeta[V] = {
+    val component = mutable.Map.empty[V, Int]
+    val tin       = mutable.Map.empty[V, Int]
+    val tout      = mutable.Map.empty[V, Int]
+
+    val counter           = new AtomicInteger(0)
+    val componentsCounter = new AtomicInteger(0)
+
+    def dfs_(v: V, num: Int): Unit = {
+      tin.update(v, counter.incrementAndGet())
+      component.update(v, num)
+
+      g(v).foreach(u => if (!component.contains(u)) dfs_(u, num))
+
+      tout.update(v, counter.incrementAndGet())
+    }
+
+    g.keys.foreach { v =>
+      if (!component.contains(v)) dfs_(v, componentsCounter.incrementAndGet())
+    }
+
+    DFSMeta(componentsCounter.get(), component.toMap, tin.toMap, tout.toMap)
+  }
+
+  def bfs(s: V): BFSMeta[V] = {
+    val colors    = mutable.Map.empty[V, Color]
+    val distances = mutable.Map.empty[V, Int]
+    val parents   = mutable.Map.empty[V, Option[V]]
+
+    values.foreach { v =>
+      colors.update(v, White)
+      distances.update(v, -1)
+      parents.update(v, None)
+    }
+
+    colors.update(s, Grey)
+    distances.update(s, 0)
+
+    val queue = mutable.Queue.empty[V]
+    queue.enqueue(s)
+
+    while (queue.nonEmpty) {
+      val u = queue.dequeue()
+
+      values
+        .foreach { v =>
+          if (colors(v) == White && adjacent(u, v)) {
+            colors.update(v, Grey)
+            distances.update(v, distances(u) + 1)
+            parents.update(v, Some(u))
+            queue.enqueue(v)
+          }
+        }
+
+      colors.update(u, Black)
+    }
+
+    BFSMeta(colors.toMap, distances.toMap, parents.toMap)
+  }
+
 }
+
 object Adj {
-  import Color._
+  case class DFSMeta[V](
+    componentsCount: Int,
+    components:      Map[V, Int],
+    tin:             Map[V, Int],
+    tout:            Map[V, Int]
+  )
 
-  def apply[V](edgesMappings: Map[String, List[V]]): Adj[V] = {
+  case class BFSMeta[V](
+    colors:    Map[V, Color],
+    distances: Map[V, Int],
+    parents:   Map[V, Option[V]]
+  )
 
-    val (gMap, reprMap) = edgesMappings.values.foldLeft(
-      (mutable.Map.empty[V, List[V]], mutable.Map.empty[V, Meta[V]])
-    ) {
-      case ((gi, repri), pair) =>
+  def build[V](edgesMappings: Map[String, List[V]]): Adj[V] = {
+
+    val gMap = edgesMappings.values.foldLeft(mutable.Map.empty[V, List[V]]) {
+      case (gi, pair) =>
         if (pair.nonEmpty) {
           require(pair.length == 2, s"pair.length != 2, fact =  ${pair.length}")
           val (v1, v2) = pair.head -> pair(1)
           gi.update(v1, v2 :: gi.getOrElse(v1, List.empty))
           gi.update(v2, v1 :: gi.getOrElse(v2, List.empty))
-          repri.update(v1, Meta(v1))
-          repri.update(v2, Meta(v2))
         }
 
-        gi -> repri
+        gi
     }
 
-    new Adj(gMap.toMap, reprMap.toMap)
-  }
-
-  def bfs[V](g: Adj[V], s: Meta[V]): Adj[V] = {
-    val clean =
-      g.map(vrepr => vrepr.copy(color = White, distance = 0, parent = None))
-    val head = s.copy(color = Grey, distance = 0, parent = None)
-
-    val queue = mutable.Queue.empty[Meta[V]]
-    queue.enqueue(head)
-
-    var adj = clean
-    while (queue.nonEmpty) {
-      val u = queue.dequeue()
-
-      adj = adj
-        .map { v =>
-          if (v.color == White && adj.adjacent(u.v, v.v)) {
-            val visited =
-              v.setColor(Grey).setDistance(u.distance + 1).setParent(u.v)
-            queue.enqueue(visited)
-            visited
-          } else v
-        }
-        .update(u.v)(_.setColor(Black))
-
-    }
-
-    adj
-  }
-
-  def dfs[V](adj: Adj[V]): Adj[V] = {
-    val clean =
-      adj.map(vrepr => vrepr.copy(color = White, parent = None))
-
-    val time = new AtomicInteger(0)
-
-    val result = clean.repr.values.foldLeft(clean) {
-      case (a, u) =>
-        if (u.color == White) {
-          dfsVisit(a, u, time)
-        } else a
-    }
-
-    result
-  }
-
-  private def dfsVisit[V](
-    adj:  Adj[V],
-    u:    Meta[V],
-    time: AtomicInteger
-  ): Adj[V] = {
-    val head    = u.setOpen(time.incrementAndGet()).setColor(Grey)
-    val updated = adj.update(head.v)(_ => head)
-
-    val recur = updated.repr.values.foldLeft(updated) {
-      case (a, v) =>
-        if (v.color == White && a.adjacent(head.v, v.v)) {
-          dfsVisit(a, v, time)
-        } else a
-    }
-
-    recur.update(head.v)(
-      _ => head.setColor(Black).setClose(time.incrementAndGet())
-    )
+    new Adj(gMap.toMap)
   }
 }
 
 object TestAdj extends App {
-  val adj = Adj(
+  val adj = Adj.build(
     Map(
       "a" -> List(1, 5),
       "b" -> List(1, 2),
       "c" -> List(2, 4),
       "d" -> List(4, 5),
-      "e" -> List(2, 3)
-//      "f" -> List(3, 4),
-//      "g" -> List(6, 7),
-//      "h" -> List()
+      "e" -> List(2, 3),
+      "f" -> List(3, 4),
+      "g" -> List(6, 7),
+      "h" -> List()
     )
   )
 
   println(adj)
 
-  println(Adj.bfs(adj, adj.repr.head._2))
+  println(adj.bfs(5))
 
-  println(Adj.dfs(adj))
+  println(adj.dfs)
 
   // TODO check for 3 trees
 }
