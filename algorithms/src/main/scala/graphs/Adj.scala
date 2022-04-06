@@ -1,12 +1,13 @@
 package graphs
 
+import java.io.{BufferedReader, InputStreamReader}
 import java.util.concurrent.atomic.AtomicInteger
 import scala.collection.mutable
 
 /** Adjacency list representation (список смежности)
   * Для каждой вершины u Adj[u] состоит из всех вершин смежных с u в графе G
   */
-case class Adj[V](g: Map[V, List[V]]) {
+case class Adj[V](g: Map[V, Set[V]]) {
   import Adj._
   import Color._
 
@@ -93,13 +94,13 @@ object Adj {
 
   def build[V](edgesMappings: Map[String, List[V]]): Adj[V] = {
 
-    val gMap = edgesMappings.values.foldLeft(mutable.Map.empty[V, List[V]]) {
+    val gMap = edgesMappings.values.foldLeft(mutable.Map.empty[V, Set[V]]) {
       case (gi, pair) =>
         if (pair.nonEmpty) {
           require(pair.length == 2, s"pair.length != 2, fact =  ${pair.length}")
           val (v1, v2) = pair.head -> pair(1)
-          gi.update(v1, v2 :: gi.getOrElse(v1, List.empty))
-          gi.update(v2, v1 :: gi.getOrElse(v2, List.empty))
+          gi.update(v1, gi.getOrElse(v1, Set.empty[V]) + v2)
+          gi.update(v2, gi.getOrElse(v2, Set.empty[V]) + v1)
         }
 
         gi
@@ -107,6 +108,39 @@ object Adj {
 
     new Adj(gMap.toMap)
   }
+}
+
+object MainAdj {
+  def main(args: Array[String]): Unit = {
+    val br: BufferedReader = new BufferedReader(
+      new InputStreamReader(System.in)
+    )
+
+    val frst             = br.readLine().split(" ")
+    val (vCount, eCount) = frst.head.toInt -> frst.last.toInt
+    val pairs = (0 until eCount).map { _ =>
+      val arr = br.readLine().split(" ")
+      arr.head.toInt -> arr.last.toInt
+    }.toIndexedSeq
+
+    process(pairs, vCount)
+
+    br.close()
+  }
+
+  def process(pairs: IndexedSeq[(Int, Int)], vCount: Int): Unit = {
+    val map             = pairs.map(p => p.toString() -> List(p._1, p._2)).toMap
+    val adj             = Adj.build(map)
+    val additionalCount = vCount - map.values.flatten.max
+    println(adj.dfs.componentsCount + additionalCount)
+  }
+
+  //6 5
+  //1 2
+  //3 4
+  //5 6
+  //2 3
+  //6 1
 }
 
 object TestAdj extends App {
