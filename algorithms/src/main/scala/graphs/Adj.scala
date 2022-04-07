@@ -2,7 +2,7 @@ package graphs
 
 import java.io.{BufferedReader, InputStreamReader}
 import java.util.concurrent.atomic.AtomicInteger
-import scala.collection.mutable
+import scala.collection.{immutable, mutable}
 
 /** Adjacency list representation (список смежности)
   * Для каждой вершины u Adj[u] состоит из всех вершин смежных с u в графе G
@@ -92,18 +92,21 @@ object Adj {
     parents:   Map[V, Option[V]]
   )
 
-  def build[V](edgesMappings: Map[String, List[V]]): Adj[V] = {
+  def build[V](edgesMappings: Seq[List[V]]): Adj[V] = {
 
-    val gMap = edgesMappings.values.foldLeft(mutable.Map.empty[V, Set[V]]) {
+    val gMap = edgesMappings.foldLeft(mutable.Map.empty[V, Set[V]]) {
       case (gi, pair) =>
-        if (pair.nonEmpty) {
-          require(pair.length == 2, s"pair.length != 2, fact =  ${pair.length}")
-          val (v1, v2) = pair.head -> pair(1)
-          gi.update(v1, gi.getOrElse(v1, Set.empty[V]) + v2)
-          gi.update(v2, gi.getOrElse(v2, Set.empty[V]) + v1)
+        pair match {
+          case List(v1, v2) =>
+            gi.update(v1, gi.getOrElse(v1, Set.empty[V]) + v2)
+            gi.update(v2, gi.getOrElse(v2, Set.empty[V]) + v1)
+            gi
+          case List(v1) =>
+            gi.update(v1, gi.getOrElse(v1, Set.empty[V]))
+            gi
+          case _ =>
+            gi
         }
-
-        gi
     }
 
     new Adj(gMap.toMap)
@@ -118,21 +121,26 @@ object MainAdj {
 
     val frst             = br.readLine().split(" ")
     val (vCount, eCount) = frst.head.toInt -> frst.last.toInt
-    val pairs = (0 until eCount).map { _ =>
-      val arr = br.readLine().split(" ")
-      arr.head.toInt -> arr.last.toInt
-    }.toIndexedSeq
+    var maxV             = Int.MinValue
+    val pairs: immutable.IndexedSeq[List[Int]] = (0 until eCount).map { _ =>
+      val arr = br.readLine().split(" ").map(_.toInt).toList
 
-    process(pairs, vCount)
+      maxV = math.max(maxV, arr.max)
+
+      arr
+    }
+
+    val additional: immutable.IndexedSeq[List[Int]] =
+      (0 until math.max(0, vCount - maxV)).map(v => List(v))
+
+    process(pairs ++ additional)
 
     br.close()
   }
 
-  def process(pairs: IndexedSeq[(Int, Int)], vCount: Int): Unit = {
-    val map             = pairs.map(p => p.toString() -> List(p._1, p._2)).toMap
-    val adj             = Adj.build(map)
-    val additionalCount = vCount - map.values.flatten.max
-    println(adj.dfs.componentsCount + additionalCount)
+  def process(pairs: IndexedSeq[List[Int]]): Unit = {
+    val adj = Adj.build(pairs)
+    println(adj.dfs.componentsCount)
   }
 
   //6 5
@@ -145,15 +153,16 @@ object MainAdj {
 
 object TestAdj extends App {
   val adj = Adj.build(
-    Map(
-      "a" -> List(1, 5),
-      "b" -> List(1, 2),
-      "c" -> List(2, 4),
-      "d" -> List(4, 5),
-      "e" -> List(2, 3),
-      "f" -> List(3, 4),
-      "g" -> List(6, 7),
-      "h" -> List()
+    Seq(
+      List(1, 5),
+      List(1, 2),
+      List(2, 4),
+      List(4, 5),
+      List(2, 3),
+      List(3, 4),
+      List(5),
+      List(6, 7),
+      List(8)
     )
   )
 
