@@ -151,6 +151,43 @@ object MainAdj {
   //6 1
 }
 
+object MainDistances {
+  def main(args: Array[String]): Unit = {
+    val br: BufferedReader = new BufferedReader(
+      new InputStreamReader(System.in)
+    )
+
+    val frst        = br.readLine().split(" ")
+    val (_, eCount) = frst.head.toInt -> frst.last.toInt
+    val pairs: IndexedSeq[List[Int]] = (0 until eCount).map { _ =>
+      br.readLine().split(" ").map(_.toInt).toList
+    }
+
+    process(pairs)
+
+    br.close()
+  }
+
+  def process(pairs: IndexedSeq[List[Int]]): Unit = {
+    val adj = Adj.build(pairs)
+    adj.bfs(0).distances.toSeq.sortWith(_._1 < _._1).foreach {
+      case (k, v) =>
+        print(s"$v ")
+    }
+  }
+
+  //6 7
+  //0 1
+  //1 2
+  //2 0
+  //3 2
+  //4 3
+  //4 2
+  //5 4
+
+  //0 1 1 2 2 3
+}
+
 object TestAdj extends App {
   val adj = Adj.build(
     Seq(
