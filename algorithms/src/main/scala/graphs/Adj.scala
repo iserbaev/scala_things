@@ -171,7 +171,7 @@ object MainDistances {
   def process(pairs: IndexedSeq[List[Int]]): Unit = {
     val adj = Adj.build(pairs)
     adj.bfs(0).distances.toSeq.sortWith(_._1 < _._1).foreach {
-      case (k, v) =>
+      case (_, v) =>
         print(s"$v ")
     }
   }
