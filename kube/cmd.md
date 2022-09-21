@@ -1,3 +1,5 @@
+minikube start
+
 kubectl create deployment first-deployment  --image=ksxack/lesson1:v0.2
 
 kubectl apply -f deployment.yaml
@@ -41,3 +43,8 @@ kubectl cp /local/path namespace/podname:path/to/directory          # Копир
 Проброс портов
 kubectl port-forward pods/mongo-75f59d57f4-4nd6q 28015:27017  # Проброс порта Пода
 kubectl port-forward mongo-75f59d57f4-4nd6q 28015:27017       # Проброс порта Сервиса
+
+Rollout
+kubectl rollout history deployment/goapp-deployment     # Проверить историю деплоймента
+kubectl rollout undo deployment/goapp-deployment        # Откатиться к предыдущей версии деплоймента
+kubectl rollout restart deployment/goapp-deployment     # Плавающий рестарт Подов в деплойменте
