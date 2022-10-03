@@ -1,0 +1,8 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: env-cm
+  namespace: lesson16
+data:
+  colorgood: purple # в отличии от secrets здесь данные передаются в незашифрованном виде
+  colorbad: yellow

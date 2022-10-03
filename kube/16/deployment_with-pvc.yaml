@@ -1,0 +1,46 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: goapp-deployment
+  namespace: lesson16
+  labels:
+    app: goapp
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: goapp
+  template:
+    metadata:
+      labels:
+        app: goapp
+    spec:
+      containers:
+        - name: web
+          image: ksxack/lesson1:v0.2
+          ports:
+            - containerPort: 8080
+          volumeMounts:                      # Здесь описано монтирование volume'а к контейнеру
+            - name: secret-volume
+              mountPath: "/usr/secrets/"
+              readOnly: true
+            - mountPath: "/data"
+              name: my-volume
+          env:
+            - name: COLORGOOD
+              valueFrom:
+                configMapKeyRef:
+                  name: env-cm
+                  key: colorgood
+            - name: COLORBAD
+              valueFrom:
+                configMapKeyRef:
+                  name: env-cm
+                  key: colorbad
+      volumes:                               # Здесь описан сам volume (том)
+        - name: secret-volume
+          secret:
+            secretName: first-secret
+        - name: my-volume
+          persistentVolumeClaim:
+            claimName: my-pvc

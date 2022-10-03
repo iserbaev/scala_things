@@ -31,6 +31,7 @@ kubectl apply -f service.yaml
 kubectl get svc -n lesson14
 
 ---
+#### Lesson 15 ####
 
 kubectl create ns lesson15
 kubectl apply -f deployment.yaml
@@ -57,3 +58,22 @@ kubectl scale deployment -n lesson15 goapp-deployment --replicas=2
 kubectl get pods -n lesson15
 kubectl delete -f deployment.yaml
 kubectl delete deployment -n lesson15 goapp-deployment
+
+---
+#### Lesson 16 ####
+
+minikube start
+kubectl create ns lesson16
+kubectl apply -f deployment_secrets.yaml
+kubectl get pods -n lesson16
+
+kubectl apply -f configMap-to-env.yaml
+kubectl apply -f deployment_with-config-map.yaml
+
+Порою КонфигМапы удобнее создавать из файла:
+kubectl create cm test-config -n lesson16 --from-file=root-ca.pem  # Вы можете писать cm вместо configmap
+
+kubectl apply -f pvc.yaml
+kubectl apply -f deployment_with-pvc.yaml
+
+kubectl delete deployment -n lesson16 goapp-deployment
