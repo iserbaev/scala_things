@@ -1,0 +1,5 @@
+image: ksxack/lesson1:v0.2
+replicas: 3
+secret:
+  name: load-secret
+  password: loadqwerty

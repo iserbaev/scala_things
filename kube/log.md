@@ -31,7 +31,7 @@ kubectl apply -f service.yaml
 kubectl get svc -n lesson14
 
 ---
-#### Lesson 15 ####
+#### Lesson 1.5 ####
 
 kubectl create ns lesson15
 kubectl apply -f deployment.yaml
@@ -60,7 +60,7 @@ kubectl delete -f deployment.yaml
 kubectl delete deployment -n lesson15 goapp-deployment
 
 ---
-#### Lesson 16 ####
+#### Lesson 1.6 ####
 
 minikube start
 kubectl create ns lesson16
@@ -77,3 +77,35 @@ kubectl apply -f pvc.yaml
 kubectl apply -f deployment_with-pvc.yaml
 
 kubectl delete deployment -n lesson16 goapp-deployment
+
+### Lesson 2.1
+
+minikube start
+helm create test-chart
+kubectl create ns tst-namespace
+helm install my-helm-release  test-chart -n tst-namespace -f test-chart/values.yaml
+kubectl get pods -n tst-namespace
+helm uninstall my-helm-release -n tst-namespace
+
+kubectl create ns dev-namespace
+helm install my-dev-release  test-chart -n dev-namespace -f test-chart/dev.yaml
+kubectl get pods -n dev-namespace
+
+helm package test-chart
+helm status my-helm-release
+helm uninstall my-helm-release -n dev-namespace
+
+# Добавляем репозиторий Хельм-Чартов
+helm repo add grafana https://grafana.github.io/helm-charts
+# Устанавливаем релиз grafana
+helm install grafana  grafana/grafana
+# Пьем чай, пока Под Графаны не будет Running
+kubectl get pods -w
+# Узнаем пароль от учетки admin
+kubectl get secret --namespace default grafana -o jsonpath="{.data.admin-password}" | base64 --decode ; echo
+
+# Делаем проброс портов и заходим в браузер на  localhost:3000
+export POD_NAME=$(kubectl get pods --namespace default -l "app.kubernetes.io/name=grafana,app.kubernetes.io/instance=grafana" -o jsonpath="{.items[0].metadata.name}")
+kubectl --namespace default port-forward $POD_NAME 3000
+
+helm uninstall grafana -n default
