@@ -109,3 +109,10 @@ export POD_NAME=$(kubectl get pods --namespace default -l "app.kubernetes.io/nam
 kubectl --namespace default port-forward $POD_NAME 3000
 
 helm uninstall grafana -n default
+
+### Lesson 2.2
+minikube start
+kubectl create ns lesson22
+kubectl apply -f deployment.yaml
+kubectl get pods -n lesson22
+kubectl delete deployment -n lesson22 my-pod-http

@@ -1,0 +1,29 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  labels:
+    test: my-pod
+  name: my-pod-http
+  namespace: lesson22
+spec:
+  containers:
+    - name: goproxy
+      image: k8s.gcr.io/goproxy:0.1
+      ports:
+        - containerPort: 8080
+      readinessProbe:
+        tcpSocket:
+          port: 8080
+        initialDelaySeconds: 5
+        periodSeconds: 10
+      livenessProbe:
+        tcpSocket:
+          port: 8080
+        initialDelaySeconds: 15
+        periodSeconds: 20
+      startupProbe:
+        httpGet:
+          path: /healthz
+          port: 8080
+        failureThreshold: 30
+        periodSeconds: 10
