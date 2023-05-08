@@ -2,18 +2,18 @@ import sbt._
 
 object Deps {
   object Versions {
-    val Scala = "2.13.10"
-    val cats = "2.9.0"
-    val catsEffect = "3.4.8"
+    val Scala       = "2.13.10"
+    val cats        = "2.9.0"
+    val catsEffect  = "3.4.8"
     val catsTagless = "0.14.0"
     val shapeless   = "2.3.10"
 
     // Compiler Plugins
-    val BetterMonadicFor = "0.3.1"
-    val KindProjector = "0.13.2"
-    val SemanticDB = "4.7.6"
+    val BetterMonadicFor        = "0.3.1"
+    val KindProjector           = "0.13.2"
+    val SemanticDB              = "4.7.6"
     val ScalafixOrganizeImports = "0.6.0"
-    val ScalafixTypelevel = "0.1.5"
+    val ScalafixTypelevel       = "0.1.5"
 
     val scalaLogging = "3.9.2"
     val logback      = "1.4.5"
@@ -27,13 +27,14 @@ object Deps {
 
     val fs2_kafka = "3.0.1"
 
-    val spire = "0.18.0"
+    val spire  = "0.18.0"
+    val breeze = "2.1.0"
 
     val scalaTest             = "3.0.8"
     val testcontainers        = "0.40.14"
     val kafkaTestContainer    = "1.12.3"
     val postgresTestcontainer = "1.12.3"
-    val Weaver = "0.8.2"
+    val Weaver                = "0.8.2"
 
     val quickLens = "1.9.3"
   }
@@ -43,22 +44,22 @@ object Deps {
   )
 
   private lazy val logging = Seq(
-    "com.typesafe.scala-logging" %% "scala-logging"  % Versions.scalaLogging,
-    "ch.qos.logback"             % "logback-core"    % Versions.logback,
-    "ch.qos.logback"             % "logback-classic" % Versions.logback
+    "com.typesafe.scala-logging" %% "scala-logging"   % Versions.scalaLogging,
+    "ch.qos.logback"              % "logback-core"    % Versions.logback,
+    "ch.qos.logback"              % "logback-classic" % Versions.logback
   )
 
   private lazy val testDeps = Seq(
-    "org.scalatest"      %% "scalatest"                      % Versions.scalaTest,
-    "com.dimafeng"       %% "testcontainers-scala"           % Versions.testcontainers,
-    "com.dimafeng"       %% "testcontainers-scala-scalatest" % Versions.testcontainers,
-    "org.testcontainers" % "postgresql"                      % Versions.postgresTestcontainer,
-    "org.testcontainers" % "kafka"                           % Versions.kafkaTestContainer
+    "org.scalatest"     %% "scalatest"                      % Versions.scalaTest,
+    "com.dimafeng"      %% "testcontainers-scala"           % Versions.testcontainers,
+    "com.dimafeng"      %% "testcontainers-scala-scalatest" % Versions.testcontainers,
+    "org.testcontainers" % "postgresql"                     % Versions.postgresTestcontainer,
+    "org.testcontainers" % "kafka"                          % Versions.kafkaTestContainer
   ).map(_ % Test)
 
   private lazy val cats = Seq(
-    "org.typelevel" %% "cats-core"   % Versions.cats,
-    "org.typelevel" %% "cats-free"   % Versions.cats
+    "org.typelevel" %% "cats-core" % Versions.cats,
+    "org.typelevel" %% "cats-free" % Versions.cats
   )
 
   private lazy val catsEffect = Seq(
@@ -91,17 +92,17 @@ object Deps {
   )
 
   private lazy val doobie = Seq(
-    "org.tpolecat" %% "doobie-core"      % Versions.doobieVersion,
-    "org.tpolecat" %% "doobie-h2"        % Versions.doobieVersion,
-    "org.tpolecat" %% "doobie-hikari"    % Versions.doobieVersion, // HikariCP transactor.
-    "org.tpolecat" %% "doobie-postgres"  % Versions.doobieVersion, // Postgres driver 42.2.8 + type mappings
+    "org.tpolecat" %% "doobie-core"     % Versions.doobieVersion,
+    "org.tpolecat" %% "doobie-h2"       % Versions.doobieVersion,
+    "org.tpolecat" %% "doobie-hikari"   % Versions.doobieVersion, // HikariCP transactor.
+    "org.tpolecat" %% "doobie-postgres" % Versions.doobieVersion, // Postgres driver 42.2.8 + type mappings
     "org.tpolecat" %% "doobie-scalatest" % Versions.doobieVersion % "test" // ScalaTest support for typechecking statements.
   )
 
   private lazy val fs2 = Seq(
     "co.fs2" %% "fs2-core"             % Versions.fs2, // For cats 2 and cats-effect 2
     "co.fs2" %% "fs2-io"               % Versions.fs2, // optional I/O library
-    "co.fs2" %% "fs2-reactive-streams" % Versions.fs2 // optional reactive streams interop
+    "co.fs2" %% "fs2-reactive-streams" % Versions.fs2  // optional reactive streams interop
   )
   private lazy val fs2_kafka = Seq(
     "com.github.fd4s" %% "fs2-kafka" % Versions.fs2_kafka
@@ -112,28 +113,32 @@ object Deps {
   )
 
   val weaver = Seq(
-    "com.disneystreaming" %% "weaver-cats" % Versions.Weaver,
+    "com.disneystreaming" %% "weaver-cats"       % Versions.Weaver,
     "com.disneystreaming" %% "weaver-discipline" % Versions.Weaver,
     "com.disneystreaming" %% "weaver-scalacheck" % Versions.Weaver,
   )
 
-  val sbtBetterMonadicFor = "com.olegpy" %% "better-monadic-for" % Versions.BetterMonadicFor
-  val sbtKindProjector = "org.typelevel" % "kind-projector" % Versions.KindProjector
-  val sbtSemanticDB = "org.scalameta" % "semanticdb-scalac" % Versions.SemanticDB
+  val sbtBetterMonadicFor = "com.olegpy"   %% "better-monadic-for" % Versions.BetterMonadicFor
+  val sbtKindProjector    = "org.typelevel" % "kind-projector"     % Versions.KindProjector
+  val sbtSemanticDB       = "org.scalameta" % "semanticdb-scalac"  % Versions.SemanticDB
 
   val sbtScalafixOrganizeImports = Seq(
     "com.github.liancheng" %% "organize-imports" % Versions.ScalafixOrganizeImports,
   )
   val sbtScalafixTypelevel = Seq(
-    "org.typelevel" %% "typelevel-scalafix-cats" % Versions.ScalafixTypelevel,
+    "org.typelevel" %% "typelevel-scalafix-cats"        % Versions.ScalafixTypelevel,
     "org.typelevel" %% "typelevel-scalafix-cats-effect" % Versions.ScalafixTypelevel,
-    "org.typelevel" %% "typelevel-scalafix-fs2" % Versions.ScalafixTypelevel
+    "org.typelevel" %% "typelevel-scalafix-fs2"         % Versions.ScalafixTypelevel
   )
 
   val sbtScalafix = Def.setting(
     sbtScalafixOrganizeImports ++ sbtScalafixTypelevel
   )
 
-  lazy val algsProjectDeps
-    : Seq[ModuleID] = logging ++ testDeps ++ cats ++ catsEffect ++ catsTagless ++ conf ++ fs2 ++ shapeless ++ spire ++ lens ++ weaver
+  val breeze = Seq(
+    "org.scalanlp" %% "breeze" % Versions.breeze
+  )
+
+  lazy val algsProjectDeps: Seq[ModuleID] =
+    breeze ++ logging ++ testDeps ++ cats ++ catsEffect ++ catsTagless ++ conf ++ fs2 ++ shapeless ++ spire ++ lens ++ weaver
 }
