@@ -78,6 +78,28 @@ object MainDistances {
   //0 1 1 2 2 3
 }
 
+object LoopsCount {
+  def main(args: Array[String]): Unit = {
+    val br: BufferedReader = new BufferedReader(
+      new InputStreamReader(System.in)
+    )
+
+    val size        = br.readLine().toInt
+
+    var count = 0
+
+    (0 until size).foreach{ i =>
+      val row = br.readLine().split(" ").map(_.toInt)
+
+      if (row(i) == 1) count += 1
+    }
+
+    println(count)
+
+    br.close()
+  }
+}
+
 object TestAdj extends App {
   val adj = EdgesList(
     Seq(
