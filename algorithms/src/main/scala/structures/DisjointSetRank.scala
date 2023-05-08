@@ -2,7 +2,7 @@ package structures
 
 import scala.collection.mutable
 
-class DisjointSetRank(val origin: mutable.IndexedSeq[Int]) {
+class DisjointSetRank private (val origin: mutable.IndexedSeq[Int]) {
   private val parent     = mutable.Map.empty[Int, Int]
   private val rank       = mutable.Map.empty[Int, Int]
   private val maxes      = IndexedSeq.newBuilder[Int]
@@ -66,4 +66,9 @@ class DisjointSetRank(val origin: mutable.IndexedSeq[Int]) {
   }
 
   def result: IndexedSeq[Int] = maxes.result()
+}
+
+object DisjointSetRank {
+  def apply(it: Iterable[Int]): DisjointSetRank =
+    new DisjointSetRank(mutable.IndexedSeq.newBuilder[Int].++=(it).result())
 }

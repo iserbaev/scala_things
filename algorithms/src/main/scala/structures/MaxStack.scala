@@ -1,17 +1,17 @@
 package structures
 
-import scala.collection.mutable.{ArrayStack => ScalaStack}
+import scala.collection.mutable.{ Stack => ScalaStack }
 
 case class MaxStack(size: Int) {
   private val underlying = ScalaStack[(Int, Int)]()
 
-  def length: Int = underlying.length
+  def length: Int               = underlying.length
   def apply(i: Int): (Int, Int) = underlying(i)
 
-  def isFull:  Boolean = underlying.size >= size
+  def isFull: Boolean  = underlying.size >= size
   def nonFull: Boolean = !isFull
 
-  def isEmpty:  Boolean = underlying.isEmpty
+  def isEmpty: Boolean  = underlying.isEmpty
   def nonEmpty: Boolean = !isEmpty
 
   def clear(): Unit = underlying.clear()
@@ -28,7 +28,7 @@ case class MaxStack(size: Int) {
     if (isEmpty) None else Some(underlying.top._2)
 
   def popSafely: Option[(Int, Int)] =
-    if (isEmpty) None else Some(underlying.pop)
+    if (isEmpty) None else Some(underlying.pop())
 
-  def result: Seq[(Int, Int)] = underlying
+  def result: Seq[(Int, Int)] = underlying.toSeq
 }

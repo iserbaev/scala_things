@@ -1,39 +1,33 @@
 package course2
 
-import scala.util.Try
-
-/**
-  * week 1 - for expressions and monads
-  */
+/** week 1 - for expressions and monads */
 object MainWeek1 extends App {
 
-  /**
-    * lecture 1.1 - Queries with for
-    */
+  /** lecture 1.1 - Queries with for */
   case class Book(title: String, authors: List[String])
   val books: List[Book] = List(
     Book(
-      title   = "Structure and Interpretation of Computer Programs",
+      title = "Structure and Interpretation of Computer Programs",
       authors = List("Abelson, Harald", "Sussman, Gerald J.")
     ),
     Book(
-      title   = "Introduction to Functional Programming",
+      title = "Introduction to Functional Programming",
       authors = List("Bird, Richard", "Wadler, Phil")
     ),
-    Book(title = "Effective Java", authors   = List(" Bloch, Joshua")),
+    Book(title = "Effective Java", authors = List(" Bloch, Joshua")),
     Book(title = "Effective Java 2", authors = List(" Bloch, Joshua")),
     Book(
-      title   = "Java Puzzlers",
+      title = "Java Puzzlers",
       authors = List("Bloch, Joshua", "Gafter, Neal")
     ),
     Book(
-      title   = "Programming in Scala",
+      title = "Programming in Scala",
       authors = List("Odersky, Martin", "Spoon, Lex", "Venners, Bill")
     )
   )
 
-  /**
-    * find the names of all authors who have written at least two books presented in database "books"
+  /** find the names of all authors who have written at least two books presented in
+    * database "books"
     */
   val query = {
     for {
@@ -47,9 +41,7 @@ object MainWeek1 extends App {
   }.distinct
   println(query)
 
-  /**
-    * lecture 2.2 - translation of for
-    */
+  /** lecture 2.2 - translation of for */
   def mapFun[T, U](xs: List[T], f: T => U): List[U] =
     for (x <- xs) yield f(x)
 
@@ -60,56 +52,31 @@ object MainWeek1 extends App {
     } yield y
 
   def filterFun[T](xs: List[T], p: T => Boolean): List[T] =
-    for (x <- xs; if p(x)) yield x
+    for (x <- xs if p(x)) yield x
 
-  /**
-    * simple for expression
-    * for (x <- e1) yield e2
-    * will transform by compiler to
-    * e1.map(x => e2)
+  /** simple for expression for (x <- e1) yield e2 will transform by compiler to e1.map(x
+    * => e2)
     */
-  /**
-    * for expression
-    * for (x <- e1 if f; s) yield e2
-    * will transform by compiler to
-    * for (x <- e1.withFilter(x => f); s) yield e2
-    * and then translate to simplier expressions
+  /** for expression for (x <- e1 if f; s) yield e2 will transform by compiler to for (x
+    * <- e1.withFilter(x => f); s) yield e2 and then translate to simplier expressions
     */
-  /**
-    * s - mean is "something more sequence of generators or filters"
+  /** s - mean is "something more sequence of generators or filters" */
+  /** for expression for (x <- e1; y <- e2; s) yield e3 will transform by compiler to
+    * e1.flatMap( x => for (y <- e2); s) yield e3) and then translate to simplier
+    * expressions
     */
-  /**
-    * for expression
-    * for (x <- e1; y <- e2; s) yield e3
-    * will transform by compiler to
-    * e1.flatMap( x => for (y <- e2); s) yield e3)
-    * and then translate to simplier expressions
-    */
-  /**
-    * for expression
-    * for {
-    * i <- 1 until n
-    * j <- 1 until n
-    * if isPrime(i + j)
-    * } yield (i, j)
-    * will transform by compiler to
-    * (1 until n).flatMap( i =>
-    *   (1 until i).withFilter(j => isPrime(i+j))
-    *   .map(j => (i,j))
-    *   )
+  /** for expression for { i <- 1 until n j <- 1 until n if isPrime(i + j) } yield (i, j)
+    * will transform by compiler to (1 until n).flatMap( i => (1 until i).withFilter(j =>
+    * isPrime(i+j)) .map(j => (i,j)) )
     */
   val forQuery = for {
     b <- books
     a <- b.authors if a.startsWith("Bird")
   } yield b.title
-  val translatedQuery = books.flatMap(
-    b => b.authors.withFilter(a => a.startsWith("Bird")).map(y => b.title)
-  )
+  val translatedQuery = books.flatMap(b => b.authors.withFilter(a => a.startsWith("Bird")).map(y => b.title))
   println(translatedQuery)
 
-  /**
-    * lecture 1.3 Functional random generators
-    */
+  /** lecture 1.3 Functional random generators */
   trait Generator[+T] {
     self => // an alias for "this"
 
@@ -158,7 +125,7 @@ object MainWeek1 extends App {
 
   trait Tree
   case class Inner(left: Tree, right: Tree) extends Tree
-  case class Leaf(x:     Int) extends Tree
+  case class Leaf(x: Int)                   extends Tree
   def leafs: Generator[Leaf] =
     for {
       x <- integers
@@ -174,11 +141,9 @@ object MainWeek1 extends App {
       tree   <- if (isLeaf) leafs else inners
     } yield tree
 
-  /**
-    * tests generator
-    */
+  /** tests generator */
   def test[T](g: Generator[T], numTimes: Int = 100)(
-    test:        T => Boolean
+      test: T => Boolean
   ): Unit = {
     for (i <- 0 until numTimes) {
       val value = g.generate
@@ -187,40 +152,31 @@ object MainWeek1 extends App {
     println("passed " + numTimes + " tests")
   }
 
-  /**
-    * example of test using -> if ">" must be assertion failed or if ">=" must be true
-    */
-  test(pairs(lists, lists)) {
-    case (xs: List[Int], ys: List[Int]) => (xs ++ ys).length >= xs.length
+  /** example of test using -> if ">" must be assertion failed or if ">=" must be true */
+  test(pairs(lists, lists)) { case (xs: List[Int], ys: List[Int]) =>
+    (xs ++ ys).length >= xs.length
   }
 
-  /**
-    * ScalaCheck tool
+  /** ScalaCheck tool
     *
-    * forAll { (l1: List[Int], l2: List[Int]) =>
-    *   l1.size + l2.size == (l1 ++ l2).size
-    * }
+    * forAll { (l1: List[Int], l2: List[Int]) => l1.size + l2.size == (l1 ++ l2).size }
     */
-  /**
-    * lecture 1.4 Monads
-    */
+  /** lecture 1.4 Monads */
   trait M[T] {
     def flatMap[U](f: T => M[U]): M[U] //in literature called as "bind"
   }
 
-  /**
-    *     def unit[T](x: T): M[T]
+  /** def unit[T](x: T): M[T]
     *
-    *     List is a monad with unit(x) = List(x)
-    *     Option is a monad with unit(x) = Some(x)
+    * List is a monad with unit(x) = List(x) Option is a monad with unit(x) = Some(x)
     *
-    *     map for monad is combination of flatMap and unit
-    *     m map f == m flatMap (x => unit(f(x)))
-    *             == m flatMap (f andThen unit)
+    * map for monad is combination of flatMap and unit m map f == m flatMap (x =>
+    * unit(f(x)))
+    * == m flatMap (f andThen unit)
     */
-  val trySum = Try(5 + 1)
-  println(trySum)
-
-  val tryFail = Try(5 / 0)
-  println(tryFail)
+//  val trySum = Try(5 + 1)
+//  println(trySum)
+//
+//  val tryFail = Try(5 / 0)
+//  println(tryFail)
 }

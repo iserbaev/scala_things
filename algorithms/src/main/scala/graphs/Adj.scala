@@ -1,11 +1,11 @@
 package graphs
 
-import java.io.{BufferedReader, InputStreamReader}
+import java.io.{ BufferedReader, InputStreamReader }
 import java.util.concurrent.atomic.AtomicInteger
-import scala.collection.{immutable, mutable}
+import scala.collection.{ immutable, mutable }
 
-/** Adjacency list representation (список смежности)
-  * Для каждой вершины u Adj[u] состоит из всех вершин смежных с u в графе G
+/** Adjacency list representation (список смежности) Для каждой вершины u Adj[u] состоит
+  * из всех вершин смежных с u в графе G
   */
 case class Adj[V](g: Map[V, Set[V]]) {
   import Adj._
@@ -80,33 +80,32 @@ case class Adj[V](g: Map[V, Set[V]]) {
 
 object Adj {
   case class DFSMeta[V](
-    componentsCount: Int,
-    components:      Map[V, Int],
-    tin:             Map[V, Int],
-    tout:            Map[V, Int]
+      componentsCount: Int,
+      components: Map[V, Int],
+      tin: Map[V, Int],
+      tout: Map[V, Int]
   )
 
   case class BFSMeta[V](
-    colors:    Map[V, Color],
-    distances: Map[V, Int],
-    parents:   Map[V, Option[V]]
+      colors: Map[V, Color],
+      distances: Map[V, Int],
+      parents: Map[V, Option[V]]
   )
 
   def build[V](edgesMappings: Seq[List[V]]): Adj[V] = {
 
-    val gMap = edgesMappings.foldLeft(mutable.Map.empty[V, Set[V]]) {
-      case (gi, pair) =>
-        pair match {
-          case List(v1, v2) =>
-            gi.update(v1, gi.getOrElse(v1, Set.empty[V]) + v2)
-            gi.update(v2, gi.getOrElse(v2, Set.empty[V]) + v1)
-            gi
-          case List(v1) =>
-            gi.update(v1, gi.getOrElse(v1, Set.empty[V]))
-            gi
-          case _ =>
-            gi
-        }
+    val gMap = edgesMappings.foldLeft(mutable.Map.empty[V, Set[V]]) { case (gi, pair) =>
+      pair match {
+        case List(v1, v2) =>
+          gi.update(v1, gi.getOrElse(v1, Set.empty[V]) + v2)
+          gi.update(v2, gi.getOrElse(v2, Set.empty[V]) + v1)
+          gi
+        case List(v1) =>
+          gi.update(v1, gi.getOrElse(v1, Set.empty[V]))
+          gi
+        case _ =>
+          gi
+      }
     }
 
     new Adj(gMap.toMap)
@@ -170,9 +169,8 @@ object MainDistances {
 
   def process(pairs: IndexedSeq[List[Int]]): Unit = {
     val adj = Adj.build(pairs)
-    adj.bfs(0).distances.toSeq.sortWith(_._1 < _._1).foreach {
-      case (_, v) =>
-        print(s"$v ")
+    adj.bfs(0).distances.toSeq.sortWith(_._1 < _._1).foreach { case (_, v) =>
+      print(s"$v ")
     }
   }
 

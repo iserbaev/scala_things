@@ -1,22 +1,18 @@
 package course2
 
-/**
-  * Created by ilnur on 17.02.17.
-  */
+/** Created by ilnur on 17.02.17. */
 object MainWeek2 extends App {
 
-  /**
-    * lecture 2.1 Structural induction of trees
-    */
+  /** lecture 2.1 Structural induction of trees */
   abstract class IntSet {
-    def incl(x:      Int):    IntSet
-    def contains(x:  Int):    Boolean
+    def incl(x: Int): IntSet
+    def contains(x: Int): Boolean
     def union(other: IntSet): IntSet
   }
   object Empty extends IntSet {
-    def incl(x:      Int):    IntSet  = NonEmpty(x, Empty, Empty)
-    def contains(x:  Int):    Boolean = false
-    def union(other: IntSet): IntSet  = other
+    def incl(x: Int): IntSet         = NonEmpty(x, Empty, Empty)
+    def contains(x: Int): Boolean    = false
+    def union(other: IntSet): IntSet = other
   }
   case class NonEmpty(elem: Int, left: IntSet, right: IntSet) extends IntSet {
     def incl(x: Int): IntSet =
@@ -33,17 +29,13 @@ object MainWeek2 extends App {
       (left.union(right.union(other))).incl(elem)
   }
 
-  /**
-    * Laws of IntSet
+  /** Laws of IntSet
     *
-    * 1. Empty contains x = false
-    * 2. (s incl x) contains x = true
-    * 3. (s incl x) contains y = s contains y (if x != y)
-    * 4. (xs union ys) contains x = xs contains x || ys contains x
+    *   1. Empty contains x = false 2. (s incl x) contains x = true 3. (s incl x) contains
+    *      y = s contains y (if x != y) 4. (xs union ys) contains x = xs contains x || ys
+    *      contains x
     */
-  /**
-    * lecture 2.2 Streams
-    */
+  /** lecture 2.2 Streams */
   def isPrime(n: Int): Boolean =
     (2 until n).forall(x => n % x != 0)
 
@@ -53,10 +45,8 @@ object MainWeek2 extends App {
   val ys = Stream(1, 2, 3)
   val zs = (1 to 1000).toStream
 
-  /**
-    * example - stream and list
-    * for function streamRange(1,10) and listRange(1,10)
-    * stream construct only first element, however list construct all element
+  /** example - stream and list for function streamRange(1,10) and listRange(1,10) stream
+    * construct only first element, however list construct all element
     */
   def streamRange(lo: Int, hi: Int): Stream[Int] =
     if (lo >= hi) Stream.empty
@@ -75,10 +65,8 @@ object MainWeek2 extends App {
 
   streamRange(1, 10).take(3) //will init stream with only 3 digit
 
-  /**
-    * lecture 2.4 Compute with infinite sequences
-    */
-  def from(n:  Int): Stream[Int] = n #:: from(n + 1)
+  /** lecture 2.4 Compute with infinite sequences */
+  def from(n: Int): Stream[Int] = n #:: from(n + 1)
   def sieve(s: Stream[Int]): Stream[Int] =
     s.head #:: sieve(s.tail.filter(_ % s.head != 0))
 
@@ -86,15 +74,13 @@ object MainWeek2 extends App {
 
   def sqrtStream(x: Double): Stream[Double] = {
     def improve(guess: Double): Double = (guess + x / guess) / 2
-    lazy val guesses: Stream[Double] = 1 #:: (guesses.map(improve))
+    lazy val guesses: Stream[Double]   = 1.toDouble #:: (guesses.map(improve))
     guesses
   }
   def isGoodEnough(guess: Double, x: Double) =
     math.abs((guess * guess - x) / x) < 0.0001
 
-  /**
-    * lecture 2.5 The wter pouring problem
-    */
+  /** lecture 2.5 The wter pouring problem */
   class Pouring(capacity: Vector[Int]) {
     //States
     type State = Vector[Int]
@@ -123,15 +109,15 @@ object MainWeek2 extends App {
 
     val moves =
       (for (g <- glasses) yield Empty(g)) ++
-      (for (g <- glasses) yield Fill(g)) ++
-      (for {
-        from <- glasses
-        to   <- glasses if from != to
-      } yield Pour(from, to))
+        (for (g <- glasses) yield Fill(g)) ++
+        (for {
+          from <- glasses
+          to   <- glasses if from != to
+        } yield Pour(from, to))
 
     //Paths
     class Path(history: List[Move]) {
-      def endState: State = history.foldRight(initialState)(_.change(_))
+      def endState: State    = history.foldRight(initialState)(_.change(_))
       def extend(move: Move) = new Path(move :: history)
       override def toString: String =
         (history.reverse.mkString(" ")) + "-->" + endState
@@ -158,7 +144,7 @@ object MainWeek2 extends App {
   }
 
   val problem = new Pouring(Vector(4, 9))
-  problem.moves
+//  problem.moves
   val result = problem.solutions(17)
   println(result)
 }

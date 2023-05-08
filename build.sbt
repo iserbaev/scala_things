@@ -1,20 +1,25 @@
 import Deps._
-import Settings._
 
-name := """scala learn"""
-
-lazy val scalaLearn = project in file("scalaLearn")
+inThisBuild(
+  Seq(
+    name := """scala learn""",
+    versionScheme := Some("early-semver"),
+  )
+)
 
 lazy val coursera = project in file("coursera")
 
 lazy val algorithms = project
   .in(file("algorithms"))
-  .settings(commonSettings2_12())
   .settings(
     version := "0.1",
+    scalaVersion  := Deps.Versions.Scala,
+    addCompilerPlugin(Deps.sbtBetterMonadicFor),
+    addCompilerPlugin(Deps.sbtKindProjector.cross(CrossVersion.full)),
     name    := "algorithms",
-    libraryDependencies ++= algsProjectDeps
+    libraryDependencies ++= algsProjectDeps,
+    testFrameworks += new TestFramework("weaver.framework.CatsEffect")
   )
 
 lazy val root = (project in file("."))
-  .aggregate(scalaLearn, coursera, algorithms)
+  .aggregate(coursera, algorithms)

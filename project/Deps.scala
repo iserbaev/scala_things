@@ -1,31 +1,41 @@
 import sbt._
 
 object Deps {
-  private object Versions {
-    val cats        = "2.1.1"
-    val catsTagless = "0.11"
-    val shapeless   = "2.3.3"
+  object Versions {
+    val Scala = "2.13.10"
+    val cats = "2.9.0"
+    val catsEffect = "3.4.8"
+    val catsTagless = "0.14.0"
+    val shapeless   = "2.3.10"
+
+    // Compiler Plugins
+    val BetterMonadicFor = "0.3.1"
+    val KindProjector = "0.13.2"
+    val SemanticDB = "4.7.6"
+    val ScalafixOrganizeImports = "0.6.0"
+    val ScalafixTypelevel = "0.1.5"
 
     val scalaLogging = "3.9.2"
-    val logback      = "1.2.3"
+    val logback      = "1.4.5"
 
-    val fs2 = "2.4.3"
+    val fs2 = "3.6.1"
 
-    val circe         = "0.13.0"
-    val http4sVersion = "0.21.7"
+    val circe         = "0.14.5"
+    val http4sVersion = "0.23.18"
 
-    val doobieVersion = "0.9.0"
+    val doobieVersion = "1.0.0-RC2"
 
-    val fs2_kafka = "1.0.0"
+    val fs2_kafka = "3.0.1"
 
-    val spire = "0.17.0-M1"
+    val spire = "0.18.0"
 
     val scalaTest             = "3.0.8"
-    val testcontainers        = "0.34.1"
+    val testcontainers        = "0.40.14"
     val kafkaTestContainer    = "1.12.3"
     val postgresTestcontainer = "1.12.3"
+    val Weaver = "0.8.2"
 
-    val quickLens = "1.6.0"
+    val quickLens = "1.9.3"
   }
 
   private lazy val lens = Seq(
@@ -48,12 +58,11 @@ object Deps {
 
   private lazy val cats = Seq(
     "org.typelevel" %% "cats-core"   % Versions.cats,
-    "org.typelevel" %% "cats-free"   % Versions.cats,
-    "org.typelevel" %% "cats-effect" % Versions.cats
+    "org.typelevel" %% "cats-free"   % Versions.cats
   )
 
   private lazy val catsEffect = Seq(
-    "org.typelevel" %% "cats-effect" % Versions.cats
+    "org.typelevel" %% "cats-effect" % Versions.catsEffect
   )
   private lazy val catsTagless = Seq(
     "org.typelevel" %% "cats-tagless-macros" % Versions.catsTagless
@@ -102,6 +111,29 @@ object Deps {
     "org.typelevel" %% "spire" % Versions.spire
   )
 
+  val weaver = Seq(
+    "com.disneystreaming" %% "weaver-cats" % Versions.Weaver,
+    "com.disneystreaming" %% "weaver-discipline" % Versions.Weaver,
+    "com.disneystreaming" %% "weaver-scalacheck" % Versions.Weaver,
+  )
+
+  val sbtBetterMonadicFor = "com.olegpy" %% "better-monadic-for" % Versions.BetterMonadicFor
+  val sbtKindProjector = "org.typelevel" % "kind-projector" % Versions.KindProjector
+  val sbtSemanticDB = "org.scalameta" % "semanticdb-scalac" % Versions.SemanticDB
+
+  val sbtScalafixOrganizeImports = Seq(
+    "com.github.liancheng" %% "organize-imports" % Versions.ScalafixOrganizeImports,
+  )
+  val sbtScalafixTypelevel = Seq(
+    "org.typelevel" %% "typelevel-scalafix-cats" % Versions.ScalafixTypelevel,
+    "org.typelevel" %% "typelevel-scalafix-cats-effect" % Versions.ScalafixTypelevel,
+    "org.typelevel" %% "typelevel-scalafix-fs2" % Versions.ScalafixTypelevel
+  )
+
+  val sbtScalafix = Def.setting(
+    sbtScalafixOrganizeImports ++ sbtScalafixTypelevel
+  )
+
   lazy val algsProjectDeps
-    : Seq[ModuleID] = logging ++ testDeps ++ cats ++ catsEffect ++ catsTagless ++ conf ++ fs2 ++ shapeless ++ spire ++ lens
+    : Seq[ModuleID] = logging ++ testDeps ++ cats ++ catsEffect ++ catsTagless ++ conf ++ fs2 ++ shapeless ++ spire ++ lens ++ weaver
 }

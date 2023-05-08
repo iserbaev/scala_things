@@ -1,16 +1,16 @@
 package structures
 
-import structures.BinarySearchTree.{BNil, Node}
+import structures.BinarySearchTree.{ BNil, Node }
 
 import scala.annotation.tailrec
-import scala.collection.mutable.{ArrayBuffer, ListBuffer}
+import scala.collection.mutable.{ ArrayBuffer, ListBuffer }
 
 sealed trait BinarySearchTree[+T] {
-  def key:         Option[T]
-  def left:        BinarySearchTree[T]
-  def right:       BinarySearchTree[T]
+  def key: Option[T]
+  def left: BinarySearchTree[T]
+  def right: BinarySearchTree[T]
   def parentLabel: Option[T]
-  def size:        Int
+  def size: Int
 
   def map[R](f: T => R): BinarySearchTree[R] = this match {
     case BNil =>
@@ -53,20 +53,20 @@ object BinarySearchTree {
   case object BNil extends BinarySearchTree[Nothing] {
     override def key: Option[Nothing] = None
 
-    override def left:        BinarySearchTree[Nothing] = BNil
-    override def right:       BinarySearchTree[Nothing] = BNil
-    override def parentLabel: Option[Nothing]           = None
-    override def size:        Int                       = 0
+    override def left: BinarySearchTree[Nothing]  = BNil
+    override def right: BinarySearchTree[Nothing] = BNil
+    override def parentLabel: Option[Nothing]     = None
+    override def size: Int                        = 0
   }
 
   case class Node[+T](
-    k:           T,
-    left:        BinarySearchTree[T],
-    right:       BinarySearchTree[T],
-    parentLabel: Option[T]
+      k: T,
+      left: BinarySearchTree[T],
+      right: BinarySearchTree[T],
+      parentLabel: Option[T]
   ) extends BinarySearchTree[T] {
-    override def key:  Option[T] = Some(k)
-    override def size: Int       = 1 + left.size + right.size
+    override def key: Option[T] = Some(k)
+    override def size: Int      = 1 + left.size + right.size
   }
 
   def preOrder[T](b: BinarySearchTree[T])(runNode: Node[T] => Unit): Unit =
@@ -90,8 +90,8 @@ object BinarySearchTree {
     }
 
   def inOrderTraversal[T](
-    b:   BinarySearchTree[T],
-    acc: ListBuffer[T]
+      b: BinarySearchTree[T],
+      acc: ListBuffer[T]
   ): ListBuffer[T] =
     b match {
       case BNil =>
@@ -119,8 +119,8 @@ object BinarySearchTree {
     *   - больше всех ключей из её левого поддерева и
     *   - не меньше всех ключей из правого поддерева
     */
-  def isValid[T](x:    BinarySearchTree[T])(
-    implicit ordering: Ordering[T]
+  def isValid[T](x: BinarySearchTree[T])(
+      implicit ordering: Ordering[T]
   ): Boolean = {
     val isValid = ArrayBuffer(true)
     inOrderValidate(x, ArrayBuffer[BinarySearchTree[T]](BNil), isValid)
@@ -128,11 +128,11 @@ object BinarySearchTree {
   }
 
   def inOrderValidate[T](
-    root:    BinarySearchTree[T],
-    prev:    ArrayBuffer[BinarySearchTree[T]],
-    isValid: ArrayBuffer[Boolean]
+      root: BinarySearchTree[T],
+      prev: ArrayBuffer[BinarySearchTree[T]],
+      isValid: ArrayBuffer[Boolean]
   )(
-    implicit ordering: Ordering[T]
+      implicit ordering: Ordering[T]
   ): Unit =
     root match {
       case BNil =>
@@ -152,7 +152,7 @@ object BinarySearchTree {
   // O(log n)
   @tailrec
   def treeSearch[T](x: BinarySearchTree[T], t: T)(
-    implicit ordering: Ordering[T]
+      implicit ordering: Ordering[T]
   ): BinarySearchTree[T] =
     x match {
       case BNil =>
@@ -163,13 +163,15 @@ object BinarySearchTree {
         treeSearch(l, t)
       case Node(k, _, r, _) if ordering.gt(t, k) =>
         treeSearch(r, t)
+      case _ =>
+        throw new IllegalStateException("should not happen")
     }
 
   def treeMin[T](x: BinarySearchTree[T]): BinarySearchTree[T] = {
     @tailrec
     def recur(
-      xx:  BinarySearchTree[T],
-      acc: BinarySearchTree[T]
+        xx: BinarySearchTree[T],
+        acc: BinarySearchTree[T]
     ): BinarySearchTree[T] = xx.left match {
       case BNil =>
         acc
@@ -183,8 +185,8 @@ object BinarySearchTree {
   def treeMax[T](x: BinarySearchTree[T]): BinarySearchTree[T] = {
     @tailrec
     def recur(
-      xx:  BinarySearchTree[T],
-      acc: BinarySearchTree[T]
+        xx: BinarySearchTree[T],
+        acc: BinarySearchTree[T]
     ): BinarySearchTree[T] = xx.right match {
       case BNil =>
         acc
@@ -195,14 +197,13 @@ object BinarySearchTree {
   }
 
   // O(log n)
-  def parent[T](root:  BinarySearchTree[T], parentLabel: Option[T])(
-    implicit ordering: Ordering[T]
+  def parent[T](root: BinarySearchTree[T], parentLabel: Option[T])(
+      implicit ordering: Ordering[T]
   ): BinarySearchTree[T] =
     parentLabel.map(BinarySearchTree.treeSearch(root, _)).getOrElse(BNil)
 
   def treeSuccessor[T](x: BinarySearchTree[T], root: BinarySearchTree[T])(
-    implicit opt:         Ordering[Option[T]],
-    tOrd:                 Ordering[T]
+      implicit tOrd: Ordering[T]
   ): BinarySearchTree[T] =
     x.right match {
       case value: Node[T] =>
@@ -210,8 +211,8 @@ object BinarySearchTree {
       case BNil =>
         @tailrec
         def recur(
-          y:  BinarySearchTree[T],
-          xx: BinarySearchTree[T]
+            y: BinarySearchTree[T],
+            xx: BinarySearchTree[T]
         ): BinarySearchTree[T] =
           parent(root, y.parentLabel) match {
             case yp: Node[T] if y.right.key == xx.key =>
@@ -223,8 +224,7 @@ object BinarySearchTree {
     }
 
   def treePredecessor[T](x: BinarySearchTree[T], root: BinarySearchTree[T])(
-    implicit opt:           Ordering[Option[T]],
-    tOrd:                   Ordering[T]
+      implicit tOrd: Ordering[T]
   ): BinarySearchTree[T] =
     x.left match {
       case value: Node[T] =>
@@ -232,8 +232,8 @@ object BinarySearchTree {
       case BNil =>
         @tailrec
         def recur(
-          y:  BinarySearchTree[T],
-          xx: BinarySearchTree[T]
+            y: BinarySearchTree[T],
+            xx: BinarySearchTree[T]
         ): BinarySearchTree[T] =
           parent(root, y.parentLabel) match {
             case yp: Node[T] if y.left.key == xx.key =>
@@ -245,11 +245,11 @@ object BinarySearchTree {
     }
 
   def treeInsert[T](
-    x:           BinarySearchTree[T],
-    v:           BinarySearchTree[T],
-    parentLabel: Option[T] = None
+      x: BinarySearchTree[T],
+      v: BinarySearchTree[T],
+      parentLabel: Option[T] = None
   )(
-    implicit ordering: Ordering[T]
+      implicit ordering: Ordering[T]
   ): BinarySearchTree[T] =
     (x, v) match {
       case (BNil, BNil) =>
@@ -258,28 +258,26 @@ object BinarySearchTree {
         n.copy(parentLabel = parentLabel)
       case (n @ Node(_, _, _, _), BNil) =>
         n.copy(parentLabel = parentLabel)
-      case (pp @ Node(pk, pl, _, _), n @ Node(nk, _, _, _))
-          if ordering.lt(nk, pk) =>
+      case (pp @ Node(pk, pl, _, _), n @ Node(nk, _, _, _)) if ordering.lt(nk, pk) =>
         pp.copy(left = treeInsert(pl, n, pp.key), parentLabel = parentLabel)
       case (pp @ Node(_, _, r, _), n @ Node(_, _, _, _)) =>
         pp.copy(right = treeInsert(r, n, pp.key), parentLabel = parentLabel)
     }
 
   def treeInserts[T](x: BinarySearchTree[T], vv: T*)(
-    implicit ordering:  Ordering[T]
-  ): BinarySearchTree[T] = vv.toSeq.foldLeft(x) {
-    case (xx, v) =>
-      treeInsert(xx, Node(v, BNil, BNil, None))
+      implicit ordering: Ordering[T]
+  ): BinarySearchTree[T] = vv.toSeq.foldLeft(x) { case (xx, v) =>
+    treeInsert(xx, Node(v, BNil, BNil, None))
   }
 
   def treeDelete[T](x: BinarySearchTree[T], v: T)(
-    implicit ordering: Ordering[T]
+      implicit ordering: Ordering[T]
   ): BinarySearchTree[T] = {
 //    @tailrec
     def recur(xx: BinarySearchTree[T]): BinarySearchTree[T] = xx match {
       case BNil =>
         xx
-      case Node(zk, zl, zr, parentLabel) if ordering.equiv(zk, v) =>
+      case Node(zk, zl, zr, parentLabel) if zk == v =>
         (zl, zr) match {
           case (BNil, BNil) =>
             BNil
@@ -307,6 +305,8 @@ object BinarySearchTree {
         Node(zk, zl, recur(zr), parentLabel)
       case Node(zk, zl, zr, parentLabel) if ordering.gt(zk, v) =>
         Node(zk, recur(zl), zr, parentLabel)
+      case _ =>
+        throw new IllegalStateException("should not happen")
     }
 
     recur(x)
@@ -318,17 +318,7 @@ object TestTree extends App {
 
   def test(): Unit = {
 
-    /**
-      *                        15
-      *                     /     \
-      *                    6      18
-      *                   / \    /  \
-      *                  3   7  17   20
-      *                 / \   \
-      *                2   4  13
-      *                      /
-      *                     9
-      */
+    /** 15 / \ 6 18 / \ / \ 3 7 17 20 / \ \ 2 4 13 / 9 */
     val seq    = Seq(15, 6, 3, 7, 2, 4, 13, 9, 18, 17, 20)
     val result = treeInserts(BNil, seq: _*)
 

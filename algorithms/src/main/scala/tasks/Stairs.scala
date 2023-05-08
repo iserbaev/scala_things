@@ -9,9 +9,8 @@ object Stairs {
       else (sum + prev, element)
 
     val res = arr.tail
-      .foldLeft((0, arr.head)) {
-        case ((sum, prev), element) =>
-          process(sum, prev, element)
+      .foldLeft((0, arr.head)) { case ((sum, prev), element) =>
+        process(sum, prev, element)
       }
 
     res._1

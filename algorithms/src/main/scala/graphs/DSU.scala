@@ -1,6 +1,6 @@
 package graphs
 
-import java.io.{BufferedReader, InputStreamReader}
+import java.io.{ BufferedReader, InputStreamReader }
 import scala.collection.mutable
 
 object DSU {

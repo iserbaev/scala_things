@@ -2,9 +2,9 @@ package tasks
 
 import java.util.concurrent.atomic.AtomicReference
 
-import scala.concurrent.{Await, Future}
+import scala.concurrent.{ Await, Future }
 import scala.concurrent.ExecutionContext.Implicits.global
-import scala.util.{Failure, Success}
+import scala.util.{ Failure, Success }
 import scala.concurrent.duration._
 
 /*
@@ -18,7 +18,7 @@ object ReliableService extends App {
   }
 
   def reliableCall[V](k: String, f: => Future[V])(
-    cache:               FindCache[V]
+      cache: FindCache[V]
   ): Future[(V, Boolean)] =
     (for {
       res <- f.transform(Success(_))
@@ -52,7 +52,7 @@ object ReliableService extends App {
   }
 
   def reliableCallV2[V](k: String, f: => Future[V])(
-    cache:                 Cache[V]
+      cache: Cache[V]
   ): Future[(V, Boolean)] =
     (for {
       res <- f.transform(Success(_))

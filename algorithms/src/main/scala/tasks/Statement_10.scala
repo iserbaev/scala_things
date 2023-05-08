@@ -1,31 +1,28 @@
 package tasks
 
 object Main10 {
-  import java.io.{BufferedReader, InputStreamReader}
-  import java.util.StringTokenizer
-  import scala.collection.mutable
-  import scala.collection.mutable.ArrayBuffer
+  import java.io.{ BufferedReader, InputStreamReader }
 
   sealed trait Command {
-    def cmd:      String
-    def args:     Array[String]
+    def cmd: String
+    def args: Array[String]
     def validate: Boolean
-    def run(store: mutable.Map[Int, String]): mutable.Map[Int, String]
+    def run(store: Map[Int, String]): Map[Int, String]
   }
   object Command {
     case class Add(args: Array[String]) extends Command {
       def validate: Boolean = args.length == 3
-      def run(store: mutable.Map[Int, String]): mutable.Map[Int, String] =
-        store.+((num.toInt, name))
+      def run(store: Map[Int, String]): Map[Int, String] =
+        store.updated(num.toInt, name)
 
-      val cmd:  String = "add"
-      val num:  String = args(1)
+      val cmd: String  = "add"
+      val num: String  = args(1)
       val name: String = args(2)
     }
     case class Find(args: Array[String]) extends Command {
       def validate: Boolean = args.length == 2
 
-      def run(store: mutable.Map[Int, String]): mutable.Map[Int, String] = {
+      def run(store: Map[Int, String]): Map[Int, String] = {
         println(store.getOrElse(num.toInt, "not found"))
         store
       }
@@ -36,7 +33,7 @@ object Main10 {
     case class Del(args: Array[String]) extends Command {
       def validate: Boolean = args.length == 2
 
-      def run(store: mutable.Map[Int, String]): mutable.Map[Int, String] =
+      def run(store: Map[Int, String]): Map[Int, String] =
         store.-(num.toInt)
 
       val cmd: String = "find"
@@ -75,9 +72,8 @@ object Main10 {
   def process(arr: Seq[String]) =
     arr
       .flatMap(Command.parse)
-      .foldLeft(mutable.Map.empty[Int, String]) {
-        case (acc, command) =>
-          command.run(acc)
+      .foldLeft(Map.empty[Int, String]) { case (acc, command) =>
+        command.run(acc)
       }
 
 }

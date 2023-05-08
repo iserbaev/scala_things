@@ -4,8 +4,8 @@ import scala.annotation.tailrec
 
 sealed trait Conc[@specialized(Int, Long, Float, Double) +T] {
   def level: Int
-  def size:  Int
-  def left:  Conc[T]
+  def size: Int
+  def left: Conc[T]
   def right: Conc[T]
   def normalized = this
 }
@@ -27,17 +27,16 @@ object Conc {
     def size  = 0
   }
 
-  class Single[@specialized(Int, Long, Float, Double) T](val x: T)
-      extends Leaf[T] {
+  class Single[@specialized(Int, Long, Float, Double) T](val x: T) extends Leaf[T] {
     def level             = 0
     def size              = 1
     override def toString = s"Single($x)"
   }
 
   class Chunk[@specialized(Int, Long, Float, Double) T](
-    val array: Array[T],
-    val size:  Int,
-    val k:     Int
+      val array: Array[T],
+      val size: Int,
+      val k: Int
   ) extends Leaf[T] {
     def level             = 0
     override def toString = s"Chunk(${array.mkString("", ", ", "")}; $size; $k)"
@@ -47,7 +46,7 @@ object Conc {
     val level = 1 + math.max(left.level, right.level)
     val size  = left.size + right.size
     override def normalized = {
-      def wrap[T](xs: Conc[T], ys: Conc[T]): Conc[T] = (xs: @unchecked) match {
+      def wrap(xs: Conc[T], ys: Conc[T]): Conc[T] = (xs: @unchecked) match {
         case Append(ws, zs) => wrap(ws, zs <> ys)
         case xs             => xs <> ys
       }
@@ -100,9 +99,9 @@ object Conc {
 
   def appendTop[T](xs: Conc[T], ys: Leaf[T]): Conc[T] = (xs: @unchecked) match {
     case xs: Append[T] => append(xs, ys)
-    case _ <> _ => new Append(xs, ys)
-    case Empty  => ys
-    case xs: Leaf[T] => new <>(xs, ys)
+    case _ <> _        => new Append(xs, ys)
+    case Empty         => ys
+    case xs: Leaf[T]   => new <>(xs, ys)
   }
   @tailrec private def append[T](xs: Append[T], ys: Conc[T]): Conc[T] =
     if (xs.right.level > ys.level) new Append(xs, ys)
@@ -116,14 +115,15 @@ object Conc {
     }
 
   def traverse[
-    @specialized(Int, Long, Float, Double) T,
-    @specialized(Int, Long, Float, Double) U
+      @specialized(Int, Long, Float, Double) T,
+      @specialized(Int, Long, Float, Double) U
   ](xs: Conc[T], f: T => U): Unit = (xs: @unchecked) match {
     case left <> right =>
       traverse(left, f)
       traverse(right, f)
     case s: Single[T] =>
       f(s.x)
+      ()
     case c: Chunk[T] =>
       val a  = c.array
       val sz = c.size

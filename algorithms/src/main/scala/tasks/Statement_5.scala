@@ -1,85 +1,16 @@
 package tasks
 
-import scala.collection.mutable.ArrayBuffer
 import scala.util.Random
-import scala.collection.mutable.{ArrayStack => ScalaStack}
+import structures._
 
 object Statement_5 {
-  case class MaxStack(size: Int) {
-    private val underlying = ScalaStack[(Int, Int)]()
-
-    def length: Int = underlying.length
-    def apply(i: Int): (Int, Int) = underlying(i)
-
-    def isFull:  Boolean = underlying.size >= size
-    def nonFull: Boolean = !isFull
-
-    def isEmpty:  Boolean = underlying.isEmpty
-    def nonEmpty: Boolean = !isEmpty
-
-    def clear(): Unit = underlying.clear()
-
-    def push(e: Int): Unit = {
-      if (isFull) throw new IndexOutOfBoundsException("MaxStack is full")
-      val max = if (isEmpty) e else math.max(e, underlying.top._2)
-      underlying.push((e, max))
-    }
-
-    def pop(): (Int, Int) = underlying.pop()
-
-    def topMaxOption: Option[Int] =
-      if (isEmpty) None else Some(underlying.top._2)
-
-    def popSafely: Option[(Int, Int)] =
-      if (isEmpty) None else Some(underlying.pop)
-
-    def result: Seq[(Int, Int)] = underlying
-  }
-
-  case class MaxWindow(windowSize: Int) {
-    private val input  = MaxStack(windowSize)
-    private val output = MaxStack(windowSize)
-    private val buf    = ArrayBuffer[Int]()
-
-    def add(e: Int): MaxWindow = {
-      input.push(e)
-      if (input.isFull && output.isEmpty) {
-        while (input.nonEmpty) {
-          output.push(input.pop()._1)
-        }
-      }
-
-      if (input.length + output.length == windowSize) {
-        buf.append(
-          math.max(
-            input.topMaxOption.getOrElse(Int.MinValue),
-            output.topMaxOption.getOrElse(Int.MinValue)
-          )
-        )
-        output.popSafely
-      }
-
-      this
-    }
-
-    def result: Seq[Int] = buf
-  }
-
-  def maxWindow(n: Int, a: Array[Int], m: Int): Seq[Int] =
-    if (a.length <= m || m == n)
-      Seq(a.max)
-    else
-      a.foldLeft(MaxWindow(m)) {
-          case (acc, e) => acc.add(e)
-        }
-        .result
 
   def main(args: Array[String]): Unit = {
     val n  = scala.io.StdIn.readInt()
     val ar = scala.io.StdIn.readLine().split(" ").map(_.toInt)
     val m  = scala.io.StdIn.readInt()
 
-    val result = maxWindow(n, ar, m)
+    val result = MaxWindow(n, ar, m)
     print(result.mkString(" "))
   }
 
@@ -87,15 +18,14 @@ object Statement_5 {
 
 object TestApp5 extends App {
   def test(a: String, m: Int, expected: String): Unit = {
-    val aa = a.split(" ").map(_.toInt)
+    val aa             = a.split(" ").map(_.toInt)
     val result: String = t(m, aa)
     if (result != expected) println(s"($result) != ($expected)")
   }
 
   private def t(m: Int, aa: Array[Int]) = {
     val before = System.currentTimeMillis()
-    val result =
-      Statement_5.maxWindow(aa.length, aa, m).mkString(" ")
+    val result = MaxWindow(aa.length, aa, m).mkString(" ")
 
     val after = System.currentTimeMillis()
     println(s"Time = ${after - before} MS, n = ${aa.length}, m = $m")
@@ -128,10 +58,10 @@ object TestApp5 extends App {
   test("1 4 5 6 1 1 1 1", 4, "6 6 6 6 1")
   test("1 0 2 2 2 2 0 0", 4, "2 2 2 2 2")
 
-  val a = (1 to 100).map(_     => Random.nextInt()).toArray
-  val b = (1 to 1000).map(_    => Random.nextInt()).toArray
-  val c = (1 to 10000).map(_   => Random.nextInt()).toArray
-  val d = (1 to 100000).map(_  => Random.nextInt()).toArray
+  val a = (1 to 100).map(_ => Random.nextInt()).toArray
+  val b = (1 to 1000).map(_ => Random.nextInt()).toArray
+  val c = (1 to 10000).map(_ => Random.nextInt()).toArray
+  val d = (1 to 100000).map(_ => Random.nextInt()).toArray
   val e = (1 to 1000000).map(_ => Random.nextInt()).toArray
 
   val mm = (1 to 100).toArray

@@ -6,8 +6,9 @@ import scala.reflect.ClassTag
 import org.scalameter._
 import common._
 
-class ArrayCombiner[T <: AnyRef: ClassTag](val parallelism: Int)
-    extends Combiner[T, Array[T]] {
+import java.util.concurrent.ForkJoinPool
+
+class ArrayCombiner[T <: AnyRef: ClassTag](val parallelism: Int) extends Combiner[T, Array[T]] {
   private var numElems = 0
   private val buffers  = new ArrayBuffer[ArrayBuffer[T]]
   buffers += new ArrayBuffer[T]
@@ -21,7 +22,7 @@ class ArrayCombiner[T <: AnyRef: ClassTag](val parallelism: Int)
 
   // O(P), assuming that buffers contains no more than O(P) nested array buffers.
   override def combine[N <: T, NewTo >: Array[T]](
-    that: Combiner[N, NewTo]
+      that: Combiner[N, NewTo]
   ): Combiner[N, NewTo] =
     (that: @unchecked) match {
       case that: ArrayCombiner[T] =>
@@ -79,7 +80,7 @@ object ArrayCombiner {
 
     def run(p: Int) = {
       val taskSupport = new collection.parallel.ForkJoinTaskSupport(
-        new scala.concurrent.forkjoin.ForkJoinPool(p)
+        new ForkJoinPool(p)
       )
       val strings = (0 until size).map(_.toString)
       val time = standardConfig.measure {

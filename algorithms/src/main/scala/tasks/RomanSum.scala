@@ -1,7 +1,6 @@
 package tasks
 
-import language.postfixOps
-import scala.util.{Failure, Success, Try}
+import scala.util.{ Failure, Success, Try }
 
 //Roman Calculator
 //  You need to create a calculator that accepts two strings representing Roman numbers
@@ -25,23 +24,24 @@ case class Roman(s: String) extends AnyVal {
   }
 
   def toArabic: Int =
-    s.toUpperCase.map(Roman.mapping).foldLeft((0,0)) {
-      case ((acc, previous), currentDigit) =>
+    s.toUpperCase
+      .map(Roman.mapping)
+      .foldLeft((0, 0)) { case ((acc, previous), currentDigit) =>
         (acc + currentDigit + (if (previous < currentDigit) -2 * previous else 0), currentDigit)
-    }._1
+      }
+      ._1
 
 }
 
 object Roman {
   val mapping: Map[Char, Int] =
-    Map('I' -> 1, 'V' -> 5, 'X' -> 10, 'L' -> 50, 'C' -> 100,  'D' -> 500, 'M' -> 1000)
+    Map('I' -> 1, 'V' -> 5, 'X' -> 10, 'L' -> 50, 'C' -> 100, 'D' -> 500, 'M' -> 1000)
 
-  def toRoman(value: Int): String = {
+  def toRoman(value: Int): String =
     "M" * (value / 1000) +
       ("", "C", "CC", "CCC", "CD", "D", "DC", "DCC", "DCCC", "CM").productElement(value % 1000 / 100) +
       ("", "X", "XX", "XXX", "XL", "L", "LX", "LXX", "LXXX", "XC").productElement(value % 100 / 10) +
       ("", "I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX").productElement(value % 10)
-  }
 
   implicit class RomanSyntaxSupport(val r: Roman) {
     def +(r2: Roman): String = toRoman(r.toArabic + r2.toArabic)
@@ -78,9 +78,8 @@ object RomanCalculator extends App {
   }
 
   def calculateRomanSum(): Try[String] = Try {
-    println(
-      """Type first roman number, hit enter, and then second roman number.
-        |After validating and calc sum will print""".stripMargin)
+    println("""Type first roman number, hit enter, and then second roman number.
+              |After validating and calc sum will print""".stripMargin)
     val input1: String = io.StdIn.readLine()
     val input2: String = io.StdIn.readLine()
 
@@ -96,7 +95,6 @@ object RomanCalculator extends App {
   }
 
   def exit: Try[Nothing] = Try(sys.exit(0))
-
 
   println("It is program to calculate sum of roman numbers")
   runApp()
@@ -115,13 +113,13 @@ object SumTest extends App {
     assert(res.toArabic == expected, s"$res != $expected")
   }
 
-  Roman.mapping.foreach {
-    case (c, i) => testConvert(c.toString, i)
+  Roman.mapping.foreach { case (c, i) =>
+    testConvert(c.toString, i)
   }
   testConvert("MCMXC", 1990)
   testConvert("MMVIII", 2008)
   testConvert("MDCLXVI", 1666)
   testConvert("MMMCMXCVIII", 3998)
 
-  testSum("MCMXC","MMVIII","MMMCMXCVIII")
+  testSum("MCMXC", "MMVIII", "MMMCMXCVIII")
 }

@@ -3,9 +3,8 @@ package tasks
 import structures.DisjointSetRank
 
 object Main8 {
-  import java.io.{BufferedReader, InputStreamReader}
+  import java.io.{ BufferedReader, InputStreamReader }
   import java.util.StringTokenizer
-  import scala.collection.mutable
   import scala.collection.mutable.ArrayBuffer
 
   def readTuple(s: String): (Int, Int) = {
@@ -13,7 +12,7 @@ object Main8 {
     t.nextToken().toInt -> t.nextToken().toInt
   }
 
-  def readSeq(s: String): mutable.IndexedSeq[Int] = {
+  def readSeq(s: String): Seq[Int] = {
     val t      = new StringTokenizer(s)
     val buffer = new ArrayBuffer[Int]()
 
@@ -21,7 +20,7 @@ object Main8 {
     while (t.hasMoreTokens) {
       buffer.append(t.nextToken().toInt)
     }
-    buffer
+    buffer.toSeq
   }
 
   def main(args: Array[String]) = {
@@ -41,16 +40,15 @@ object Main8 {
   }
 
   def process(
-    sizes:      mutable.IndexedSeq[Int],
-    mergeTasks: Seq[(Int, Int)]
+      sizes: Seq[Int],
+      mergeTasks: Seq[(Int, Int)]
   ): DisjointSetRank = {
-    val dse = new DisjointSetRank(sizes)
+    val dse = DisjointSetRank(sizes)
     (1 until sizes.length).foreach { index =>
       dse.makeSet(index)
     }
-    mergeTasks.foreach {
-      case (i, j) =>
-        dse.union(i, j)
+    mergeTasks.foreach { case (i, j) =>
+      dse.union(i, j)
     }
     dse
   }
@@ -60,16 +58,15 @@ object Test8 extends App {
   import scala.util.Random
 
   def test(
-    sizes:      Array[Int],
-    mergeTasks: Seq[(Int, Int)],
-    expected:   Seq[Int]
+      sizes: Seq[Int],
+      mergeTasks: Seq[(Int, Int)],
+      expected: Seq[Int]
   ): Long = {
     val start  = System.currentTimeMillis()
     val result = Main8.process(sizes, mergeTasks).result
 
-    expected.zipWithIndex.foreach {
-      case (a, index) =>
-        require(result(index) == a, s"${result(index)} != $a")
+    expected.zipWithIndex.foreach { case (a, index) =>
+      require(result(index) == a, s"${result(index)} != $a")
     }
     val end = System.currentTimeMillis()
 
@@ -77,8 +74,8 @@ object Test8 extends App {
   }
 
   test(
-    Array(0, 1, 1, 1, 1, 1),
-    Array(
+    Seq(0, 1, 1, 1, 1, 1),
+    Seq(
       (3, 5),
       (2, 4),
       (1, 4),
@@ -89,8 +86,8 @@ object Test8 extends App {
   )
 
   test(
-    Array(0, 6, 5, 3, 7),
-    Array(
+    Seq(0, 6, 5, 3, 7),
+    Seq(
       (1, 4),
       (2, 1),
       (3, 2)
@@ -99,8 +96,8 @@ object Test8 extends App {
   )
 
   test(
-    Array(0, 2, 11, 5, 1, 7, 3),
-    Array(
+    Seq(0, 2, 11, 5, 1, 7, 3),
+    Seq(
       (6, 6),
       (1, 2),
       (6, 5),
@@ -118,8 +115,8 @@ object Test8 extends App {
     val seed = new Random(123456)
     val duration = (0 to mult).map { _ =>
       test(
-        (0 to n).map(_ => r).toArray,
-        (0 until n).map(x => (x + 1) -> (seed.nextInt(x + 1).abs + 1)),
+        (0 to n).map(_ => r).toSeq,
+        (0 until n).map(x => (x + 1) -> (seed.nextInt(x + 1).abs + 1)).toSeq,
         Seq.empty
       )
     }.sum

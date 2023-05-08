@@ -2,18 +2,19 @@ package course3
 
 import scala.reflect.ClassTag
 import org.scalameter._
-import common._
+
+import java.util.concurrent.ForkJoinPool
 
 class ConcBuffer[@specialized(Byte, Char, Int, Long, Float, Double) T: ClassTag](
-  val k:            Int,
-  private var conc: Conc[T]
+    val k: Int,
+    private var conc: Conc[T]
 ) extends Traversable[T] {
   require(k > 0)
 
   def this() = this(128, Conc.Empty)
 
-  private var chunk:    Array[T] = new Array(k)
-  private var lastSize: Int      = 0
+  private var chunk: Array[T] = new Array(k)
+  private var lastSize: Int   = 0
 
   def foreach[U](f: T => U): Unit = {
     conc.foreach(f)
@@ -45,13 +46,13 @@ class ConcBuffer[@specialized(Byte, Char, Int, Long, Float, Double) T: ClassTag]
 
   private def expand() {
     pack()
-    chunk    = new Array(k)
+    chunk = new Array(k)
     lastSize = 0
   }
 
   def clear() {
-    conc     = Conc.Empty
-    chunk    = new Array(k)
+    conc = Conc.Empty
+    chunk = new Array(k)
     lastSize = 0
   }
 
@@ -75,7 +76,7 @@ object ConcBuffer {
 
     def run(p: Int) {
       val taskSupport = new collection.parallel.ForkJoinTaskSupport(
-        new scala.concurrent.forkjoin.ForkJoinPool(p)
+        new ForkJoinPool(p)
       )
       val strings = (0 until size).map(_.toString)
       val time = standardConfig.measure {

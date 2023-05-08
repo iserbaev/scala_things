@@ -1,6 +1,6 @@
 package tasks
 
-import java.io.{BufferedReader, InputStreamReader}
+import java.io.{ BufferedReader, InputStreamReader }
 import scala.collection.mutable.ArrayBuffer
 
 // Rabin–Karp algorithm
@@ -28,8 +28,8 @@ object Main12 {
 
     val patternHash = patternCodes.sum
 
-    val p = Int.MaxValue
-    def hash(ints: Seq[Int]): Int = ints.sum % p
+    val p                           = Int.MaxValue
+    def hash(ints: Array[Int]): Int = ints.sum % p
 
     def recalcHash(oldHash: Int, oldHead: Int, newLast: Int): Int =
       (oldHash - oldHead % p) + newLast % p
@@ -44,17 +44,16 @@ object Main12 {
       val (textCodesHead, textCodesTail) = textCodes.splitAt(patternSize)
 
       val (lastWindow, lastIndex, lastHash) = textCodesTail.foldLeft(
-        (ArrayBuffer(textCodesHead: _*), 0, hash(textCodesHead))
-      ) {
-        case ((window, headIndex, oldHash), c) =>
-          if (isEqual(window, oldHash)) print(s"$headIndex ")
+        (ArrayBuffer.from(textCodesHead), 0, hash(textCodesHead))
+      ) { case ((window, headIndex, oldHash), c) =>
+        if (isEqual(window, oldHash)) print(s"$headIndex ")
 
-          val newHash = recalcHash(oldHash, window(0), c)
+        val newHash = recalcHash(oldHash, window(0), c)
 
-          window.remove(0)
-          window.append(c)
+        window.remove(0)
+        window.append(c)
 
-          (window, headIndex + 1, newHash)
+        (window, headIndex + 1, newHash)
 
       }
       if (isEqual(lastWindow, lastHash)) print(s"$lastIndex ")

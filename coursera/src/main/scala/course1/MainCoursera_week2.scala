@@ -1,11 +1,9 @@
-package course1; /**
-  * Created by ilnur on 07.12.16.
-  */
+package course1;
+
+/** Created by ilnur on 07.12.16. */
 object MainCoursera_week2 extends App {
 
-  /**
-    * wk2_tsk1
-    */
+  /** wk2_tsk1 */
   def sum(f: Int => Int)(a: Int, b: Int): Int = {
     def loop(a: Int, acc: Int): Int =
       if (a > b) acc
@@ -16,18 +14,14 @@ object MainCoursera_week2 extends App {
   println(sum(x => x * x)(1, 100))
   println(sum(x => x * x * x)(1, 100))
 
-  /**
-    * wk2-tsk2
-    */
+  /** wk2-tsk2 */
   def product(f: Int => Int)(a: Int, b: Int): Int =
     if (a > b) 1
     else f(a) * product(f)(a + 1, b)
   println(product(x => x)(1, 4))
   def fact(n: Int) = product(x => x)(1, n)
 
-  /**
-    * wk2_tsk3
-    */
+  /** wk2_tsk3 */
   def isCloseEnough(x: Double, y: Double): Boolean = {
     val tolerance = 0.01
     math.abs((x - y) / x) / x < tolerance
@@ -44,18 +38,16 @@ object MainCoursera_week2 extends App {
   def sqrtIncrt(x: Double) = fixedPoint(y => x / y)(1)
   sqrtIncrt(2)
   def averageDump(f: Double => Double)(x: Double) = (x + f(x)) / 2
-  def sqrt(x:        Double) = fixedPoint(averageDump(y => x / y))(1)
+  def sqrt(x: Double)                             = fixedPoint(averageDump(y => x / y))(1)
   sqrt(2)
 
-  /**
-    * wk2_tsk4
-    */
+  /** wk2_tsk4 */
   class Rational(x: Int, y: Int) {
     require(y != 0, "denominator must be non zero")
     private def gcd(a: Int, b: Int): Int = if (b == 0) a else gcd(b, a % b)
-    private val g = gcd(x, y)
-    def numer     = x / g
-    def denom     = y / g
+    private val g                        = gcd(x, y)
+    def numer                            = x / g
+    def denom                            = y / g
 
     def +(that: Rational) =
       new Rational(
@@ -63,8 +55,8 @@ object MainCoursera_week2 extends App {
         denom * that.denom
       )
 
-    def unary_- : Rational = new Rational(-numer, denom)
-    def unary_+ : Rational = new Rational(numer, denom)
+    def unary_- : Rational          = new Rational(-numer, denom)
+    def unary_+ : Rational          = new Rational(numer, denom)
     def -(that: Rational): Rational = this + -that
     def /(that: Rational) =
       new Rational(
@@ -77,7 +69,7 @@ object MainCoursera_week2 extends App {
         denom * that.denom
       )
 
-    def <(that:   Rational) = numer * that.denom < that.numer * denom
+    def <(that: Rational)   = numer * that.denom < that.numer * denom
     def max(that: Rational) = if (this < that) that else this
     override def toString() = numer + "/" + denom
   }

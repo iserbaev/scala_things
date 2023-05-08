@@ -1,12 +1,14 @@
 package tasks
 
-/**
-  * По данным n процессорам и m задач определите, для каждой из задач, каким процессором она будет обработана.
+/** По данным n процессорам и m задач определите, для каждой из задач, каким процессором
+  * она будет обработана.
   *
-  * Вход. Число процессоров n и последовательность чисел t0, . . . , tm−1, где ti — время, необходимое на обработку i-й задачи.
+  * Вход. Число процессоров n и последовательность чисел t0, . . . , tm−1, где ti — время,
+  * необходимое на обработку i-й задачи.
   *
-  * Выход. Для каждой задачи определите, какой процессор и в какое время начнёт её обрабатывать,
-  * предполагая, что каждая задача поступает на обработку первому освободившемуся процессору.
+  * Выход. Для каждой задачи определите, какой процессор и в какое время начнёт её
+  * обрабатывать, предполагая, что каждая задача поступает на обработку первому
+  * освободившемуся процессору.
   */
 object Statement_6 {
   import scala.collection.mutable
@@ -37,8 +39,8 @@ object Statement_6 {
         val completed = processors.dequeue()
         val task = Processor(
           processorIndex = completed.processorIndex,
-          startTime      = completed.completeTime,
-          completeTime   = completed.completeTime + duration
+          startTime = completed.completeTime,
+          completeTime = completed.completeTime + duration
         )
         processors.enqueue(task)
         task
@@ -46,8 +48,8 @@ object Statement_6 {
         val available = processors.head
         val task = Processor(
           processorIndex = available.processorIndex,
-          startTime      = available.completeTime,
-          completeTime   = available.completeTime + duration
+          startTime = available.completeTime,
+          completeTime = available.completeTime + duration
         )
         task
       }
@@ -71,9 +73,7 @@ object Main {
 
     val tasksWithStartTime = tasks.map(pool.addTask)
 
-    tasksWithStartTime.foreach(
-      t => println(s"${t.processorIndex} ${t.startTime}")
-    )
+    tasksWithStartTime.foreach(t => println(s"${t.processorIndex} ${t.startTime}"))
   }
 }
 
@@ -84,17 +84,16 @@ object TestApp6 extends App {
     val tasksWithStartTime = tasks.map(pool.addTask)
     val result             = tasksWithStartTime.map(t => t.processorIndex -> t.startTime)
 
-    expected.zipWithIndex.foreach {
-      case ((procIndex, startTime), index) =>
-        val (resProcIndex, resStartTime) = result(index)
-        assert(
-          resProcIndex == procIndex,
-          s"$resProcIndex != $procIndex. index=$index, expectedProcIndex = $procIndex"
-        )
-        assert(
-          resStartTime == startTime,
-          s"$resStartTime != $startTime. index=$index, expectedStartTime = $startTime"
-        )
+    expected.zipWithIndex.foreach { case ((procIndex, startTime), index) =>
+      val (resProcIndex, resStartTime) = result(index)
+      assert(
+        resProcIndex == procIndex,
+        s"$resProcIndex != $procIndex. index=$index, expectedProcIndex = $procIndex"
+      )
+      assert(
+        resStartTime == startTime,
+        s"$resStartTime != $startTime. index=$index, expectedStartTime = $startTime"
+      )
     }
     println("success")
   }

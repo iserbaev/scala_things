@@ -2,17 +2,15 @@ package tasks
 
 import structures.BinarySearchTree
 
-import java.io.{BufferedReader, InputStreamReader}
+import java.io.{ BufferedReader, InputStreamReader }
 
 /** Проверить, является ли данное двоичное дерево деревом поиска.
   *
   * Вход. Двоичное дерево.
   *
-  * Выход.
-  *   Проверить, является ли оно корректным деревом поиска:
-  *   верно ли, что для любой вершины дерева её
-  *     ключ больше всех ключей в левом поддереве данной вершины и
-  *          меньше всех ключей в правом поддереве.
+  * Выход. Проверить, является ли оно корректным деревом поиска: верно ли, что для любой
+  * вершины дерева её ключ больше всех ключей в левом поддереве данной вершины и меньше
+  * всех ключей в правом поддереве.
   */
 object Main14 {
   def main(args: Array[String]) = {
@@ -40,8 +38,8 @@ object Main14 {
     }
 
     def mkTree(
-      row:    (Int, Int, Int),
-      parent: Option[Int]
+        row: (Int, Int, Int),
+        parent: Option[Int]
     ): BinarySearchTree[Int] = {
       val (s, leftIndex, rightIndex) = row
 

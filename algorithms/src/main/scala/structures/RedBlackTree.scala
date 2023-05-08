@@ -16,15 +16,15 @@ object RBColor {
     case Red   => Black
     case Black => Red
   }
-  case object Red extends RBColor
+  case object Red   extends RBColor
   case object Black extends RBColor
 }
 
 sealed trait RedBlackTree[+T] {
-  def color:       RBColor
-  def key:         Option[T]
-  def left:        RedBlackTree[T]
-  def right:       RedBlackTree[T]
+  def color: RBColor
+  def key: Option[T]
+  def left: RedBlackTree[T]
+  def right: RedBlackTree[T]
   def parentLabel: Option[T]
 
   def colorBalance: RedBlackTree[T] = this match {
@@ -55,8 +55,8 @@ sealed trait RedBlackTree[+T] {
             RBTNil
           )
         case (
-            RBTNode(_, ak, aleft, aright, aparentLabel),
-            RBTNode(_, bk, bleft, bright, bparentLabel)
+              RBTNode(_, ak, aleft, aright, aparentLabel),
+              RBTNode(_, bk, bleft, bright, bparentLabel)
             ) =>
           val resolved = RBColor.resolve(color)
           (
@@ -74,12 +74,9 @@ sealed trait RedBlackTree[+T] {
       )
   }
 
-  /**
-    * 1. Each Node can be red or black
-    * 2. Root must be black
-    * 3. Each Nil black
-    * 4. if Node is red then children must be black
-    * 5. for each Node all simple paths must contain same black nodes
+  /**   1. Each Node can be red or black 2. Root must be black 3. Each Nil black 4. if
+    *      Node is red then children must be black 5. for each Node all simple paths must
+    *      contain same black nodes
     * @return
     */
   private def validateCurrent: List[String] = this match {
@@ -147,12 +144,11 @@ sealed trait RedBlackTree[+T] {
 
 object RedBlackTree {
   def leftRotate[T](root: RedBlackTree[T], keyToRotate: T)(
-    implicit ordering:    Ordering[T]
+      implicit ordering: Ordering[T]
   ): RedBlackTree[T] = {
     def recur(a: RedBlackTree[T]): RedBlackTree[T] = a match {
       case RBTNil => RBTNil
-      case x @ RBTNode(xcolor, xk, xl, xr, xpl)
-          if ordering.equiv(xk, keyToRotate) =>
+      case x @ RBTNode(xcolor, xk, xl, xr, xpl) if ordering.equiv(xk, keyToRotate) =>
         xr match {
           case RBTNil => x
           case RBTNode(ycolor, yk, yl, yr, _) =>
@@ -182,8 +178,7 @@ object RedBlackTree {
             }
 
         }
-      case RBTNode(color, k, l, r, parentLabel)
-          if ordering.lt(k, keyToRotate) =>
+      case RBTNode(color, k, l, r, parentLabel) if ordering.lt(k, keyToRotate) =>
         RBTNode(color, k, l, recur(r), parentLabel)
       case RBTNode(color, k, l, r, parentLabel) =>
         RBTNode(color, k, recur(l), r, parentLabel)
@@ -193,12 +188,11 @@ object RedBlackTree {
   }
 
   def rightRotate[T](root: RedBlackTree[T], keyToRotate: T)(
-    implicit ordering:     Ordering[T]
+      implicit ordering: Ordering[T]
   ): RedBlackTree[T] = {
     def recur(a: RedBlackTree[T]): RedBlackTree[T] = a match {
       case RBTNil => RBTNil
-      case y @ RBTNode(ycolor, yk, yl, yr, yparentLabel)
-          if ordering.equiv(keyToRotate, yk) =>
+      case y @ RBTNode(ycolor, yk, yl, yr, yparentLabel) if ordering.equiv(keyToRotate, yk) =>
         yl match {
           case RBTNil => y
           case RBTNode(xcolor, xk, xl, xr, _) =>
@@ -228,12 +222,12 @@ object RedBlackTree {
             }
         }
 
-      case RBTNode(color, xk, xl, xr, parentLabel)
-          if ordering.lt(keyToRotate, xk) =>
+      case RBTNode(color, xk, xl, xr, parentLabel) if ordering.lt(keyToRotate, xk) =>
         RBTNode(color, xk, recur(xl), xr, parentLabel)
-      case RBTNode(color, xk, xl, xr, parentLabel)
-          if ordering.gt(keyToRotate, xk) =>
+      case RBTNode(color, xk, xl, xr, parentLabel) if ordering.gt(keyToRotate, xk) =>
         RBTNode(color, xk, xl, recur(xr), parentLabel)
+      case _ =>
+        throw new IllegalStateException("should not happen")
     }
 
     recur(root)
@@ -241,19 +235,19 @@ object RedBlackTree {
 }
 
 case object RBTNil extends RedBlackTree[Nothing] {
-  override def color:       RBColor               = RBColor.Black
-  override def key:         Option[Nothing]       = None
-  override def left:        RedBlackTree[Nothing] = RBTNil
-  override def right:       RedBlackTree[Nothing] = RBTNil
-  override def parentLabel: Option[Nothing]       = None
+  override def color: RBColor               = RBColor.Black
+  override def key: Option[Nothing]         = None
+  override def left: RedBlackTree[Nothing]  = RBTNil
+  override def right: RedBlackTree[Nothing] = RBTNil
+  override def parentLabel: Option[Nothing] = None
 }
 
 case class RBTNode[+T](
-  color:       RBColor,
-  k:           T,
-  left:        RedBlackTree[T],
-  right:       RedBlackTree[T],
-  parentLabel: Option[T]
+    color: RBColor,
+    k: T,
+    left: RedBlackTree[T],
+    right: RedBlackTree[T],
+    parentLabel: Option[T]
 ) extends RedBlackTree[T] {
   override def key: Option[T] = Some(k)
 }

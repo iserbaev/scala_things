@@ -4,28 +4,27 @@ object Statement_2 {
 
   case class Packet(i: Int, arrival: Long, duration: Long)
   def process(
-    bufferSize: Int,
-    packets:    IndexedSeq[Packet]
+      bufferSize: Int,
+      packets: IndexedSeq[Packet]
   ): IndexedSeq[Long] =
     packets
-      .foldLeft((IndexedSeq(0L), IndexedSeq.empty[Long])) {
-        case ((buffer, logs), packet) =>
-          if (packet.arrival < buffer.head) {
-            if (buffer.length < bufferSize) {
-              val startTime = buffer.lastOption.getOrElse(buffer.head)
-              buffer.:+(startTime + packet.duration) -> logs.:+(startTime)
-            } else {
-              buffer -> logs.:+(-1L)
-            }
-
+      .foldLeft((IndexedSeq(0L), IndexedSeq.empty[Long])) { case ((buffer, logs), packet) =>
+        if (packet.arrival < buffer.head) {
+          if (buffer.length < bufferSize) {
+            val startTime = buffer.lastOption.getOrElse(buffer.head)
+            buffer.:+(startTime + packet.duration) -> logs.:+(startTime)
           } else {
-            val filtered  = buffer.filter(_ > packet.arrival)
-            val startTime = filtered.lastOption.getOrElse(packet.arrival)
-
-            filtered.:+(startTime + packet.duration) -> logs.:+(
-              startTime
-            )
+            buffer -> logs.:+(-1L)
           }
+
+        } else {
+          val filtered  = buffer.filter(_ > packet.arrival)
+          val startTime = filtered.lastOption.getOrElse(packet.arrival)
+
+          filtered.:+(startTime + packet.duration) -> logs.:+(
+            startTime
+          )
+        }
       }
       ._2
 }
@@ -37,18 +36,16 @@ object TestApp extends App {
       val h = lines.head.split(" ")
       (h.head.toInt, h.last.toInt)
     }
-    val arrivalWithDurations = lines.tail.map(s => {
+    val arrivalWithDurations = lines.tail.map { s =>
       val tmp = s.split(" ")
       tmp.head.toLong -> tmp.last.toLong
-    })
+    }
 
-    val packets = arrivalWithDurations.zipWithIndex.map(
-      t => Statement_2.Packet(t._2, t._1._1, t._1._2)
-    )
+    val packets = arrivalWithDurations.zipWithIndex.map(t => Statement_2.Packet(t._2, t._1._1, t._1._2)).toIndexedSeq
 
     val result = Statement_2.process(bufferSize, packets).mkString(" ")
     println(s"""result   = ($result) ${if (result != expected) "!!!" else ""}
-         |expected = ($expected) """.stripMargin)
+               |expected = ($expected) """.stripMargin)
   }
 
   val t1 =

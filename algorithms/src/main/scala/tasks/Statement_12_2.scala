@@ -1,8 +1,8 @@
 package tasks
 
-import java.io.{BufferedReader, InputStreamReader}
+import java.io.{ BufferedReader, InputStreamReader }
 import scala.collection.immutable
-import scala.collection.mutable.{ArrayBuffer, ListBuffer}
+import scala.collection.mutable.{ ArrayBuffer, ListBuffer }
 
 // Rabin–Karp algorithm
 // Найти все вхождения строки Pattern в строку Text.
@@ -31,8 +31,8 @@ object Main12_2 {
 
 class RCAlg(pattern: String, text: String) {
   private val DIVIDER: Short = 10007
-  private val BASE:    Short = 47
-  private val STEPS:   Short = 6
+  private val BASE: Short    = 47
+  private val STEPS: Short   = 6
 
   private val patternLength: Int = pattern.length
 
@@ -46,19 +46,16 @@ class RCAlg(pattern: String, text: String) {
 
     if (patternLength > 2) {
       (2 to patternLength)
-        .foreach(
-          power => powers.insert(power, (powers(power - 1) * BASE) % DIVIDER)
-        )
+        .foreach(power => powers.insert(power, (powers(power - 1) * BASE) % DIVIDER))
     }
-    powers.result().toIndexedSeq
+    powers.toIndexedSeq
   }
 
   private def hash(chars: Array[Char]): Int = {
-    val (lastHC, _) = chars.foldLeft((0, 0)) {
-      case ((hash, power), ch) =>
-        val newHC = (((hash + (ch.toInt * powers(power))) % DIVIDER) + DIVIDER) % DIVIDER
+    val (lastHC, _) = chars.foldLeft((0, 0)) { case ((hash, power), ch) =>
+      val newHC = (((hash + (ch.toInt * powers(power))) % DIVIDER) + DIVIDER) % DIVIDER
 
-        (newHC, power + 1)
+      (newHC, power + 1)
     }
 
     lastHC
@@ -68,15 +65,14 @@ class RCAlg(pattern: String, text: String) {
   private def hash(chars: Array[Char], i: Int): Int =
     if (i != chars.length - patternLength) {
       val h0 = ((subStringHashCode - (chars(i + patternLength) * powers(
-          patternLength - 1
-        )) % DIVIDER) + DIVIDER) % DIVIDER
+        patternLength - 1
+      ))                     % DIVIDER) + DIVIDER) % DIVIDER
       (h0 * BASE + chars(i)) % DIVIDER
     } else {
-      val (lastHash, _) = (i until i + patternLength).foldLeft((0, 0)) {
-        case ((hash, power), pos) =>
-          val hashCode = (hash + (chars(pos) * powers(power)) % DIVIDER) % DIVIDER
+      val (lastHash, _) = (i until i + patternLength).foldLeft((0, 0)) { case ((hash, power), pos) =>
+        val hashCode = (hash + (chars(pos) * powers(power)) % DIVIDER) % DIVIDER
 
-          (hashCode, power + 1)
+        (hashCode, power + 1)
       }
 
       lastHash
@@ -99,9 +95,11 @@ class RCAlg(pattern: String, text: String) {
         var tRight = i + pRight
         var steps  = 0
         while (tLeft < tRight && steps <= STEPS && equals) {
-          if (pattern(pLeft) != text(tLeft) || pattern(pRight) != text(
-                tRight
-              )) {
+          if (
+            pattern(pLeft) != text(tLeft) || pattern(pRight) != text(
+              tRight
+            )
+          ) {
             equals = false
           }
 

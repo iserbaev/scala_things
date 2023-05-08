@@ -1,7 +1,7 @@
 package tasks
 
 import scala.annotation.tailrec
-import scala.collection.mutable.{ArrayStack => ScalaStack}
+import scala.collection.mutable.{ Stack => ScalaStack }
 
 // statements #1
 object StackBalanced {
@@ -24,8 +24,8 @@ object StackBalanced {
       case _
           if st.nonEmpty && (
             (ch._1 == ']' && st.top._1 == '[')
-            || (ch._1 == ')' && st.top._1 == '(')
-            || (ch._1 == '}' && st.top._1 == '{')
+              || (ch._1 == ')' && st.top._1 == '(')
+              || (ch._1 == '}' && st.top._1 == '{')
           ) =>
         if (acc.isEmpty) {
           st.pop()
@@ -86,8 +86,8 @@ object Test extends App {
     "(slkj, {lk[lve]} ,l)" -> "Success",
     "(slkj{lk[lsj]}"       -> "1",
     "dasdsadsadas]]]"      -> "13"
-  ).map {
-    case (k, v) => test(k, v)
+  ).map { case (k, v) =>
+    test(k, v)
   }
 }
 

@@ -8,8 +8,8 @@ case class Heap[A: ClassTag](maxSize: Int)(implicit val ord: Ordering[A]) {
   import Heap._
 
   def parent(i: Int): Int = i >> 1
-  def left(i:   Int): Int = i << 1
-  def right(i:  Int): Int = (i << 1) + 1
+  def left(i: Int): Int   = i << 1
+  def right(i: Int): Int  = (i << 1) + 1
 
   def siftUp(a: Array[A], i: Int): Unit = {
     var ii = i
@@ -56,17 +56,16 @@ case class Heap[A: ClassTag](maxSize: Int)(implicit val ord: Ordering[A]) {
     a
   }
 
-  def result: List[A]      = buffer.toList
-  def swaps:  List[String] = swapCounter.result().toList
+  def result: List[A]     = buffer.toList
+  def swaps: List[String] = swapCounter.toList
 
   def heapSort(a: Array[A]): List[A] = {
     val length = a.length
     val heap   = buildMaxHeap(a)
-    val res = (a.length to 2 by -1).foldLeft((length, heap, List.empty[A])) {
-      case ((heapSize, h, a), i) =>
-        val swapped = swapHeap(h, 1, i)
-        val nHeap   = siftDown(swapped.init, 1)
-        (heapSize - 1, nHeap, swapped.last :: a)
+    val res = (a.length to 2 by -1).foldLeft((length, heap, List.empty[A])) { case ((heapSize, h, a), i) =>
+      val swapped = swapHeap(h, 1, i)
+      val nHeap   = siftDown(swapped.init, 1)
+      (heapSize - 1, nHeap, swapped.last :: a)
     }
     res._2.head :: res._3
   }
