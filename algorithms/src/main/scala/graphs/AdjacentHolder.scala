@@ -58,6 +58,8 @@ object AdjacentHolder {
   class AdjMatrix[V: ClassTag](val vertices: IndexedSeq[V], matrix: Array[Array[Int]]) extends AdjacentHolder[V] {
     private val mapping = Mapping(vertices)
 
+    def size: Int = vertices.size
+
     def adjacent(u: V, v: V): Boolean =
       matrix(mapping.vertexIndex(u))(mapping.vertexIndex(v)) == 1
 
@@ -66,6 +68,9 @@ object AdjacentHolder {
         .filter(_._1 == 1)
         .map { case (_, idx) => mapping.indexVertex(idx) }
         .toSet
+
+    def loopsCount: Int =
+      (0 until size).count(i => matrix(i)(i) == 1)
   }
 
   /** Adjacency list representation (список смежности) Для каждой вершины u Adj[u] состоит
