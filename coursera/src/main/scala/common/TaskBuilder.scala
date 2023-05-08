@@ -1,7 +1,9 @@
+package common
+
 import java.util.concurrent.RecursiveTask
 import scala.util.DynamicVariable
 
-object common {
+object TaskBuilder {
   val forkJoinPool = new java.util.concurrent.ForkJoinPool
 
   abstract class TaskScheduler {

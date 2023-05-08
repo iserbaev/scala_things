@@ -84,11 +84,11 @@ object LoopsCount {
       new InputStreamReader(System.in)
     )
 
-    val size        = br.readLine().toInt
+    val size = br.readLine().toInt
 
     var count = 0
 
-    (0 until size).foreach{ i =>
+    (0 until size).foreach { i =>
       val row = br.readLine().split(" ").map(_.toInt)
 
       if (row(i) == 1) count += 1

@@ -1,10 +1,11 @@
 package course3
 
+import common.TaskBuilder._
+
 import scala.collection.parallel.Combiner
 import scala.collection.mutable.ArrayBuffer
 import scala.reflect.ClassTag
 import org.scalameter._
-import common._
 
 import java.util.concurrent.ForkJoinPool
 
