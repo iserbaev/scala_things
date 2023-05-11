@@ -34,17 +34,15 @@ object AdjacentHolder {
   /** Adjacency list representation (список смежности) Для каждой вершины u Adj[u] состоит
     * из всех вершин смежных с u в графе G
     */
-  class AdjList(underlying: Map[Int, Set[Int]]) extends AdjacentHolder {
+  class AdjList(val vertices: IndexedSeq[Int], underlying: Map[Int, Set[Int]]) extends AdjacentHolder {
     def adjacent(v1: Int, v2: Int): Boolean =
       underlying(v1).contains(v2)
 
     def adjacentVertices(v: Int): Set[Int] = underlying(v)
-
-    val vertices: IndexedSeq[Int] = underlying.keys.toIndexedSeq
   }
 
   object AdjList {
-    def apply(edgesMappings: Seq[List[Int]]): AdjList = {
+    def apply(vertices: Seq[Int], edgesMappings: Seq[List[Int]]): AdjList = {
 
       val gMap = edgesMappings.foldLeft(mutable.Map.empty[Int, Set[Int]]) { case (gi, pair) =>
         pair match {
@@ -60,8 +58,13 @@ object AdjacentHolder {
         }
       }
 
-      new AdjList(gMap.toMap)
+      vertices.foreach(v => gMap.update(v, gMap.getOrElse(v, Set.empty[Int])))
+
+      new AdjList(vertices.toIndexedSeq, gMap.toMap)
     }
+
+    def apply(edgesMappings: Seq[List[Int]]): AdjList =
+      apply(edgesMappings.indices, edgesMappings)
   }
 
 }

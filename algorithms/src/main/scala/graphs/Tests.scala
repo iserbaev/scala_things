@@ -6,36 +6,21 @@ object MainAdj {
       new java.io.InputStreamReader(System.in)
     )
 
-    val frst             = br.readLine().split(" ")
-    val (vCount, eCount) = frst.head.toInt -> frst.last.toInt
-    var maxV             = Int.MinValue
-    val pairs: IndexedSeq[List[Int]] = (0 until eCount).map { _ =>
-      val arr = br.readLine().split(" ").map(_.toInt).toList
-
-      maxV = math.max(maxV, arr.max)
-
-      arr
+    val (vertexCount, edgeCount) = {
+      val tuple = br.readLine().split(" ")
+      tuple.head.toInt -> tuple.last.toInt
     }
 
-    val additional: IndexedSeq[List[Int]] =
-      (0 until math.max(0, vCount - maxV)).map(v => List(v))
+    val vertices = (1 to vertexCount)
+    val edges: IndexedSeq[List[Int]] = (0 until edgeCount).map { _ =>
+      br.readLine().split(" ").map(_.toInt).toList
+    }
 
-    process(pairs ++ additional)
+    val adj = AdjacentHolder.AdjList(vertices, edges)
+    println(GraphsProcessor.dfs(adj).componentsCount)
 
     br.close()
   }
-
-  def process(pairs: Seq[List[Int]]): Unit = {
-    val adj = AdjacentHolder.AdjList(pairs)
-    println(GraphsProcessor.dfs(adj).componentsCount)
-  }
-
-  //6 5
-  //1 2
-  //3 4
-  //5 6
-  //2 3
-  //6 1
 }
 
 object MainDistances {
@@ -82,13 +67,15 @@ object MainDistances {
 object BuildMatrixTest {
   def main(args: Array[String]): Unit = {
 
-    val matrix = AdjacentHolder.AdjMatrix(Array(
-      Array(1, 1, 1, 1, 0),
-      Array(1, 0, 1, 1, 1),
-      Array(1, 1, 0, 1, 1),
-      Array(1, 1, 1, 1, 1),
-      Array(0, 1, 1, 1, 0)
-    ))
+    val matrix = AdjacentHolder.AdjMatrix(
+      Array(
+        Array(1, 1, 1, 1, 0),
+        Array(1, 0, 1, 1, 1),
+        Array(1, 1, 0, 1, 1),
+        Array(1, 1, 1, 1, 1),
+        Array(0, 1, 1, 1, 0)
+      )
+    )
 
     assert(matrix.loopsCount == 2)
   }

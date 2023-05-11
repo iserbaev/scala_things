@@ -1,7 +1,5 @@
 package graphs
 
-import graphs.Color.{ Black, Grey, White }
-
 import java.util.concurrent.atomic.AtomicInteger
 import scala.collection.mutable
 
@@ -37,12 +35,12 @@ object GraphsProcessor {
     val parents   = mutable.Map.empty[Int, Option[Int]]
 
     holder.vertices.foreach { v =>
-      colors.update(v, White)
+      colors.update(v, Color.White)
       distances.update(v, -1)
       parents.update(v, None)
     }
 
-    colors.update(s, Grey)
+    colors.update(s, Color.Grey)
     distances.update(s, 0)
 
     val queue = mutable.Queue.empty[Int]
@@ -53,15 +51,15 @@ object GraphsProcessor {
 
       holder.vertices
         .foreach { v =>
-          if (colors(v) == White && holder.adjacent(u, v)) {
-            colors.update(v, Grey)
+          if (colors(v) == Color.White && holder.adjacent(u, v)) {
+            colors.update(v, Color.Grey)
             distances.update(v, distances(u) + 1)
             parents.update(v, Some(u))
             queue.enqueue(v)
           }
         }
 
-      colors.update(u, Black)
+      colors.update(u, Color.Black)
     }
 
     BFSMeta(colors.toMap, distances.toMap, parents.toMap)
