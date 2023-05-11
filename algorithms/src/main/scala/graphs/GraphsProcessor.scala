@@ -49,9 +49,9 @@ object GraphsProcessor {
     while (queue.nonEmpty) {
       val u = queue.dequeue()
 
-      holder.vertices
+      holder.adjacentVertices(u)
         .foreach { v =>
-          if (colors(v) == Color.White && holder.adjacent(u, v)) {
+          if (colors(v) == Color.White) {
             colors.update(v, Color.Grey)
             distances.update(v, distances(u) + 1)
             parents.update(v, Some(u))
