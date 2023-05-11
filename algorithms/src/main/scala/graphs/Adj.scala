@@ -100,6 +100,26 @@ object LoopsCount {
   }
 }
 
+object EdgesCount {
+  def main(args: Array[String]): Unit = {
+    val br: BufferedReader = new BufferedReader(
+      new InputStreamReader(System.in)
+    )
+
+    val size = br.readLine().toInt
+
+    val count = (0 until size).map { _ =>
+      val row = br.readLine().split(" ").map(_.toInt)
+
+      row.sum
+    }.sum
+
+    println(count)
+
+    br.close()
+  }
+}
+
 object TestAdj extends App {
   val adj = EdgesList(
     Seq(

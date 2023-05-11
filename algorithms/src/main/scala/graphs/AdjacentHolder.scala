@@ -1,8 +1,7 @@
 package graphs
 
-import spire.ClassTag
-
 import scala.collection.mutable
+import scala.reflect.ClassTag
 sealed trait AdjacentHolder[V] {
   def adjacent(u: V, v: V): Boolean
   def adjacentVertices(v: V): Set[V]
@@ -71,6 +70,9 @@ object AdjacentHolder {
 
     def loopsCount: Int =
       (0 until size).count(i => matrix(i)(i) == 1)
+
+    def edgesCount: Int =
+      matrix.map(_.sum).sum
   }
 
   /** Adjacency list representation (список смежности) Для каждой вершины u Adj[u] состоит

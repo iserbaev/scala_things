@@ -1,12 +1,5 @@
 import Deps._
 
-inThisBuild(
-  Seq(
-    name := """scala learn""",
-    versionScheme := Some("early-semver"),
-  )
-)
-
 lazy val coursera = project in file("coursera")
 
 lazy val algorithms = project
@@ -23,3 +16,4 @@ lazy val algorithms = project
 
 lazy val root = (project in file("."))
   .aggregate(coursera, algorithms)
+  .settings(name := """scala learn""")
