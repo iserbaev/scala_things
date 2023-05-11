@@ -1,13 +1,9 @@
 package graphs
 
-import graphs.AdjacentHolder.EdgesList
-
-import java.io.{ BufferedReader, InputStreamReader }
-
 object MainAdj {
   def main(args: Array[String]): Unit = {
-    val br: BufferedReader = new BufferedReader(
-      new InputStreamReader(System.in)
+    val br: java.io.BufferedReader = new java.io.BufferedReader(
+      new java.io.InputStreamReader(System.in)
     )
 
     val frst             = br.readLine().split(" ")
@@ -30,7 +26,7 @@ object MainAdj {
   }
 
   def process(pairs: Seq[List[Int]]): Unit = {
-    val adj = EdgesList(pairs).toAdjacentList
+    val adj = AdjacentHolder.AdjList(pairs)
     println(GraphsProcessor.dfs(adj).componentsCount)
   }
 
@@ -44,8 +40,8 @@ object MainAdj {
 
 object MainDistances {
   def main(args: Array[String]): Unit = {
-    val br: BufferedReader = new BufferedReader(
-      new InputStreamReader(System.in)
+    val br: java.io.BufferedReader = new java.io.BufferedReader(
+      new java.io.InputStreamReader(System.in)
     )
 
     val frst        = br.readLine().split(" ")
@@ -60,7 +56,7 @@ object MainDistances {
   }
 
   def process(pairs: Seq[List[Int]]): Unit = {
-    val adj = EdgesList(pairs).toAdjacentList
+    val adj = AdjacentHolder.AdjList(pairs)
     GraphsProcessor.bfs(0, adj).distances.toSeq.sortWith(_._1 < _._1).foreach { case (_, v) =>
       print(s"$v ")
     }
@@ -78,23 +74,41 @@ object MainDistances {
   //0 1 1 2 2 3
 }
 
+////1 1 1 1 0
+////1 0 1 1 1
+////1 1 0 1 1
+////1 1 1 1 1
+////0 1 1 1 0
+object BuildMatrixTest {
+  def main(args: Array[String]): Unit = {
+
+    val matrix = AdjacentHolder.AdjMatrix(Array(
+      Array(1, 1, 1, 1, 0),
+      Array(1, 0, 1, 1, 1),
+      Array(1, 1, 0, 1, 1),
+      Array(1, 1, 1, 1, 1),
+      Array(0, 1, 1, 1, 0)
+    ))
+
+    assert(matrix.loopsCount == 2)
+  }
+}
+
 object LoopsCount {
   def main(args: Array[String]): Unit = {
-    val br: BufferedReader = new BufferedReader(
-      new InputStreamReader(System.in)
+    val br: java.io.BufferedReader = new java.io.BufferedReader(
+      new java.io.InputStreamReader(System.in)
     )
 
     val size = br.readLine().toInt
 
-    var count = 0
+    val edges = (0 until size).map { _ =>
+      br.readLine().split(" ").map(_.toInt)
+    }.toArray
 
-    (0 until size).foreach { i =>
-      val row = br.readLine().split(" ").map(_.toInt)
+    val adjacentHolder = AdjacentHolder.AdjMatrix(edges)
 
-      if (row(i) == 1) count += 1
-    }
-
-    println(count)
+    println(adjacentHolder.loopsCount)
 
     br.close()
   }
@@ -102,8 +116,8 @@ object LoopsCount {
 
 object EdgesCount {
   def main(args: Array[String]): Unit = {
-    val br: BufferedReader = new BufferedReader(
-      new InputStreamReader(System.in)
+    val br: java.io.BufferedReader = new java.io.BufferedReader(
+      new java.io.InputStreamReader(System.in)
     )
 
     val size = br.readLine().toInt
@@ -121,7 +135,7 @@ object EdgesCount {
 }
 
 object TestAdj extends App {
-  val adj = EdgesList(
+  val adj = AdjacentHolder.AdjList(
     Seq(
       List(1, 5),
       List(1, 2),
@@ -133,7 +147,7 @@ object TestAdj extends App {
       List(6, 7),
       List(8)
     )
-  ).toAdjacentList
+  )
 
   println(adj)
 
