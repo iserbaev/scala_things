@@ -11,7 +11,7 @@ object MainAdj {
       tuple.head.toInt -> tuple.last.toInt
     }
 
-    val vertices = (1 to vertexCount)
+    val vertices = 1 to vertexCount
     val edges: IndexedSeq[List[Int]] = (0 until edgeCount).map { _ =>
       br.readLine().split(" ").map(_.toInt).toList
     }
@@ -29,34 +29,150 @@ object MainDistances {
       new java.io.InputStreamReader(System.in)
     )
 
-    val frst        = br.readLine().split(" ")
-    val (_, eCount) = frst.head.toInt -> frst.last.toInt
-    val pairs: IndexedSeq[List[Int]] = (0 until eCount).map { _ =>
+    val (vertexCount, edgeCount) = {
+      val tuple = br.readLine().split(" ")
+      tuple.head.toInt -> tuple.last.toInt
+    }
+
+    val vertices = 0 until vertexCount
+    val edges: IndexedSeq[List[Int]] = (0 until edgeCount).map { _ =>
       br.readLine().split(" ").map(_.toInt).toList
     }
 
-    process(pairs)
+    val adj       = AdjacentHolder.AdjList(vertices, edges)
+    val distances = GraphsProcessor.bfs(0, adj).distances
+    val result = distances.toSeq.sortBy(_._1).map(_._2)
+    println(result.mkString(" "))
 
     br.close()
   }
+}
 
-  def process(pairs: Seq[List[Int]]): Unit = {
-    val adj = AdjacentHolder.AdjList(pairs)
-    GraphsProcessor.bfs(0, adj).distances.toSeq.sortWith(_._1 < _._1).foreach { case (_, v) =>
-      print(s"$v ")
+object DistancesTest extends App {
+  def parse(s: String): AdjacentHolder.AdjList = {
+    val res = scala.io.Source.fromString(s).getLines().toIndexedSeq
+    val (vertexCount, _) = {
+      val tuple = res.head.split(" ")
+      tuple.head.toInt -> tuple.last.toInt
     }
+
+    val vertices = 0 until vertexCount
+    val edges: IndexedSeq[List[Int]] = res.tail.map { line =>
+      line.split(" ").map(_.toInt).toList
+    }
+
+    AdjacentHolder.AdjList(vertices, edges)
+  }
+  def test(vertexCount: Int, edges: Seq[List[Int]], expected: Seq[Int]): Unit = {
+    val vertices = (0 until vertexCount).toSeq
+    val adj      = AdjacentHolder.AdjList(vertices, edges)
+    test(adj, expected)
   }
 
-  //6 7
-  //0 1
-  //1 2
-  //2 0
-  //3 2
-  //4 3
-  //4 2
-  //5 4
+  def test(adjacentHolder: AdjacentHolder, expected: Seq[Int]): Unit = {
+    val distances = GraphsProcessor.bfs(0, adjacentHolder).distances
+    val result = distances.toSeq.sortBy(_._1).map(_._2)
+    if (result != expected)
+      println(s"${result.mkString("[", ",", "]")} != ${expected.mkString("[", ",", "]")}")
+  }
 
-  //0 1 1 2 2 3
+  def test(s: String, expected: String): Unit =
+    test(parse(s), expected.split(" ").map(_.toInt).toSeq)
+
+  test(
+    s"""6 7
+       |0 1
+       |1 2
+       |2 0
+       |3 2
+       |4 3
+       |4 2
+       |5 4""".stripMargin,
+    "0 1 1 2 2 3"
+  )
+
+  test(
+    s"""11 13
+       |0 1
+       |1 2
+       |1 3
+       |1 4
+       |2 5
+       |3 8
+       |4 3
+       |4 5
+       |5 6
+       |5 7
+       |5 10
+       |7 8
+       |8 9""".stripMargin,
+    "0 1 2 2 2 3 4 4 3 4 4"
+  )
+
+  test("1 0", "0")
+
+
+  test(
+    s"""5 10
+       |0 1
+       |0 2
+       |0 3
+       |0 4
+       |1 2
+       |1 3
+       |1 4
+       |2 3
+       |2 4
+       |3 4""".stripMargin, "0 1 1 1 1")
+
+  test(
+    s"""8 8
+       |0 3
+       |1 3
+       |1 2
+       |1 4
+       |2 6
+       |4 5
+       |5 6
+       |6 7""".stripMargin,
+    "0 2 3 1 3 4 4 5"
+  )
+
+  test(
+    s"""12 13
+       |0 1
+       |0 2
+       |1 3
+       |2 3
+       |3 4
+       |4 5
+       |4 6
+       |5 7
+       |5 8
+       |6 7
+       |6 9
+       |6 11
+       |8 10""".stripMargin,
+    "0 1 1 2 3 4 4 5 5 5 6 5"
+  )
+
+  test(
+    s"""12 14
+       |0 1
+       |0 2
+       |1 3
+       |2 3
+       |3 4
+       |4 5
+       |4 6
+       |5 7
+       |5 8
+       |6 7
+       |6 9
+       |6 11
+       |8 10""".stripMargin,
+    "0 1 1 2 3 3 4 4 2 5 1 5"
+  )
 }
 
 ////1 1 1 1 0
@@ -109,13 +225,13 @@ object EdgesCount {
 
     val size = br.readLine().toInt
 
-    val count = (0 until size).map { _ =>
-      val row = br.readLine().split(" ").map(_.toInt)
+    val edges = (0 until size).map { _ =>
+      br.readLine().split(" ").map(_.toInt)
+    }.toArray
 
-      row.sum
-    }.sum
+    val adjacentHolder = AdjacentHolder.AdjMatrix(edges)
 
-    println(count)
+    println(adjacentHolder.edgesCount)
 
     br.close()
   }

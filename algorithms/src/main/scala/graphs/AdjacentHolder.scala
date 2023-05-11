@@ -1,7 +1,5 @@
 package graphs
 
-import scala.collection.mutable
-
 sealed trait AdjacentHolder {
   def adjacent(u: Int, v: Int): Boolean
   def adjacentVertices(v: Int): Set[Int]
@@ -44,7 +42,7 @@ object AdjacentHolder {
   object AdjList {
     def apply(vertices: Seq[Int], edgesMappings: Seq[List[Int]]): AdjList = {
 
-      val gMap = edgesMappings.foldLeft(mutable.Map.empty[Int, Set[Int]]) { case (gi, pair) =>
+      val gMap = edgesMappings.foldLeft(scala.collection.mutable.Map.empty[Int, Set[Int]]) { case (gi, pair) =>
         pair match {
           case List(v1, v2) =>
             gi.update(v1, gi.getOrElse(v1, Set.empty[Int]) + v2)
