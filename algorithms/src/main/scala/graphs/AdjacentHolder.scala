@@ -22,6 +22,10 @@ object AdjacentHolder {
 
     def edgesCount: Int =
       matrix.map(_.sum).sum
+
+    def degrees: Array[Int] = matrix.zipWithIndex.map { case (row, idx) =>
+      if (row(idx) == 1) row.sum + 1 else row.sum
+    }
   }
 
   object AdjMatrix {

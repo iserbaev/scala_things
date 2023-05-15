@@ -1,5 +1,7 @@
 package graphs
 
+import graphs.LoopsCount.readMatrix
+
 object MainAdj {
   def main(args: Array[String]): Unit = {
     val br: java.io.BufferedReader = new java.io.BufferedReader(
@@ -199,6 +201,14 @@ object BuildMatrixTest {
 
 object LoopsCount {
   def main(args: Array[String]): Unit = {
+    val adjacentHolder = AdjacentHolder.AdjMatrix(readMatrix)
+
+    println(adjacentHolder.loopsCount)
+
+
+  }
+
+  def readMatrix: Array[Array[Int]] = {
     val br: java.io.BufferedReader = new java.io.BufferedReader(
       new java.io.InputStreamReader(System.in)
     )
@@ -209,31 +219,27 @@ object LoopsCount {
       br.readLine().split(" ").map(_.toInt)
     }.toArray
 
-    val adjacentHolder = AdjacentHolder.AdjMatrix(edges)
-
-    println(adjacentHolder.loopsCount)
-
     br.close()
+
+    edges
   }
 }
 
 object EdgesCount {
   def main(args: Array[String]): Unit = {
-    val br: java.io.BufferedReader = new java.io.BufferedReader(
-      new java.io.InputStreamReader(System.in)
-    )
-
-    val size = br.readLine().toInt
-
-    val edges = (0 until size).map { _ =>
-      br.readLine().split(" ").map(_.toInt)
-    }.toArray
-
-    val adjacentHolder = AdjacentHolder.AdjMatrix(edges)
+    val adjacentHolder = AdjacentHolder.AdjMatrix(readMatrix)
 
     println(adjacentHolder.edgesCount)
+  }
+}
 
-    br.close()
+object EdgesList {
+  def main(args: Array[String]): Unit = {
+    val adjacentHolder = AdjacentHolder.AdjMatrix(readMatrix)
+
+    val even = adjacentHolder.degrees.count(_ % 2 == 0)
+
+    println(s"${even} ${adjacentHolder.vertices.length - even}")
   }
 }
 
