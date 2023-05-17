@@ -26,6 +26,28 @@ object AdjacentHolder {
     def degrees: Array[Int] = matrix.zipWithIndex.map { case (row, idx) =>
       if (row(idx) == 1) row.sum + 1 else row.sum
     }
+
+     def sourcesAndDrainsInOrientedGraph: (Array[Int], Array[Int]) = {
+       val in = Array.fill(size)(0)
+       val out = Array.fill(size)(0)
+
+       for {
+         i <- vertices
+         j <- vertices
+       } yield {
+         if (matrix(i)(j) == 1) {
+           out.update(i, 1)
+           in.update(j, 1)
+         }
+       }
+
+       (in, out)
+     }
+
+    def sourcesAndDrainsCountInOrientedGraph: (Int, Int) = {
+      val (in, out) = sourcesAndDrainsInOrientedGraph
+      (in.count(_ == 0), out.count(_ == 0))
+    }
   }
 
   object AdjMatrix {

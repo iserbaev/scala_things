@@ -43,7 +43,7 @@ object MainDistances {
 
     val adj       = AdjacentHolder.AdjList(vertices, edges)
     val distances = GraphsProcessor.bfs(0, adj).distances
-    val result = distances.toSeq.sortBy(_._1).map(_._2)
+    val result    = distances.toSeq.sortBy(_._1).map(_._2)
     println(result.mkString(" "))
 
     br.close()
@@ -73,7 +73,7 @@ object DistancesTest extends App {
 
   def test(adjacentHolder: AdjacentHolder, expected: Seq[Int]): Unit = {
     val distances = GraphsProcessor.bfs(0, adjacentHolder).distances
-    val result = distances.toSeq.sortBy(_._1).map(_._2)
+    val result    = distances.toSeq.sortBy(_._1).map(_._2)
     if (result != expected)
       println(s"${result.mkString("[", ",", "]")} != ${expected.mkString("[", ",", "]")}")
   }
@@ -113,7 +113,6 @@ object DistancesTest extends App {
 
   test("1 0", "0")
 
-
   test(
     s"""5 10
        |0 1
@@ -125,7 +124,9 @@ object DistancesTest extends App {
        |1 4
        |2 3
        |2 4
-       |3 4""".stripMargin, "0 1 1 1 1")
+       |3 4""".stripMargin,
+    "0 1 1 1 1"
+  )
 
   test(
     s"""8 8
@@ -205,7 +206,6 @@ object LoopsCount {
 
     println(adjacentHolder.loopsCount)
 
-
   }
 
   def readMatrix: Array[Array[Int]] = {
@@ -239,7 +239,17 @@ object EdgesList {
 
     val even = adjacentHolder.degrees.count(_ % 2 == 0)
 
-    println(s"${even} ${adjacentHolder.vertices.length - even}")
+    println(s"$even ${adjacentHolder.vertices.length - even}")
+  }
+}
+
+object SourcesAndDrains {
+  def main(args: Array[String]): Unit = {
+    val adjacentHolder = AdjacentHolder.AdjMatrix(readMatrix)
+
+    val (s, d) = adjacentHolder.sourcesAndDrainsCountInOrientedGraph
+
+    println(s"$s $d")
   }
 }
 
