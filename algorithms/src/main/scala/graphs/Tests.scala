@@ -27,7 +27,14 @@ object MainAdj {
 
 object MainDistances {
   def main(args: Array[String]): Unit = {
-    val br: java.io.BufferedReader = new java.io.BufferedReader(
+    val adj: AdjacentHolder.AdjList = readAdjList
+    val distances = GraphsProcessor.bfs(0, adj).distances
+    val result    = distances.toSeq.sortBy(_._1).map(_._2)
+    println(result.mkString(" "))
+  }
+
+  def readAdjList: AdjacentHolder.AdjList = {
+    val br = new java.io.BufferedReader(
       new java.io.InputStreamReader(System.in)
     )
 
@@ -41,12 +48,9 @@ object MainDistances {
       br.readLine().split(" ").map(_.toInt).toList
     }
 
-    val adj       = AdjacentHolder.AdjList(vertices, edges)
-    val distances = GraphsProcessor.bfs(0, adj).distances
-    val result    = distances.toSeq.sortBy(_._1).map(_._2)
-    println(result.mkString(" "))
-
     br.close()
+
+    AdjacentHolder.AdjList(vertices, edges)
   }
 }
 
@@ -275,4 +279,33 @@ object TestAdj extends App {
   println(GraphsProcessor.dfs(adj))
 
   // TODO check for 3 trees
+}
+
+object EdgeAdjacency {
+  def main(args: Array[String]): Unit = {
+    val br = new java.io.BufferedReader(
+      new java.io.InputStreamReader(System.in)
+    )
+
+    val (vertexCount, edgeCount) = {
+      val tuple = br.readLine().split(" ")
+      tuple.head.toInt -> tuple.last.toInt
+    }
+
+    val vertices = 0 until vertexCount
+    val edges: IndexedSeq[List[Int]] = (0 until edgeCount).map { _ =>
+      br.readLine().split(" ").map(_.toInt).toList
+    }
+
+    val edgeNumber: Int = br.readLine().toInt
+    br.close()
+
+    val adjList = AdjacentHolder.AdjList(vertices, edges)
+
+    val List(v1,v2) = edges(edgeNumber - 1)
+    val v1Adj = adjList.adjacentVertices(v1) - v2
+    val v2Adj = adjList.adjacentVertices(v2) - v1
+
+    println(v1Adj.size + v2Adj.size)
+  }
 }
