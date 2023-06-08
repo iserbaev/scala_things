@@ -309,3 +309,36 @@ object EdgeAdjacency {
     println(v1Adj.size + v2Adj.size)
   }
 }
+
+object InvertedMatrix {
+  def main(args: Array[String]): Unit = {
+    val matrix = readMatrix
+
+    matrix.zipWithIndex.foreach{ case (row, i) =>
+       row.zipWithIndex.foreach{ case (v, j) =>
+         if (j == i)
+           print(s"$v ")
+         else {
+           print(s"${if (v == 0) 1 else 0} ")
+         }
+       }
+      println()
+    }
+  }
+
+  def readMatrix: Array[Array[Int]] = {
+    val br: java.io.BufferedReader = new java.io.BufferedReader(
+      new java.io.InputStreamReader(System.in)
+    )
+
+    val size = br.readLine().toInt
+
+    val edges = (0 until size).map { _ =>
+      br.readLine().split(" ").map(_.toInt)
+    }.toArray
+
+    br.close()
+
+    edges
+  }
+}
