@@ -101,6 +101,17 @@ object AdjacentHolder {
 
     def buildNonOriented(edges: Seq[(Int, Int)]): AdjList =
       buildNonOriented(edges.indices, edges)
+
+    def buildOriented(vertices: Seq[Int], edges: Seq[(Int, Int)]): AdjList = {
+      val edgesMap = edges.foldLeft(scala.collection.mutable.Map.empty[Int, Set[Int]]) { case (acc, (e1, e2)) =>
+        acc.update(e1, acc.getOrElse(e1, Set.empty[Int]) + e2)
+        acc
+      }
+
+      vertices.foreach(v => edgesMap.update(v, edgesMap.getOrElse(v, Set.empty[Int])))
+
+      new AdjList(vertices.toIndexedSeq, edges, edgesMap.toMap)
+    }
   }
 
 }
