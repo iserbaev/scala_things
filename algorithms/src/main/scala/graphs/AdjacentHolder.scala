@@ -48,6 +48,18 @@ object AdjacentHolder {
       val (in, out) = sourcesAndDrainsInOrientedGraph
       (in.count(_ == 0), out.count(_ == 0))
     }
+
+    def toAdjList: AdjList = {
+      val edges = Seq.newBuilder[(Int, Int)]
+      for {
+        i <- (0 until size)
+        j <- (i until size)
+      } yield {
+        if (adjacent(i, j)) edges.+=((i + 1, j + 1))
+      }
+
+      AdjList(edges.result())
+    }
   }
 
   object AdjMatrix {
@@ -58,7 +70,7 @@ object AdjacentHolder {
   /** Adjacency list representation (список смежности) Для каждой вершины u Adj[u] состоит
     * из всех вершин смежных с u в графе G
     */
-  class AdjList(val vertices: IndexedSeq[Int], underlying: Map[Int, Set[Int]]) extends AdjacentHolder {
+  class AdjList(val vertices: IndexedSeq[Int], val edges: Seq[(Int, Int)], underlying: Map[Int, Set[Int]]) extends AdjacentHolder {
     def adjacent(v1: Int, v2: Int): Boolean =
       underlying(v1).contains(v2)
 
@@ -66,29 +78,21 @@ object AdjacentHolder {
   }
 
   object AdjList {
-    def apply(vertices: Seq[Int], edgesMappings: Seq[List[Int]]): AdjList = {
+    def apply(vertices: Seq[Int], edges: Seq[(Int, Int)]): AdjList = {
 
-      val gMap = edgesMappings.foldLeft(scala.collection.mutable.Map.empty[Int, Set[Int]]) { case (gi, pair) =>
-        pair match {
-          case List(v1, v2) =>
-            gi.update(v1, gi.getOrElse(v1, Set.empty[Int]) + v2)
-            gi.update(v2, gi.getOrElse(v2, Set.empty[Int]) + v1)
-            gi
-          case List(v1) =>
-            gi.update(v1, gi.getOrElse(v1, Set.empty[Int]))
-            gi
-          case _ =>
-            gi
-        }
+      val edgesMap = edges.foldLeft(scala.collection.mutable.Map.empty[Int, Set[Int]]) { case (acc, (e1, e2)) =>
+        acc.update(e1, acc.getOrElse(e1, Set.empty[Int]) + e2)
+        acc.update(e2, acc.getOrElse(e2, Set.empty[Int]) + e1)
+        acc
       }
 
-      vertices.foreach(v => gMap.update(v, gMap.getOrElse(v, Set.empty[Int])))
+      vertices.foreach(v => edgesMap.update(v, edgesMap.getOrElse(v, Set.empty[Int])))
 
-      new AdjList(vertices.toIndexedSeq, gMap.toMap)
+      new AdjList(vertices.toIndexedSeq, edges, edgesMap.toMap)
     }
 
-    def apply(edgesMappings: Seq[List[Int]]): AdjList =
-      apply(edgesMappings.indices, edgesMappings)
+    def apply(edges: Seq[(Int, Int)]): AdjList =
+      apply(edges.indices, edges)
   }
 
 }

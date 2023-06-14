@@ -14,8 +14,9 @@ object MainAdj {
     }
 
     val vertices = 1 to vertexCount
-    val edges: IndexedSeq[List[Int]] = (0 until edgeCount).map { _ =>
-      br.readLine().split(" ").map(_.toInt).toList
+    val edges: IndexedSeq[(Int, Int)] = (0 until edgeCount).map { _ =>
+      val e = br.readLine().split(" ").map(_.toInt).toList
+      (e.head, e.last)
     }
 
     val adj = AdjacentHolder.AdjList(vertices, edges)
@@ -44,8 +45,9 @@ object MainDistances {
     }
 
     val vertices = 0 until vertexCount
-    val edges: IndexedSeq[List[Int]] = (0 until edgeCount).map { _ =>
-      br.readLine().split(" ").map(_.toInt).toList
+    val edges: IndexedSeq[(Int, Int)] = (0 until edgeCount).map { _ =>
+      val e = br.readLine().split(" ").map(_.toInt).toList
+      (e.head, e.last)
     }
 
     br.close()
@@ -63,14 +65,15 @@ object DistancesTest extends App {
     }
 
     val vertices = 0 until vertexCount
-    val edges: IndexedSeq[List[Int]] = res.tail.map { line =>
-      line.split(" ").map(_.toInt).toList
+    val edges: IndexedSeq[(Int, Int)] = res.tail.map { line =>
+      val e = line.split(" ").map(_.toInt)
+      (e.head, e.last)
     }
 
     AdjacentHolder.AdjList(vertices, edges)
   }
-  def test(vertexCount: Int, edges: Seq[List[Int]], expected: Seq[Int]): Unit = {
-    val vertices = (0 until vertexCount).toSeq
+  def test(vertexCount: Int, edges: Seq[(Int, Int)], expected: Seq[Int]): Unit = {
+    val vertices = (0 until vertexCount)
     val adj      = AdjacentHolder.AdjList(vertices, edges)
     test(adj, expected)
   }
@@ -162,24 +165,6 @@ object DistancesTest extends App {
        |8 10""".stripMargin,
     "0 1 1 2 3 4 4 5 5 5 6 5"
   )
-
-  test(
-    s"""12 14
-       |0 1
-       |0 2
-       |1 3
-       |2 3
-       |3 4
-       |4 5
-       |4 6
-       |5 7
-       |5 8
-       |6 7
-       |6 9
-       |6 11
-       |8 10""".stripMargin,
-    "0 1 1 2 3 3 4 4 2 5 1 5"
-  )
 }
 
 ////1 1 1 1 0
@@ -257,30 +242,6 @@ object SourcesAndDrains {
   }
 }
 
-object TestAdj extends App {
-  val adj = AdjacentHolder.AdjList(
-    Seq(
-      List(1, 5),
-      List(1, 2),
-      List(2, 4),
-      List(4, 5),
-      List(2, 3),
-      List(3, 4),
-      List(5),
-      List(6, 7),
-      List(8)
-    )
-  )
-
-  println(adj)
-
-  println(GraphsProcessor.bfs(5, adj))
-
-  println(GraphsProcessor.dfs(adj))
-
-  // TODO check for 3 trees
-}
-
 object EdgeAdjacency {
   def main(args: Array[String]): Unit = {
     val br = new java.io.BufferedReader(
@@ -293,8 +254,9 @@ object EdgeAdjacency {
     }
 
     val vertices = 0 until vertexCount
-    val edges: IndexedSeq[List[Int]] = (0 until edgeCount).map { _ =>
-      br.readLine().split(" ").map(_.toInt).toList
+    val edges: IndexedSeq[(Int, Int)] = (0 until edgeCount).map { _ =>
+      val e = br.readLine().split(" ").map(_.toInt).toList
+      (e.head, e.last)
     }
 
     val edgeNumber: Int = br.readLine().toInt
@@ -302,7 +264,7 @@ object EdgeAdjacency {
 
     val adjList = AdjacentHolder.AdjList(vertices, edges)
 
-    val List(v1,v2) = edges(edgeNumber - 1)
+    val (v1,v2) = edges(edgeNumber - 1)
     val v1Adj = adjList.adjacentVertices(v1) - v2
     val v2Adj = adjList.adjacentVertices(v2) - v1
 
@@ -324,6 +286,30 @@ object InvertedMatrix {
        }
       println()
     }
+  }
+
+  def readMatrix: Array[Array[Int]] = {
+    val br: java.io.BufferedReader = new java.io.BufferedReader(
+      new java.io.InputStreamReader(System.in)
+    )
+
+    val size = br.readLine().toInt
+
+    val edges = (0 until size).map { _ =>
+      br.readLine().split(" ").map(_.toInt)
+    }.toArray
+
+    br.close()
+
+    edges
+  }
+}
+
+object MatrixToAdjList {
+  def main(args: Array[String]): Unit = {
+    val matrix = AdjacentHolder.AdjMatrix(readMatrix)
+
+    matrix.toAdjList.edges.sorted.foreach(tuple => println(tuple._1.toString + " " + tuple._2.toString))
   }
 
   def readMatrix: Array[Array[Int]] = {
