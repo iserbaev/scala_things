@@ -19,7 +19,7 @@ object MainAdj {
       (e.head, e.last)
     }
 
-    val adj = AdjacentHolder.AdjList(vertices, edges)
+    val adj = AdjacentHolder.AdjList.buildNonOriented(vertices, edges)
     println(GraphsProcessor.dfs(adj).componentsCount)
 
     br.close()
@@ -52,7 +52,7 @@ object MainDistances {
 
     br.close()
 
-    AdjacentHolder.AdjList(vertices, edges)
+    AdjacentHolder.AdjList.buildNonOriented(vertices, edges)
   }
 }
 
@@ -70,11 +70,11 @@ object DistancesTest extends App {
       (e.head, e.last)
     }
 
-    AdjacentHolder.AdjList(vertices, edges)
+    AdjacentHolder.AdjList.buildNonOriented(vertices, edges)
   }
   def test(vertexCount: Int, edges: Seq[(Int, Int)], expected: Seq[Int]): Unit = {
     val vertices = (0 until vertexCount)
-    val adj      = AdjacentHolder.AdjList(vertices, edges)
+    val adj      = AdjacentHolder.AdjList.buildNonOriented(vertices, edges)
     test(adj, expected)
   }
 
@@ -262,7 +262,7 @@ object EdgeAdjacency {
     val edgeNumber: Int = br.readLine().toInt
     br.close()
 
-    val adjList = AdjacentHolder.AdjList(vertices, edges)
+    val adjList = AdjacentHolder.AdjList.buildNonOriented(vertices, edges)
 
     val (v1,v2) = edges(edgeNumber - 1)
     val v1Adj = adjList.adjacentVertices(v1) - v2
@@ -355,6 +355,6 @@ object VertexDegrees {
 
     br.close()
 
-    AdjacentHolder.AdjList(vertices, edges)
+    AdjacentHolder.AdjList.buildNonOriented(vertices, edges)
   }
 }

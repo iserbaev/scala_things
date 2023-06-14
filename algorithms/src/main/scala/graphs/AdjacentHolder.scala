@@ -58,7 +58,7 @@ object AdjacentHolder {
         if (adjacent(i, j)) edges.+=((i + 1, j + 1))
       }
 
-      AdjList(edges.result())
+      AdjList.buildNonOriented(edges.result())
     }
   }
 
@@ -86,7 +86,7 @@ object AdjacentHolder {
   }
 
   object AdjList {
-    def apply(vertices: Seq[Int], edges: Seq[(Int, Int)]): AdjList = {
+    def buildNonOriented(vertices: Seq[Int], edges: Seq[(Int, Int)]): AdjList = {
 
       val edgesMap = edges.foldLeft(scala.collection.mutable.Map.empty[Int, Set[Int]]) { case (acc, (e1, e2)) =>
         acc.update(e1, acc.getOrElse(e1, Set.empty[Int]) + e2)
@@ -99,8 +99,8 @@ object AdjacentHolder {
       new AdjList(vertices.toIndexedSeq, edges, edgesMap.toMap)
     }
 
-    def apply(edges: Seq[(Int, Int)]): AdjList =
-      apply(edges.indices, edges)
+    def buildNonOriented(edges: Seq[(Int, Int)]): AdjList =
+      buildNonOriented(edges.indices, edges)
   }
 
 }
