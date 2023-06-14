@@ -10,7 +10,7 @@ object Main {
     growing:           Boolean = true
   )(implicit ordering: Ordering[A]): Index = {
     val index = (l + r) / 2
-    if (l > r || r < l) {
+    if (l > r) {
       -1
     } else {
       val am = array(index)
@@ -34,7 +34,7 @@ object Main {
     resultIndex:       Option[Index] = None
   )(implicit ordering: Ordering[A]): Index = {
     val index = (l + r) / 2
-    if (l > r || r < l || (firstOccurrence && resultIndex.isDefined)) {
+    if (l > r || (firstOccurrence && resultIndex.isDefined)) {
       resultIndex.getOrElse(-1)
     } else {
       val am      = array(index)
