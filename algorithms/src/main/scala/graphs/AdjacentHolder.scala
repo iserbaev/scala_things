@@ -27,22 +27,22 @@ object AdjacentHolder {
       if (row(idx) == 1) row.sum + 1 else row.sum
     }
 
-     def sourcesAndDrainsInOrientedGraph: (Array[Int], Array[Int]) = {
-       val in = Array.fill(size)(0)
-       val out = Array.fill(size)(0)
+    def sourcesAndDrainsInOrientedGraph: (Array[Int], Array[Int]) = {
+      val in  = Array.fill(size)(0)
+      val out = Array.fill(size)(0)
 
-       for {
-         i <- vertices
-         j <- vertices
-       } yield {
-         if (matrix(i)(j) == 1) {
-           out.update(i, 1)
-           in.update(j, 1)
-         }
-       }
+      for {
+        i <- vertices
+        j <- vertices
+      } yield {
+        if (matrix(i)(j) == 1) {
+          out.update(i, 1)
+          in.update(j, 1)
+        }
+      }
 
-       (in, out)
-     }
+      (in, out)
+    }
 
     def sourcesAndDrainsCountInOrientedGraph: (Int, Int) = {
       val (in, out) = sourcesAndDrainsInOrientedGraph
@@ -70,11 +70,19 @@ object AdjacentHolder {
   /** Adjacency list representation (список смежности) Для каждой вершины u Adj[u] состоит
     * из всех вершин смежных с u в графе G
     */
-  class AdjList(val vertices: IndexedSeq[Int], val edges: Seq[(Int, Int)], underlying: Map[Int, Set[Int]]) extends AdjacentHolder {
+  class AdjList(val vertices: IndexedSeq[Int], val edges: Seq[(Int, Int)], underlying: Map[Int, Set[Int]])
+      extends AdjacentHolder {
     def adjacent(v1: Int, v2: Int): Boolean =
       underlying(v1).contains(v2)
 
     def adjacentVertices(v: Int): Set[Int] = underlying(v)
+
+    def degrees: Seq[Int] = vertices.map{v =>
+      val edges = underlying
+        .getOrElse(v, Set.empty[Int])
+
+      edges.size
+    }
   }
 
   object AdjList {

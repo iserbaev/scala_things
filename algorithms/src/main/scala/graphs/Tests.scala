@@ -328,3 +328,33 @@ object MatrixToAdjList {
     edges
   }
 }
+
+object VertexDegrees {
+  def main(args: Array[String]): Unit = {
+    val adj: AdjacentHolder.AdjList = readAdjList
+    val degrees = adj.degrees
+
+    println(degrees.toSet.size)
+  }
+
+  def readAdjList: AdjacentHolder.AdjList = {
+    val br = new java.io.BufferedReader(
+      new java.io.InputStreamReader(System.in)
+    )
+
+    val (vertexCount, edgeCount) = {
+      val tuple = br.readLine().split(" ")
+      tuple.head.toInt -> tuple.last.toInt
+    }
+
+    val vertices = 1 to vertexCount
+    val edges: IndexedSeq[(Int, Int)] = (0 until edgeCount).map { _ =>
+      val e = br.readLine().split(" ").map(_.toInt).toList
+      (e.head, e.last)
+    }
+
+    br.close()
+
+    AdjacentHolder.AdjList(vertices, edges)
+  }
+}
