@@ -29,8 +29,8 @@ object MainAdj {
 object MainDistances {
   def main(args: Array[String]): Unit = {
     val adj: AdjacentHolder.AdjList = readAdjList
-    val distances = GraphsProcessor.bfs(0, adj).distances
-    val result    = distances.toSeq.sortBy(_._1).map(_._2)
+    val distances                   = GraphsProcessor.bfs(0, adj).distances
+    val result                      = distances.toSeq.sortBy(_._1).map(_._2)
     println(result.mkString(" "))
   }
 
@@ -73,7 +73,7 @@ object DistancesTest extends App {
     AdjacentHolder.AdjList.buildNonOriented(vertices, edges)
   }
   def test(vertexCount: Int, edges: Seq[(Int, Int)], expected: Seq[Int]): Unit = {
-    val vertices = (0 until vertexCount)
+    val vertices = 0 until vertexCount
     val adj      = AdjacentHolder.AdjList.buildNonOriented(vertices, edges)
     test(adj, expected)
   }
@@ -264,9 +264,9 @@ object EdgeAdjacency {
 
     val adjList = AdjacentHolder.AdjList.buildNonOriented(vertices, edges)
 
-    val (v1,v2) = edges(edgeNumber - 1)
-    val v1Adj = adjList.adjacentVertices(v1) - v2
-    val v2Adj = adjList.adjacentVertices(v2) - v1
+    val (v1, v2) = edges(edgeNumber - 1)
+    val v1Adj    = adjList.adjacentVertices(v1) - v2
+    val v2Adj    = adjList.adjacentVertices(v2) - v1
 
     println(v1Adj.size + v2Adj.size)
   }
@@ -276,14 +276,14 @@ object InvertedMatrix {
   def main(args: Array[String]): Unit = {
     val matrix = readMatrix
 
-    matrix.zipWithIndex.foreach{ case (row, i) =>
-       row.zipWithIndex.foreach{ case (v, j) =>
-         if (j == i)
-           print(s"$v ")
-         else {
-           print(s"${if (v == 0) 1 else 0} ")
-         }
-       }
+    matrix.zipWithIndex.foreach { case (row, i) =>
+      row.zipWithIndex.foreach { case (v, j) =>
+        if (j == i)
+          print(s"$v ")
+        else {
+          print(s"${if (v == 0) 1 else 0} ")
+        }
+      }
       println()
     }
   }
@@ -332,7 +332,7 @@ object MatrixToAdjList {
 object VertexDegrees {
   def main(args: Array[String]): Unit = {
     val adj: AdjacentHolder.AdjList = readAdjList
-    val degrees = adj.degrees
+    val degrees                     = adj.degrees
 
     println(degrees.toSet.size)
   }
@@ -356,5 +356,43 @@ object VertexDegrees {
     br.close()
 
     AdjacentHolder.AdjList.buildNonOriented(vertices, edges)
+  }
+}
+
+object OnlyOneEdgeBetweenVertices {
+  def main(args: Array[String]): Unit = {
+    val adjList: AdjacentHolder.AdjList = readAdjList
+    val existMoreThanOneEdgeBetweenVertex = adjList.vertices.find { i =>
+      adjList.
+        vertices.exists { j =>
+        val ij = adjList.adjacent(i, j)
+        val ji = adjList.adjacent(j, i)
+        (ij && ji) ||
+        (i != j && !ij && !ji)
+      }
+    }
+
+    println(if (existMoreThanOneEdgeBetweenVertex.isEmpty) "YES" else "NO")
+  }
+
+  def readAdjList: AdjacentHolder.AdjList = {
+    val br = new java.io.BufferedReader(
+      new java.io.InputStreamReader(System.in)
+    )
+
+    val (vertexCount, edgeCount) = {
+      val tuple = br.readLine().split(" ")
+      tuple.head.toInt -> tuple.last.toInt
+    }
+
+    val vertices = 1 to vertexCount
+    val edges: IndexedSeq[(Int, Int)] = (0 until edgeCount).map { _ =>
+      val e = br.readLine().split(" ").map(_.toInt).toList
+      (e.head, e.last)
+    }
+
+    br.close()
+
+    AdjacentHolder.AdjList.buildOriented(vertices, edges)
   }
 }
