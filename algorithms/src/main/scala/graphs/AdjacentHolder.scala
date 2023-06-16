@@ -96,7 +96,7 @@ object AdjacentHolder {
 
       vertices.foreach(v => edgesMap.update(v, edgesMap.getOrElse(v, Set.empty[Int])))
 
-      new AdjList(vertices.toIndexedSeq, edges, edgesMap.toMap)
+      new AdjList(vertices.toIndexedSeq, edges.sorted, edgesMap.toMap)
     }
 
     def buildNonOriented(edges: Seq[(Int, Int)]): AdjList =
@@ -110,7 +110,7 @@ object AdjacentHolder {
 
       vertices.foreach(v => edgesMap.update(v, edgesMap.getOrElse(v, Set.empty[Int])))
 
-      new AdjList(vertices.toIndexedSeq, edges, edgesMap.toMap)
+      new AdjList(vertices.toIndexedSeq, edges.sorted, edgesMap.toMap)
     }
   }
 

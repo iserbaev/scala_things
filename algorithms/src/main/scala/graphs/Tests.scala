@@ -396,3 +396,34 @@ object OnlyOneEdgeBetweenVertices {
     AdjacentHolder.AdjList.buildOriented(vertices, edges)
   }
 }
+
+object MoreThanOneEdgeBetweenVertices {
+  def main(args: Array[String]): Unit = {
+    val adjList: AdjacentHolder.AdjList = readAdjList
+    val swappedEdges = adjList.edges.map{ case (i, j) => if (i > j) (j,i) else (i,j) }
+    val grouped = swappedEdges.groupBy(identity).view.mapValues(_.length)
+
+    println(grouped.count(_._2 > 1))
+  }
+
+  def readAdjList: AdjacentHolder.AdjList = {
+    val br = new java.io.BufferedReader(
+      new java.io.InputStreamReader(System.in)
+    )
+
+    val (vertexCount, edgeCount) = {
+      val tuple = br.readLine().split(" ")
+      tuple.head.toInt -> tuple.last.toInt
+    }
+
+    val vertices = 1 to vertexCount
+    val edges: IndexedSeq[(Int, Int)] = (0 until edgeCount).map { _ =>
+      val e = br.readLine().split(" ").map(_.toInt).toList
+      (e.head, e.last)
+    }
+
+    br.close()
+
+    AdjacentHolder.AdjList.buildNonOriented(vertices, edges)
+  }
+}
