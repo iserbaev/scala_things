@@ -427,3 +427,34 @@ object MoreThanOneEdgeBetweenVertices {
     AdjacentHolder.AdjList.buildNonOriented(vertices, edges)
   }
 }
+
+object AdjacentVertex {
+  def main(args: Array[String]): Unit = {
+    val (adjList, vertex) = readAdjList
+
+    println(adjList.adjacentVertices(vertex).size)
+  }
+
+  def readAdjList: (AdjacentHolder.AdjList, Int) = {
+    val br = new java.io.BufferedReader(
+      new java.io.InputStreamReader(System.in)
+    )
+
+    val (vertexCount, edgeCount) = {
+      val tuple = br.readLine().split(" ")
+      tuple.head.toInt -> tuple.last.toInt
+    }
+
+    val vertices = 1 to vertexCount
+    val edges: IndexedSeq[(Int, Int)] = (0 until edgeCount).map { _ =>
+      val e = br.readLine().split(" ").map(_.toInt).toList
+      (e.head, e.last)
+    }
+
+    val vertex = br.readLine().toInt
+
+    br.close()
+
+    (AdjacentHolder.AdjList.buildNonOriented(vertices, edges), vertex)
+  }
+}
