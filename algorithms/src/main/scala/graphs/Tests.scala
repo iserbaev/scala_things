@@ -466,7 +466,7 @@ object AdjComponent {
     val dfs     = GraphsProcessor.dfs(adjList)
 
     val firstComponentIdx = dfs.components(1)
-    val firstComponent    = dfs.components.filter(_._2 == firstComponentIdx).keys
+    val firstComponent    = dfs.components.collect{ case (v, c) if c == firstComponentIdx => v }
 
     println(firstComponent.size)
     println(firstComponent.toList.sorted.mkString(" "))
