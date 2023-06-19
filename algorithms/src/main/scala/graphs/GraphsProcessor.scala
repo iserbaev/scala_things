@@ -1,6 +1,5 @@
 package graphs
 
-import java.util.concurrent.atomic.AtomicInteger
 import scala.collection.mutable
 
 object GraphsProcessor {
@@ -10,23 +9,29 @@ object GraphsProcessor {
     val tin       = mutable.Map.empty[Int, Int]
     val tout      = mutable.Map.empty[Int, Int]
 
-    val counter           = new AtomicInteger(0)
-    val componentsCounter = new AtomicInteger(0)
+    var counter           = 0
+    var componentsCounter = 0
 
     def dfs_(v: Int, component: Int): Unit = {
-      tin.update(v, counter.incrementAndGet())
+      counter += 1
+      tin.update(v, counter)
       components.update(v, component)
 
       holder.adjacentVertices(v).foreach(u => if (!components.contains(u)) dfs_(u, component))
 
-      tout.update(v, counter.incrementAndGet())
+      counter += 1
+      tout.update(v, counter)
     }
 
     holder.vertices.foreach { v =>
-      if (!components.contains(v)) dfs_(v, componentsCounter.incrementAndGet())
+      if (!components.contains(v)) {
+        componentsCounter += 1
+        dfs_(v, componentsCounter)
+      }
     }
 
-    DFSMeta(componentsCounter.get(), components.toMap, tin.toMap, tout.toMap)
+    componentsCounter += 1
+    DFSMeta(componentsCounter, components.toMap, tin.toMap, tout.toMap)
   }
 
   def bfs(s: Int, holder: AdjacentHolder): BFSMeta[Int] = {
