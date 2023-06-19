@@ -6,27 +6,27 @@ import scala.collection.mutable
 object GraphsProcessor {
 
   def dfs(holder: AdjacentHolder): DFSMeta[Int] = {
-    val component = mutable.Map.empty[Int, Int]
+    val components = mutable.Map.empty[Int, Int]
     val tin       = mutable.Map.empty[Int, Int]
     val tout      = mutable.Map.empty[Int, Int]
 
     val counter           = new AtomicInteger(0)
     val componentsCounter = new AtomicInteger(0)
 
-    def dfs_(v: Int, num: Int): Unit = {
+    def dfs_(v: Int, component: Int): Unit = {
       tin.update(v, counter.incrementAndGet())
-      component.update(v, num)
+      components.update(v, component)
 
-      holder.adjacentVertices(v).foreach(u => if (!component.contains(u)) dfs_(u, num))
+      holder.adjacentVertices(v).foreach(u => if (!components.contains(u)) dfs_(u, component))
 
       tout.update(v, counter.incrementAndGet())
     }
 
     holder.vertices.foreach { v =>
-      if (!component.contains(v)) dfs_(v, componentsCounter.incrementAndGet())
+      if (!components.contains(v)) dfs_(v, componentsCounter.incrementAndGet())
     }
 
-    DFSMeta(componentsCounter.get(), component.toMap, tin.toMap, tout.toMap)
+    DFSMeta(componentsCounter.get(), components.toMap, tin.toMap, tout.toMap)
   }
 
   def bfs(s: Int, holder: AdjacentHolder): BFSMeta[Int] = {
