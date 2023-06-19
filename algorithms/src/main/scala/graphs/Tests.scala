@@ -363,8 +363,7 @@ object OnlyOneEdgeBetweenVertices {
   def main(args: Array[String]): Unit = {
     val adjList: AdjacentHolder.AdjList = readAdjList
     val existMoreThanOneEdgeBetweenVertex = adjList.vertices.find { i =>
-      adjList.
-        vertices.exists { j =>
+      adjList.vertices.exists { j =>
         val ij = adjList.adjacent(i, j)
         val ji = adjList.adjacent(j, i)
         (ij && ji) ||
@@ -400,8 +399,8 @@ object OnlyOneEdgeBetweenVertices {
 object MoreThanOneEdgeBetweenVertices {
   def main(args: Array[String]): Unit = {
     val adjList: AdjacentHolder.AdjList = readAdjList
-    val swappedEdges = adjList.edges.map{ case (i, j) => if (i > j) (j,i) else (i,j) }
-    val grouped = swappedEdges.groupBy(identity).view.mapValues(_.length)
+    val swappedEdges                    = adjList.edges.map { case (i, j) => if (i > j) (j, i) else (i, j) }
+    val grouped                         = swappedEdges.groupBy(identity).view.mapValues(_.length)
 
     println(grouped.count(_._2 > 1))
   }
@@ -456,5 +455,35 @@ object AdjacentVertex {
     br.close()
 
     (AdjacentHolder.AdjList.buildNonOriented(vertices, edges), vertex)
+  }
+}
+
+object AdjComponent {
+  def main(args: Array[String]): Unit = {
+    val (vertices, edges) = readRaw()
+
+    val adjList = AdjacentHolder.AdjList.buildNonOriented(vertices, edges)
+    val components     = GraphsProcessor.dfs(adjList).components
+
+    val firstComponentIdx = components(1)
+    val firstComponent    = components.collect{ case (v, c) if c == firstComponentIdx => v }
+
+    println(firstComponent.size)
+    println(firstComponent.toList.sorted.mkString(" "))
+  }
+
+  def readRaw(): (Seq[Int], IndexedSeq[(Int, Int)]) = {
+    val scanner = new java.util.Scanner(new java.io.InputStreamReader(System.in))
+
+    val (vertexCount, edgeCount) = (scanner.nextInt(), scanner.nextInt())
+
+    val vertices: Seq[Int] = (1 to vertexCount).toSeq
+    val edges: IndexedSeq[(Int, Int)] = (0 until edgeCount).map { _ =>
+      (scanner.nextInt(), scanner.nextInt())
+    }
+
+    scanner.close()
+
+    (vertices, edges)
   }
 }
