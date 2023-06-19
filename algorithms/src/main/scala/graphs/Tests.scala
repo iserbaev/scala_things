@@ -459,11 +459,39 @@ object AdjacentVertex {
 }
 
 object AdjComponent {
+  def dfs(holder: AdjacentHolder) = {
+    val components = scala.collection.mutable.Map.empty[Int, Int]
+    var componentsCounter = 0
+
+    @scala.annotation.tailrec def dfs_(adjacents: Set[Int], component: Int): Unit = {
+      if (adjacents.nonEmpty) {
+        val v = adjacents.head
+        if (!components.contains(v)) {
+          components.update(v, component)
+          dfs_(adjacents.tail ++ holder.adjacentVertices(v), component)
+        } else {
+          dfs_(adjacents.tail, component)
+        }
+      } else {
+        ()
+      }
+    }
+
+    holder.vertices.foreach { v =>
+      if (!components.contains(v)) {
+        componentsCounter += 1
+        components.update(v, componentsCounter)
+        dfs_(holder.adjacentVertices(v), componentsCounter)
+      }
+    }
+
+    components.toMap
+  }
   def main(args: Array[String]): Unit = {
     val (vertices, edges) = readRaw()
 
     val adjList = AdjacentHolder.AdjList.buildNonOriented(vertices, edges)
-    val components     = GraphsProcessor.dfs(adjList).components
+    val components     = dfs(adjList)
 
     val firstComponentIdx = components(1)
     val firstComponent    = components.collect{ case (v, c) if c == firstComponentIdx => v }
