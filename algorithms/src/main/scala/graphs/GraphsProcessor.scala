@@ -5,33 +5,32 @@ import scala.collection.mutable
 object GraphsProcessor {
 
   def dfs(holder: AdjacentHolder): DFSMeta[Int] = {
-    val components = mutable.Map.empty[Int, Int]
-    val tin       = mutable.Map.empty[Int, Int]
-    val tout      = mutable.Map.empty[Int, Int]
-
-    var counter           = 0
+    val components = scala.collection.mutable.Map.empty[Int, Int]
     var componentsCounter = 0
 
-    def dfs_(v: Int, component: Int): Unit = {
-      counter += 1
-      tin.update(v, counter)
-      components.update(v, component)
-
-      holder.adjacentVertices(v).foreach(u => if (!components.contains(u)) dfs_(u, component))
-
-      counter += 1
-      tout.update(v, counter)
+    @scala.annotation.tailrec def dfs_(adjacents: Set[Int], component: Int): Unit = {
+      if (adjacents.nonEmpty) {
+        val v = adjacents.head
+        if (!components.contains(v)) {
+          components.update(v, component)
+          dfs_(adjacents.tail ++ holder.adjacentVertices(v), component)
+        } else {
+          dfs_(adjacents.tail, component)
+        }
+      } else {
+        ()
+      }
     }
 
     holder.vertices.foreach { v =>
       if (!components.contains(v)) {
         componentsCounter += 1
-        dfs_(v, componentsCounter)
+        components.update(v, componentsCounter)
+        dfs_(holder.adjacentVertices(v), componentsCounter)
       }
     }
 
-    componentsCounter += 1
-    DFSMeta(componentsCounter, components.toMap, tin.toMap, tout.toMap)
+    DFSMeta(components.toMap)
   }
 
   def bfs(s: Int, holder: AdjacentHolder): BFSMeta[Int] = {

@@ -1,11 +1,6 @@
 package graphs
 
-case class DFSMeta[V](
-    componentsCount: Int,
-    components: Map[V, Int],
-    tin: Map[V, Int],
-    tout: Map[V, Int]
-)
+case class DFSMeta[V](components: Map[V, Int])
 
 case class BFSMeta[V](
     colors: Map[V, Color],
