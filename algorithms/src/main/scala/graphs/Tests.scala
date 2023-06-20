@@ -20,7 +20,7 @@ object MainAdj {
     }
 
     val adj = AdjacentHolder.AdjList.buildNonOriented(vertices, edges)
-    println(GraphsProcessor.dfs(adj).components.size)
+    println(GraphsProcessor.components(adj).components.size)
 
     br.close()
   }
@@ -463,7 +463,7 @@ object FirstComponent {
     val (vertices, edges) = readRaw()
 
     val adjList    = AdjacentHolder.AdjList.buildNonOriented(vertices, edges)
-    val components = GraphsProcessor.dfs(adjList).components
+    val components = GraphsProcessor.components(adjList)
 
     val firstComponentIdx = components(1)
     val firstComponent    = components.collect { case (v, c) if c == firstComponentIdx => v }
@@ -495,7 +495,7 @@ object AllComponents {
     val (vertices, edges) = readRaw()
 
     val adjList    = AdjacentHolder.AdjList.buildNonOriented(vertices, edges)
-    val components: Map[Int, Int] = GraphsProcessor.dfs(adjList).components
+    val components: Map[Int, Int] = GraphsProcessor.components(adjList)
 
     val componentsGrouped = components.groupMap(_._2)(_._1)
 
@@ -503,6 +503,40 @@ object AllComponents {
     componentsGrouped.toList.sortBy(_._1).foreach { case (_, group) =>
       println(group.size)
       println(group.toList.sorted.mkString(" ") + "  ")
+    }
+  }
+
+
+  def readRaw(): (Seq[Int], IndexedSeq[(Int, Int)]) = {
+    val scanner = new java.util.Scanner(new java.io.InputStreamReader(System.in))
+
+    val (vertexCount, edgeCount) = (scanner.nextInt(), scanner.nextInt())
+
+    val vertices: Seq[Int] = (1 to vertexCount).toSeq
+    val edges: IndexedSeq[(Int, Int)] = (0 until edgeCount).map { _ =>
+      (scanner.nextInt(), scanner.nextInt())
+    }
+
+    scanner.close()
+
+    (vertices, edges)
+  }
+}
+
+object FirstVertexComponent {
+  def main(args: Array[String]): Unit = {
+    val (vertices, edges) = readRaw()
+
+    val adjList    = AdjacentHolder.AdjList.buildOriented(vertices, edges)
+    val components: Map[Int, Int] = GraphsProcessor.components(adjList)
+    val dfsG = GraphsProcessor.dfs(adjList)
+
+    if (components.nonEmpty) {
+      val firstComponentIdx = components(1)
+      val firstComponent = components.collect { case (v, c) if c == firstComponentIdx => v }
+
+      println(firstComponent.toList.sorted.mkString(" "))
+      println(dfsG)
     }
   }
 

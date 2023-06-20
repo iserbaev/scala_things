@@ -4,7 +4,7 @@ import scala.collection.mutable
 
 object GraphsProcessor {
 
-  def dfs(holder: AdjacentHolder): DFSMeta[Int] = {
+  def components(holder: AdjacentHolder): Map[Int, Int] = {
     val components = scala.collection.mutable.Map.empty[Int, Int]
     var componentsCounter = 0
 
@@ -30,7 +30,46 @@ object GraphsProcessor {
       }
     }
 
-    DFSMeta(components.toMap)
+    components.toMap
+  }
+
+  def dfs(holder: AdjacentHolder): DFSMeta[Int] = {
+    val colors = mutable.Map.empty[Int, Color]
+    val parents = mutable.Map.empty[Int, Option[Int]]
+    val discoveryTime = mutable.Map.empty[Int, Int]
+    val finishedTime = mutable.Map.empty[Int, Int]
+
+    holder.vertices.foreach{ v =>
+      colors.update(v, Color.White)
+      parents.update(v, None)
+    }
+
+    var time = 0
+    def dfsVisit(u: Int): Unit = {
+      time += 1
+      discoveryTime.update(u, time)
+      colors.update(u, Color.Grey)
+
+      holder.adjacentVertices(u).foreach { uv =>
+        if (colors(uv) == Color.White) {
+          parents.update(uv, Some(u))
+          dfsVisit(uv)
+        }
+      }
+
+      colors.update(u, Color.Black)
+      time += 1
+      finishedTime.update(u, time)
+    }
+
+    holder.vertices.foreach{ v =>
+      if (colors(v) == Color.White) {
+        dfsVisit(v)
+      }
+    }
+
+
+    DFSMeta(colors.toMap, parents.toMap, discoveryTime.toMap, finishedTime.toMap)
   }
 
   def bfs(s: Int, holder: AdjacentHolder): BFSMeta[Int] = {
