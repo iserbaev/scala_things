@@ -5,10 +5,11 @@ import scala.collection.mutable
 object GraphsProcessor {
 
   def components(holder: AdjacentHolder): Map[Int, Int] = {
-    val components = scala.collection.mutable.Map.empty[Int, Int]
+    val components        = scala.collection.mutable.Map.empty[Int, Int]
     var componentsCounter = 0
 
-    @scala.annotation.tailrec def dfs_(adjacents: Set[Int], component: Int): Unit = {
+    @scala.annotation.tailrec
+    def dfs_(adjacents: Set[Int], component: Int): Unit =
       if (adjacents.nonEmpty) {
         val v = adjacents.head
         if (!components.contains(v)) {
@@ -20,7 +21,6 @@ object GraphsProcessor {
       } else {
         ()
       }
-    }
 
     holder.vertices.foreach { v =>
       if (!components.contains(v)) {
@@ -34,12 +34,12 @@ object GraphsProcessor {
   }
 
   def dfs(holder: AdjacentHolder): DFSMeta[Int] = {
-    val colors = mutable.Map.empty[Int, Color]
-    val parents = mutable.Map.empty[Int, Option[Int]]
+    val colors        = mutable.Map.empty[Int, Color]
+    val parents       = mutable.Map.empty[Int, Option[Int]]
     val discoveryTime = mutable.Map.empty[Int, Int]
-    val finishedTime = mutable.Map.empty[Int, Int]
+    val finishedTime  = mutable.Map.empty[Int, Int]
 
-    holder.vertices.foreach{ v =>
+    holder.vertices.foreach { v =>
       colors.update(v, Color.White)
       parents.update(v, None)
     }
@@ -62,12 +62,11 @@ object GraphsProcessor {
       finishedTime.update(u, time)
     }
 
-    holder.vertices.foreach{ v =>
+    holder.vertices.foreach { v =>
       if (colors(v) == Color.White) {
         dfsVisit(v)
       }
     }
-
 
     DFSMeta(colors.toMap, parents.toMap, discoveryTime.toMap, finishedTime.toMap)
   }
@@ -92,7 +91,8 @@ object GraphsProcessor {
     while (queue.nonEmpty) {
       val u = queue.dequeue()
 
-      holder.adjacentVertices(u)
+      holder
+        .adjacentVertices(u)
         .foreach { v =>
           if (colors(v) == Color.White) {
             colors.update(v, Color.Grey)

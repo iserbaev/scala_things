@@ -20,7 +20,7 @@ object MainAdj {
     }
 
     val adj = AdjacentHolder.AdjList.buildNonOriented(vertices, edges)
-    println(GraphsProcessor.components(adj).components.size)
+    println(GraphsProcessor.components(adj).size)
 
     br.close()
   }
@@ -488,13 +488,11 @@ object FirstComponent {
   }
 }
 
-
-
 object AllComponents {
   def main(args: Array[String]): Unit = {
     val (vertices, edges) = readRaw()
 
-    val adjList    = AdjacentHolder.AdjList.buildNonOriented(vertices, edges)
+    val adjList                   = AdjacentHolder.AdjList.buildNonOriented(vertices, edges)
     val components: Map[Int, Int] = GraphsProcessor.components(adjList)
 
     val componentsGrouped = components.groupMap(_._2)(_._1)
@@ -505,7 +503,6 @@ object AllComponents {
       println(group.toList.sorted.mkString(" ") + "  ")
     }
   }
-
 
   def readRaw(): (Seq[Int], IndexedSeq[(Int, Int)]) = {
     val scanner = new java.util.Scanner(new java.io.InputStreamReader(System.in))
