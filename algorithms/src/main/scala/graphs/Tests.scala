@@ -524,19 +524,18 @@ object FirstVertexComponent {
   def main(args: Array[String]): Unit = {
     val (vertices, edges) = readRaw()
 
-    val adjList    = AdjacentHolder.AdjList.buildOriented(vertices, edges)
-    val components: Map[Int, Int] = GraphsProcessor.components(adjList)
-    val dfsG = GraphsProcessor.dfs(adjList)
+    val adjList = AdjacentHolder.AdjList.buildOriented(vertices, edges)
+    val dfs     = GraphsProcessor.dfs(adjList)
 
-    if (components.nonEmpty) {
-      val firstComponentIdx = components(1)
-      val firstComponent = components.collect { case (v, c) if c == firstComponentIdx => v }
+    val firstDiscovered = dfs.discoveryTime(1)
+    val firstFinished   = dfs.finishedTime(1)
+    val firstVertexComponent = dfs.discoveryTime
+      .collect { case (v, d) if firstDiscovered <= d && d < firstFinished => v }
+      .toList
+      .sorted
 
-      println(firstComponent.toList.sorted.mkString(" "))
-      println(dfsG)
-    }
+    println(firstVertexComponent.mkString(" "))
   }
-
 
   def readRaw(): (Seq[Int], IndexedSeq[(Int, Int)]) = {
     val scanner = new java.util.Scanner(new java.io.InputStreamReader(System.in))
