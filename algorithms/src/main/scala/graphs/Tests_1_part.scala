@@ -552,3 +552,29 @@ object FirstVertexComponent {
     (vertices, edges)
   }
 }
+
+object CycleDetection {
+  def main(args: Array[String]): Unit = {
+    val adjacentHolder = AdjacentHolder.AdjMatrix(readMatrix)
+    val dfs = GraphsProcessor.dfs(adjacentHolder)
+
+    println(if (dfs.cycles.isEmpty) 0 else 1)
+
+  }
+
+  def readMatrix: Array[Array[Int]] = {
+    val br: java.io.BufferedReader = new java.io.BufferedReader(
+      new java.io.InputStreamReader(System.in)
+    )
+
+    val size = br.readLine().toInt
+
+    val edges = (0 until size).map { _ =>
+      br.readLine().split(" ").map(_.toInt)
+    }.toArray
+
+    br.close()
+
+    edges
+  }
+}

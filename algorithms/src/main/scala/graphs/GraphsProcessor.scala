@@ -38,6 +38,12 @@ object GraphsProcessor {
     val parents       = mutable.Map.empty[Int, Option[Int]]
     val discoveryTime = mutable.Map.empty[Int, Int]
     val finishedTime  = mutable.Map.empty[Int, Int]
+    val cycles        = mutable.Map.empty[Int, Int]
+
+//    val colors = Array.fill[Color](holder.vertices.length)(Color.White)
+//    val parents = Array.fill(holder.vertices.length)(Option.empty[Int])
+//    val discoveryTime = Array.fill(holder.vertices.length)(-1)
+//    val finishedTime = Array.fill(holder.vertices.length)(-1)
 
     holder.vertices.foreach { v =>
       colors.update(v, Color.White)
@@ -54,6 +60,8 @@ object GraphsProcessor {
         if (colors(uv) == Color.White) {
           parents.update(uv, Some(u))
           dfsVisit(uv)
+        } else if (colors(uv) == Color.Grey) {
+          cycles.update(uv, u)
         }
       }
 
@@ -68,7 +76,7 @@ object GraphsProcessor {
       }
     }
 
-    DFSMeta(colors.toMap, parents.toMap, discoveryTime.toMap, finishedTime.toMap)
+    DFSMeta(colors.toMap, parents.toMap, discoveryTime.toMap, finishedTime.toMap, cycles.toMap)
   }
 
   def bfs(s: Int, holder: AdjacentHolder): BFSMeta[Int] = {
