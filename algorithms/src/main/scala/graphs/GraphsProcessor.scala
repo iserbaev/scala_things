@@ -4,6 +4,30 @@ import scala.collection.mutable
 
 object GraphsProcessor {
 
+  sealed trait Color
+
+  object Color {
+    case object White extends Color
+
+    case object Grey extends Color
+
+    case object Black extends Color
+  }
+
+  case class DFSMeta[V](
+      colors: Map[V, Color],
+      parents: Map[V, Option[V]],
+      discoveryTime: Map[V, Int],
+      finishedTime: Map[V, Int],
+      cycles: Map[V, V]
+  )
+
+  case class BFSMeta[V](
+      colors: Map[V, Color],
+      distances: Map[V, Int],
+      parents: Map[V, Option[V]]
+  )
+
   def components(holder: AdjacentHolder): Map[Int, Int] = {
     val components        = scala.collection.mutable.Map.empty[Int, Int]
     var componentsCounter = 0
@@ -114,6 +138,33 @@ object GraphsProcessor {
     }
 
     BFSMeta(colors.toMap, distances.toMap, parents.toMap)
+  }
+
+  def shortestPath(start: Int, end: Int, holder: AdjacentHolder): Int = {
+    val length = holder.vertices.length
+    require(start < length && end < length)
+    val used   = Array.fill(length)(-1)
+    val layers = Array.fill(length + 1)(Array.empty[Int])
+
+    layers.update(0, Array(start))
+    used.update(start, 0)
+
+    var currentDistance = 0
+
+    while (layers(currentDistance).nonEmpty) {
+      layers(currentDistance)
+        .foreach { currentVertex =>
+          holder.adjacentVertices(currentVertex).foreach { nextVertex =>
+            if (used(nextVertex) == -1) {
+              layers.update(currentDistance + 1, layers(currentDistance + 1).appended(nextVertex))
+              used.update(nextVertex, currentDistance + 1)
+            }
+          }
+        }
+      currentDistance += 1
+    }
+
+    used(end)
   }
 
 }

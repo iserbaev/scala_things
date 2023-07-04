@@ -556,7 +556,7 @@ object FirstVertexComponent {
 object CycleDetection {
   def main(args: Array[String]): Unit = {
     val adjacentHolder = AdjacentHolder.AdjMatrix(readMatrix)
-    val dfs = GraphsProcessor.dfs(adjacentHolder)
+    val dfs            = GraphsProcessor.dfs(adjacentHolder)
 
     println(if (dfs.cycles.isEmpty) 0 else 1)
 
