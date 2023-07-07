@@ -1,11 +1,11 @@
 package graphs
 
-object ShortestPathWave {
+object ShortestPathLee {
   def main(args: Array[String]): Unit = {
     val (m, start, end) = readMatrix
-    val matrix = AdjacentHolder.AdjMatrix(m)
+    val matrix = AdjacentHolder.AdjMatrix(m.indices, Seq.empty, m)
 
-    val result = GraphsProcessor.shortestPath(start, end, matrix)
+    val result = GraphsProcessor.shortestPathLee(start, end, matrix)
 
     println(result)
   }

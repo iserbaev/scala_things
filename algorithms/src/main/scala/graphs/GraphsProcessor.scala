@@ -25,7 +25,7 @@ object GraphsProcessor {
   case class BFSMeta[V](
       colors: Map[V, Color],
       distances: Map[V, Int],
-      parents: Map[V, Option[V]]
+      predecessor: Map[V, Option[V]]
   )
 
   def components(holder: AdjacentHolder): Map[Int, Int] = {
@@ -140,7 +140,7 @@ object GraphsProcessor {
     BFSMeta(colors.toMap, distances.toMap, parents.toMap)
   }
 
-  def shortestPath(start: Int, end: Int, holder: AdjacentHolder): Int = {
+  def shortestPathLee(start: Int, end: Int, holder: AdjacentHolder): Int = {
     val length = holder.vertices.length
     require(start < length && end < length)
     val used   = Array.fill(length)(-1)
@@ -166,5 +166,51 @@ object GraphsProcessor {
 
     used(end)
   }
+
+  def shortestPathBellmanFord(
+      source: Int,
+      holder: AdjacentHolder,
+      weight: (Int, Int) => Int
+  ): (Array[Int], Array[Option[Int]]) = {
+    val distances: Array[Int]           = Array.empty[Int]
+    val predecessor: Array[Option[Int]] = Array.empty[Option[Int]]
+
+    initializeSingleSource(source, distances, predecessor, holder)
+
+    holder.vertices.tail.foreach { _ =>
+      holder.edges.foreach { case (u, v) => relax(u, v, weight, distances, predecessor) }
+    }
+
+    holder.edges.foreach { case (u, v) =>
+      if (distances(v) > distances(u) + weight(u, v)) println("Graph contains a negative-weight cycle")
+    }
+
+    (distances, predecessor)
+  }
+
+  private def initializeSingleSource(
+      source: Int,
+      distances: Array[Int],
+      predecessors: Array[Option[Int]],
+      holder: AdjacentHolder
+  ): Unit = {
+    holder.vertices.foreach { v =>
+      distances.update(v, Int.MaxValue)
+      predecessors.update(v, None)
+    }
+    distances.update(source, 0)
+  }
+
+  private def relax(
+      u: Int,
+      v: Int,
+      weightUV: (Int, Int) => Int,
+      distances: Array[Int],
+      predecessors: Array[Option[Int]]
+  ): Unit =
+    if (distances(v) > distances(u) + weightUV(u, v)) {
+      distances.update(v, distances(u) + weightUV(u, v))
+      predecessors.update(v, Some(u))
+    }
 
 }

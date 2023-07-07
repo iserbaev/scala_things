@@ -5,27 +5,37 @@ sealed trait AdjacentHolder {
   def adjacentVertices(v: Int): Set[Int]
 
   def vertices: IndexedSeq[Int]
+  def edges: Seq[(Int, Int)]
 }
 
 object AdjacentHolder {
-  class AdjMatrix(val vertices: IndexedSeq[Int], matrix: Array[Array[Int]]) extends AdjacentHolder {
+  case class AdjMatrix(val vertices: IndexedSeq[Int], val edges: Seq[(Int, Int)], matrix: Array[Array[Int]])
+      extends AdjacentHolder {
+    // O(1)
     def size: Int = matrix.length
 
+    // O(1)
     def adjacent(u: Int, v: Int): Boolean =
       matrix(u)(v) == 1
 
+    // O(n)
     def adjacentVertices(v: Int): Set[Int] =
       matrix(v).zipWithIndex.collect { case (v, idx) if v == 1 => idx }.toSet
 
+    // O(n)
     def loopsCount: Int =
       (0 until size).count(i => matrix(i)(i) == 1)
 
+    // O(m)
     def edgesCount: Int =
-      matrix.map(_.sum).sum
+      edges.size
 
+    // O(n)
     def degrees: Array[Int] = matrix.zipWithIndex.map { case (row, idx) =>
       if (row(idx) == 1) row.sum + 1 else row.sum
     }
+
+    // O(n^2)
 
     def sourcesAndDrainsInOrientedGraph: (Array[Int], Array[Int]) = {
       val in  = Array.fill(size)(0)
@@ -35,7 +45,7 @@ object AdjacentHolder {
         i <- vertices
         j <- vertices
       } yield {
-        if (matrix(i)(j) == 1) {
+        if (adjacent(i, j)) {
           out.update(i, 1)
           in.update(j, 1)
         }
@@ -44,27 +54,11 @@ object AdjacentHolder {
       (in, out)
     }
 
+    // O(n^2)
     def sourcesAndDrainsCountInOrientedGraph: (Int, Int) = {
       val (in, out) = sourcesAndDrainsInOrientedGraph
       (in.count(_ == 0), out.count(_ == 0))
     }
-
-    def toAdjList: AdjList = {
-      val edges = Seq.newBuilder[(Int, Int)]
-      for {
-        i <- (0 until size)
-        j <- (i until size)
-      } yield {
-        if (adjacent(i, j)) edges.+=((i + 1, j + 1))
-      }
-
-      AdjList.buildNonOriented(edges.result())
-    }
-  }
-
-  object AdjMatrix {
-    def apply(raw: Array[Array[Int]]): AdjMatrix =
-      new AdjMatrix(raw.indices, raw)
   }
 
   /** Adjacency list representation (список смежности) Для каждой вершины u Adj[u] состоит

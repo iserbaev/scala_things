@@ -176,6 +176,8 @@ object BuildMatrixTest {
   def main(args: Array[String]): Unit = {
 
     val matrix = AdjacentHolder.AdjMatrix(
+      IndexedSeq(0, 1, 2, 3, 4),
+      Seq.empty,
       Array(
         Array(1, 1, 1, 1, 0),
         Array(1, 0, 1, 1, 1),
@@ -191,32 +193,32 @@ object BuildMatrixTest {
 
 object LoopsCount {
   def main(args: Array[String]): Unit = {
-    val adjacentHolder = AdjacentHolder.AdjMatrix(readMatrix)
+    val adjacentHolder = readMatrix
 
     println(adjacentHolder.loopsCount)
 
   }
 
-  def readMatrix: Array[Array[Int]] = {
+  def readMatrix: AdjacentHolder.AdjMatrix = {
     val br: java.io.BufferedReader = new java.io.BufferedReader(
       new java.io.InputStreamReader(System.in)
     )
 
     val size = br.readLine().toInt
 
-    val edges = (0 until size).map { _ =>
+    val matrix = (0 until size).map { _ =>
       br.readLine().split(" ").map(_.toInt)
     }.toArray
 
     br.close()
 
-    edges
+    AdjacentHolder.AdjMatrix(matrix.indices, Seq.empty, matrix)
   }
 }
 
 object EdgesCount {
   def main(args: Array[String]): Unit = {
-    val adjacentHolder = AdjacentHolder.AdjMatrix(readMatrix)
+    val adjacentHolder = readMatrix
 
     println(adjacentHolder.edgesCount)
   }
@@ -224,7 +226,7 @@ object EdgesCount {
 
 object EdgesList {
   def main(args: Array[String]): Unit = {
-    val adjacentHolder = AdjacentHolder.AdjMatrix(readMatrix)
+    val adjacentHolder = readMatrix
 
     val even = adjacentHolder.degrees.count(_ % 2 == 0)
 
@@ -234,7 +236,7 @@ object EdgesList {
 
 object SourcesAndDrains {
   def main(args: Array[String]): Unit = {
-    val adjacentHolder = AdjacentHolder.AdjMatrix(readMatrix)
+    val adjacentHolder = readMatrix
 
     val (s, d) = adjacentHolder.sourcesAndDrainsCountInOrientedGraph
 
@@ -286,30 +288,6 @@ object InvertedMatrix {
       }
       println()
     }
-  }
-
-  def readMatrix: Array[Array[Int]] = {
-    val br: java.io.BufferedReader = new java.io.BufferedReader(
-      new java.io.InputStreamReader(System.in)
-    )
-
-    val size = br.readLine().toInt
-
-    val edges = (0 until size).map { _ =>
-      br.readLine().split(" ").map(_.toInt)
-    }.toArray
-
-    br.close()
-
-    edges
-  }
-}
-
-object MatrixToAdjList {
-  def main(args: Array[String]): Unit = {
-    val matrix = AdjacentHolder.AdjMatrix(readMatrix)
-
-    matrix.toAdjList.edges.sorted.foreach(tuple => println(tuple._1.toString + " " + tuple._2.toString))
   }
 
   def readMatrix: Array[Array[Int]] = {
@@ -555,26 +533,10 @@ object FirstVertexComponent {
 
 object CycleDetection {
   def main(args: Array[String]): Unit = {
-    val adjacentHolder = AdjacentHolder.AdjMatrix(readMatrix)
+    val adjacentHolder = readMatrix
     val dfs            = GraphsProcessor.dfs(adjacentHolder)
 
     println(if (dfs.cycles.isEmpty) 0 else 1)
 
-  }
-
-  def readMatrix: Array[Array[Int]] = {
-    val br: java.io.BufferedReader = new java.io.BufferedReader(
-      new java.io.InputStreamReader(System.in)
-    )
-
-    val size = br.readLine().toInt
-
-    val edges = (0 until size).map { _ =>
-      br.readLine().split(" ").map(_.toInt)
-    }.toArray
-
-    br.close()
-
-    edges
   }
 }
