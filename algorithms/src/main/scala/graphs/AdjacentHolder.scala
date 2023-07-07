@@ -20,7 +20,7 @@ object AdjacentHolder {
 
     // O(n)
     def adjacentVertices(v: Int): Set[Int] =
-      matrix(v).zipWithIndex.collect { case (v, idx) if v == 1 => idx }.toSet
+      matrix(v).zipWithIndex.collect { case (v, idx) if v > 0 => idx }.toSet
 
     // O(n)
     def loopsCount: Int =

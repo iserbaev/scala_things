@@ -211,8 +211,7 @@ object GraphsProcessor {
     val (distances, predecessors) = initializeSingleSource(source, holder)
     val S                         = Set.newBuilder[Int]
     val customOrdering            = Ordering.by[Int, Int](i => distances(i)).reverse
-    val priorityQueue             = mutable.PriorityQueue.empty[Int](customOrdering) // ASC heap
-    priorityQueue.addAll(holder.vertices)
+    val priorityQueue             = mutable.PriorityQueue.from(holder.vertices)(customOrdering) // ASC heap
 
     while (priorityQueue.nonEmpty) {
       val u = priorityQueue.dequeue() // expect that next vertex will heapify
@@ -238,13 +237,9 @@ object GraphsProcessor {
       source: Int,
       holder: AdjacentHolder
   ): (Array[Int], Array[Option[Int]]) = {
-    val distances: Array[Int]            = Array.empty[Int]
-    val predecessors: Array[Option[Int]] = Array.empty[Option[Int]]
+    val distances: Array[Int]            = Array.fill(holder.vertices.size)(10000)
+    val predecessors: Array[Option[Int]] = Array.fill(holder.vertices.size)(Option.empty[Int])
 
-    holder.vertices.foreach { v =>
-      distances.update(v, Int.MaxValue)
-      predecessors.update(v, None)
-    }
     distances.update(source, 0)
 
     (distances, predecessors)
