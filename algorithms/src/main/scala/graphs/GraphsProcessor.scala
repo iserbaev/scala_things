@@ -57,6 +57,7 @@ object GraphsProcessor {
     components.toMap
   }
 
+  // O(V + E)
   def dfs(holder: AdjacentHolder): DFSMeta[Int] = {
     val colors        = mutable.Map.empty[Int, Color]
     val parents       = mutable.Map.empty[Int, Option[Int]]
@@ -103,6 +104,12 @@ object GraphsProcessor {
     DFSMeta(colors.toMap, parents.toMap, discoveryTime.toMap, finishedTime.toMap, cycles.toMap)
   }
 
+  // O(V + E)
+  def topologicalSort(holder: AdjacentHolder): IndexedSeq[Int] =
+    dfs(holder).finishedTime.toIndexedSeq
+      .sortBy(_._2)(Ordering.Int.reverse) // sort by finished time in descending order
+      .map(_._1)                          // return sorted vertices
+
   def bfs(s: Int, holder: AdjacentHolder): BFSMeta[Int] = {
     val colors    = mutable.Map.empty[Int, Color]
     val distances = mutable.Map.empty[Int, Int]
@@ -143,11 +150,11 @@ object GraphsProcessor {
   def shortestPathLee(start: Int, end: Int, holder: AdjacentHolder): Int = {
     val length = holder.vertices.length
     require(start < length && end < length)
-    val used   = Array.fill(length)(-1)
-    val layers = Array.fill(length + 1)(Array.empty[Int])
+    val distances = Array.fill(length)(-1)
+    val layers    = Array.fill(length + 1)(Array.empty[Int])
 
     layers.update(0, Array(start))
-    used.update(start, 0)
+    distances.update(start, 0)
 
     var currentDistance = 0
 
@@ -155,16 +162,16 @@ object GraphsProcessor {
       layers(currentDistance)
         .foreach { currentVertex =>
           holder.adjacentVertices(currentVertex).foreach { nextVertex =>
-            if (used(nextVertex) == -1) {
+            if (distances(nextVertex) == -1) {
               layers.update(currentDistance + 1, layers(currentDistance + 1).appended(nextVertex))
-              used.update(nextVertex, currentDistance + 1)
+              distances.update(nextVertex, currentDistance + 1)
             }
           }
         }
       currentDistance += 1
     }
 
-    used(end)
+    distances(end)
   }
 
   def shortestPathBellmanFord(
@@ -172,33 +179,75 @@ object GraphsProcessor {
       holder: AdjacentHolder,
       weight: (Int, Int) => Int
   ): (Array[Int], Array[Option[Int]]) = {
-    val distances: Array[Int]           = Array.empty[Int]
-    val predecessor: Array[Option[Int]] = Array.empty[Option[Int]]
-
-    initializeSingleSource(source, distances, predecessor, holder)
+    val (distances, predecessors) = initializeSingleSource(source, holder)
 
     holder.vertices.tail.foreach { _ =>
-      holder.edges.foreach { case (u, v) => relax(u, v, weight, distances, predecessor) }
+      holder.edges.foreach { case (u, v) => relax(u, v, weight, distances, predecessors) }
     }
 
     holder.edges.foreach { case (u, v) =>
       if (distances(v) > distances(u) + weight(u, v)) println("Graph contains a negative-weight cycle")
     }
 
-    (distances, predecessor)
+    (distances, predecessors)
   }
 
+  // O(V + E)
+  def dagShortestPath(holder: AdjacentHolder, weight: (Int, Int) => Int, source: Int) = {
+    val sortedVertices            = topologicalSort(holder)
+    val (distances, predecessors) = initializeSingleSource(source, holder)
+    sortedVertices.foreach { u =>
+      holder.adjacentVertices(u).foreach { v =>
+        relax(u, v, weight, distances, predecessors)
+      }
+    }
+
+    (distances, predecessors)
+  }
+
+  // Weighted oriented graph,
+  // where for any (u,v) in E, weight(u,v) >= 0
+  def dijkstra(holder: AdjacentHolder, weight: (Int, Int) => Int, source: Int) = {
+    val (distances, predecessors) = initializeSingleSource(source, holder)
+    val S                         = Set.newBuilder[Int]
+    val customOrdering            = Ordering.by[Int, Int](i => distances(i)).reverse
+    val priorityQueue             = mutable.PriorityQueue.empty[Int](customOrdering) // ASC heap
+    priorityQueue.addAll(holder.vertices)
+
+    while (priorityQueue.nonEmpty) {
+      val u = priorityQueue.dequeue() // expect that next vertex will heapify
+      S.addOne(u)
+      holder.adjacentVertices(u).foreach { v =>
+        relax(u, v, weight, distances, predecessors)
+      }
+      decreaseKey(priorityQueue)
+    }
+
+    (distances, predecessors)
+  }
+
+  // scala.collection.mutable.PriorityQueue does not support a decrease-key operation
+  private def decreaseKey(priorityQueue: mutable.PriorityQueue[Int]): Unit =
+    if (priorityQueue.nonEmpty) {
+      val v = priorityQueue.dequeue()
+      priorityQueue.enqueue(v)
+    }
+
+  // O(V)
   private def initializeSingleSource(
       source: Int,
-      distances: Array[Int],
-      predecessors: Array[Option[Int]],
       holder: AdjacentHolder
-  ): Unit = {
+  ): (Array[Int], Array[Option[Int]]) = {
+    val distances: Array[Int]            = Array.empty[Int]
+    val predecessors: Array[Option[Int]] = Array.empty[Option[Int]]
+
     holder.vertices.foreach { v =>
       distances.update(v, Int.MaxValue)
       predecessors.update(v, None)
     }
     distances.update(source, 0)
+
+    (distances, predecessors)
   }
 
   private def relax(
