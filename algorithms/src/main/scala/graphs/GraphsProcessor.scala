@@ -220,14 +220,14 @@ object GraphsProcessor {
       holder.adjacentVertices(u).foreach { v =>
         relax(u, v, weight, distances, predecessors)
       }
-      decreaseKey(priorityQueue)
+      decreaseKeys(priorityQueue)
     }
 
     (distances, predecessors)
   }
 
   // scala.collection.mutable.PriorityQueue does not support a decrease-key operation
-  private def decreaseKey(priorityQueue: mutable.PriorityQueue[Int]): Unit =
+  private def decreaseKeys(priorityQueue: mutable.PriorityQueue[Int]): Unit =
     if (priorityQueue.nonEmpty) {
       val v = priorityQueue.dequeue()
       priorityQueue.enqueue(v)
