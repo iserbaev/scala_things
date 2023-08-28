@@ -1,4 +1,4 @@
-package leetcode
+package leetcode.top150
 
 object RemoveDuplicatesFromSortedArray {
   def removeDuplicates(nums: Array[Int]): Int = if (nums.nonEmpty) {
