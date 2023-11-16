@@ -1,7 +1,7 @@
 package leetcode.top150
 
 object MinimumSizeSubarraySum extends App {
-  def minSubArrayLen(target: Int, nums: Array[Int]): Int = {
+  def minSubArrayLen(target: Int, nums: Array[Int]): Int =
     if (nums.exists(_ >= target)) {
       1
     } else {
@@ -27,7 +27,6 @@ object MinimumSizeSubarraySum extends App {
 
       if (len == Int.MaxValue) 0 else len
     }
-  }
 
 //  minSubArrayLen(7, Array(2, 3, 1, 2, 4, 3))
   minSubArrayLen(15, Array(1, 2, 3, 4, 5))

@@ -4,9 +4,8 @@ import scala.collection.immutable.SortedSet
 
 object Reducer {
 
-  def processLine(sortedSet: SortedSet[String]): SortedSet[String] = {
+  def processLine(sortedSet: SortedSet[String]): SortedSet[String] =
     recur(sortedSet)
-  }
 
   @scala.annotation.tailrec
   private def recur(sortedSet: SortedSet[String]): SortedSet[String] = {
@@ -15,7 +14,6 @@ object Reducer {
       return sortedSet
     }
     val data = line.split("\t")
-
 
     recur(sortedSet + data.head)
   }

@@ -22,7 +22,7 @@ object RemoveDuplicates2 extends App {
     nums.length - duplicates
   }
 
-  removeDuplicates(Array(1,1,1,2,2,3))
+  removeDuplicates(Array(1, 1, 1, 2, 2, 3))
 
-  removeDuplicates(Array(0,0,1,1,1,1,2,3,3))
+  removeDuplicates(Array(0, 0, 1, 1, 1, 1, 2, 3, 3))
 }

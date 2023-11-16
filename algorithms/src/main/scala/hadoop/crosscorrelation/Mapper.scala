@@ -10,8 +10,8 @@ object Mapper {
     }
     val arr = line.split(" ")
 
-    arr.foreach{ i =>
-      arr.foreach{ j =>
+    arr.foreach { i =>
+      arr.foreach { j =>
         if (i != j) println(s"$i,$j\t1")
       }
 

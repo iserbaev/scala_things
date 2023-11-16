@@ -6,9 +6,9 @@ object MapperFilter {
   def processLine(userName: String): Unit = {
     val line = scala.io.StdIn.readLine()
     if (line == null || line.isEmpty) return ()
-    val Array(_,user,_) = line.split("\t")
+    val Array(_, user, _) = line.split("\t")
 
-    if (user.trim()  == userName) println(line)
+    if (user.trim() == userName) println(line)
 
     processLine(userName)
   }

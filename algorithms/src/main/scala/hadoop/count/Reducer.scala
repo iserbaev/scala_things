@@ -2,9 +2,8 @@ package hadoop.count
 
 object Reducer {
 
-  def processLine(): Unit = {
-    recur("", 0,0)
-  }
+  def processLine(): Unit =
+    recur("", 0, 0)
 
   @scala.annotation.tailrec
   private def recur(previousLetter: String, sum: Integer, count: Integer): Unit = {
@@ -25,7 +24,6 @@ object Reducer {
     }
   }
 
-  def main(args: Array[String]): Unit = {
+  def main(args: Array[String]): Unit =
     processLine()
-  }
 }

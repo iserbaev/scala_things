@@ -13,8 +13,8 @@ object Mapper {
   }
 
   def main(args: Array[String]): Unit = {
-    val kv   = Map.empty[String, Int]
+    val kv       = Map.empty[String, Int]
     val resultKV = processLine(kv)
-    resultKV.foreach{ case (k,v) => println(k ++ s"\t${v.toString}") }
+    resultKV.foreach { case (k, v) => println(k ++ s"\t${v.toString}") }
   }
 }

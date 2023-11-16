@@ -14,8 +14,8 @@ object ReducerFullOuter {
   }
 
   def main(args: Array[String]): Unit =
-    processLine(Map.empty[String, Set[String]])
-      .toList.sortBy(_._1)
+    processLine(Map.empty[String, Set[String]]).toList
+      .sortBy(_._1)
       .foreach { case (str, values) =>
         if (values.size == 1) println(str)
       }

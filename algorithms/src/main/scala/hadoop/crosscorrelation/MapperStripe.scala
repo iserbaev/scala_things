@@ -15,7 +15,7 @@ object MapperStripe {
     arr.foreach { i =>
       var stripes = ListMap.empty[String, Int]
       arr.foreach { j =>
-        if(i != j) {
+        if (i != j) {
           stripes = stripes.updated(j, stripes.getOrElse(j, 0) + 1)
         }
       }

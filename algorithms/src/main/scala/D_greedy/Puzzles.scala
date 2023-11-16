@@ -139,7 +139,7 @@ object CookingDinner {
 
     val n = br.readLine().toInt
 
-    val cf = (1 to n).map{ _ =>
+    val cf = (1 to n).map { _ =>
       val pair = br.readLine().split(" ").map(_.toLong)
 
       (pair.head, pair.last)
@@ -150,10 +150,10 @@ object CookingDinner {
     var allFresh = true
 
     var currentF = Long.MaxValue
-    var idx = 0
+    var idx      = 0
 
     while (allFresh && idx < sorted.length) {
-      val (c,f) = sorted(idx)
+      val (c, f) = sorted(idx)
       currentF = math.min(f, currentF - c)
       idx += 1
       allFresh = currentF >= 0

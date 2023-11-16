@@ -6,19 +6,19 @@ object GCD {
       new java.io.InputStreamReader(System.in)
     )
 
-    val ar = br.readLine().split(" ").map(_.toLong)
-    val a = ar.head
-    val b = ar.last
-    val result = gcd(a,b)
+    val ar     = br.readLine().split(" ").map(_.toLong)
+    val a      = ar.head
+    val b      = ar.last
+    val result = gcd(a, b)
     println(result)
   }
 
   @scala.annotation.tailrec
   def gcd(a: Long, b: Long): Long = (a, b) match {
-    case (0, _) => b
-    case (_, 0) => a
+    case (0, _)               => b
+    case (_, 0)               => a
     case (aa, bb) if aa >= bb => gcd(a % b, b)
-    case (_, _) => gcd(a, b % a)
+    case (_, _)               => gcd(a, b % a)
   }
 }
 
@@ -28,10 +28,10 @@ object LCM {
       new java.io.InputStreamReader(System.in)
     )
 
-    val ar = br.readLine().split(" ").map(_.toLong)
-    val a = ar.head
-    val b = ar.last
-    val result = lcm(a,b)
+    val ar     = br.readLine().split(" ").map(_.toLong)
+    val a      = ar.head
+    val b      = ar.last
+    val result = lcm(a, b)
     println(result)
   }
 
@@ -40,9 +40,9 @@ object LCM {
 
   @scala.annotation.tailrec
   def gcd(a: Long, b: Long): Long = (a, b) match {
-    case (0, _) => b
-    case (_, 0) => a
+    case (0, _)               => b
+    case (_, 0)               => a
     case (aa, bb) if aa >= bb => gcd(a % b, b)
-    case (_, _) => gcd(a, b % a)
+    case (_, _)               => gcd(a, b % a)
   }
 }

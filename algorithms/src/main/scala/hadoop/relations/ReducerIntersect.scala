@@ -12,7 +12,7 @@ object ReducerIntersect {
   }
 
   def main(args: Array[String]): Unit =
-    processLine(Map.empty).foreach{ case (str, values) =>
+    processLine(Map.empty).foreach { case (str, values) =>
       if (values.size == 2) println(str)
     }
 }

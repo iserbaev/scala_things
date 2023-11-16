@@ -1,5 +1,5 @@
 package tasks
-import java.io.{BufferedReader, InputStreamReader}
+import java.io.{ BufferedReader, InputStreamReader }
 
 object MaxPairwise {
   def main(args: Array[String]): Unit = {
@@ -190,11 +190,11 @@ object FibonacciLastDigitPartialSum {
     )
 
     val ar = br.readLine().split(" ").map(_.toLong)
-    val m = ar.head
-    val n = ar.last
+    val m  = ar.head
+    val n  = ar.last
     if (m + n < 2) println(m + n)
     else {
-      val partialSum = (sumLastDigit(n) - sumLastDigit(math.max(0, m - 1)))
+      val partialSum = sumLastDigit(n) - sumLastDigit(math.max(0, m - 1))
 
       println((if (partialSum > 0) partialSum else (10 + partialSum)) % 10)
     }
@@ -205,7 +205,7 @@ object FibonacciLastDigitPartialSum {
 
   private def fibonacciLastDigit(n: Long): Long = {
     var current = 0L
-    var next = 1L
+    var next    = 1L
 
     (1L to n).foreach { _ =>
       val temp = next
@@ -250,19 +250,19 @@ object GCD {
       new java.io.InputStreamReader(System.in)
     )
 
-    val ar = br.readLine().split(" ").map(_.toLong)
-    val a = ar.head
-    val b = ar.last
-    val result = gcd(a,b)
+    val ar     = br.readLine().split(" ").map(_.toLong)
+    val a      = ar.head
+    val b      = ar.last
+    val result = gcd(a, b)
     println(result)
   }
 
   @scala.annotation.tailrec
   def gcd(a: Long, b: Long): Long = (a, b) match {
-    case (0, _) => b
-    case (_, 0) => a
+    case (0, _)               => b
+    case (_, 0)               => a
     case (aa, bb) if aa >= bb => gcd(a % b, b)
-    case (_, _) => gcd(a, b % a)
+    case (_, _)               => gcd(a, b % a)
   }
 }
 
@@ -272,10 +272,10 @@ object LCM {
       new java.io.InputStreamReader(System.in)
     )
 
-    val ar = br.readLine().split(" ").map(_.toLong)
-    val a = ar.head
-    val b = ar.last
-    val result = lcm(a,b)
+    val ar     = br.readLine().split(" ").map(_.toLong)
+    val a      = ar.head
+    val b      = ar.last
+    val result = lcm(a, b)
     println(result)
   }
 
@@ -284,9 +284,9 @@ object LCM {
 
   @scala.annotation.tailrec
   def gcd(a: Long, b: Long): Long = (a, b) match {
-    case (0, _) => b
-    case (_, 0) => a
+    case (0, _)               => b
+    case (_, 0)               => a
     case (aa, bb) if aa >= bb => gcd(a % b, b)
-    case (_, _) => gcd(a, b % a)
+    case (_, _)               => gcd(a, b % a)
   }
 }

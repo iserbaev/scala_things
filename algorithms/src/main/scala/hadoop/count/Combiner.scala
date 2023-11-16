@@ -2,9 +2,8 @@ package hadoop.count
 
 object Combiner {
 
-  def processLine(): Unit = {
+  def processLine(): Unit =
     recur("", 0, 0)
-  }
 
   @scala.annotation.tailrec
   private def recur(previousLetter: String, sum: Integer, count: Integer): Unit = {
@@ -13,7 +12,7 @@ object Combiner {
       println(previousLetter + "\t" + s"$sum;$count")
       return
     }
-    val data = line.split("\t")
+    val data     = line.split("\t")
     val sumCount = data(1).split(";")
 
     if (previousLetter == "") {
@@ -26,7 +25,6 @@ object Combiner {
     }
   }
 
-  def main(args: Array[String]): Unit = {
+  def main(args: Array[String]): Unit =
     processLine()
-  }
 }

@@ -1,6 +1,6 @@
 package A_fibs
 
-import java.io.{BufferedReader, InputStreamReader}
+import java.io.{ BufferedReader, InputStreamReader }
 
 object MaxPairwise {
   def main(args: Array[String]): Unit = {
@@ -191,11 +191,11 @@ object FibonacciLastDigitPartialSum {
     )
 
     val ar = br.readLine().split(" ").map(_.toLong)
-    val m = ar.head
-    val n = ar.last
+    val m  = ar.head
+    val n  = ar.last
     if (m + n < 2) println(m + n)
     else {
-      val partialSum = (sumLastDigit(n) - sumLastDigit(math.max(0, m - 1)))
+      val partialSum = sumLastDigit(n) - sumLastDigit(math.max(0, m - 1))
 
       println((if (partialSum > 0) partialSum else (10 + partialSum)) % 10)
     }
@@ -206,7 +206,7 @@ object FibonacciLastDigitPartialSum {
 
   private def fibonacciLastDigit(n: Long): Long = {
     var current = 0L
-    var next = 1L
+    var next    = 1L
 
     (1L to n).foreach { _ =>
       val temp = next

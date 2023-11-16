@@ -3,7 +3,7 @@ package graphs
 object ShortestPathLee {
   def main(args: Array[String]): Unit = {
     val (m, start, end) = readMatrix
-    val matrix = AdjacentHolder.AdjMatrix(m.indices, Seq.empty, m)
+    val matrix          = AdjacentHolder.AdjMatrix(m.indices, Seq.empty, m)
 
     val result = GraphsProcessor.shortestPathLee(start, end, matrix)
 
@@ -32,9 +32,9 @@ object ShortestPathLee {
 object DijkstraTest {
   def main(args: Array[String]): Unit = {
     val (matrix, vertices, edges, source, end) = readMatrix
-    val holder = AdjacentHolder.AdjMatrix(vertices, edges, matrix)
+    val holder                                 = AdjacentHolder.AdjMatrix(vertices, edges, matrix)
 
-    val weight: (Int, Int) => Int = (u,v) => matrix(u)(v)
+    val weight: (Int, Int) => Int = (u, v) => matrix(u)(v)
 
     val (distances, _) = GraphsProcessor.dijkstra(holder, weight, source)
 
@@ -46,14 +46,14 @@ object DijkstraTest {
       new java.io.InputStreamReader(System.in)
     )
 
-    val List(n,source,end) = br.readLine().split(" ", 3).map(_.toInt).toList
+    val List(n, source, end) = br.readLine().split(" ", 3).map(_.toInt).toList
 
-    val edges = Seq.newBuilder[(Int, Int)]
+    val edges    = Seq.newBuilder[(Int, Int)]
     val vertices = (0 until n).toIndexedSeq
 
     val matrix = vertices.map { u =>
       val row = br.readLine().split(" ").map(_.toInt)
-      row.zipWithIndex.foreach{ case (weight, v) =>
+      row.zipWithIndex.foreach { case (weight, v) =>
         if (weight > 0) {
           edges.+=((u, v))
         }

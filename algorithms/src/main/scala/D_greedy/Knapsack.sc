@@ -6,9 +6,9 @@ object Main {
   def solve1(costWeightTuples: Seq[(Int, Int)], availableWeight: Int) = {
     @scala.annotation.tailrec
     def fill(
-      costWithWeights: Seq[(Int, Int)],
-      knapsackWeight:  Int,
-      acc:             ListBuffer[(Double, Int)]
+        costWithWeights: Seq[(Int, Int)],
+        knapsackWeight: Int,
+        acc: ListBuffer[(Double, Int)]
     ): ListBuffer[(Double, Int)] = knapsackWeight match {
       case x if x < 0 =>
         throw sys.error("W less than 0")
@@ -30,8 +30,12 @@ object Main {
         fill(costWithWeights.tail, knapsackWeight - resultWeight, acc)
     }
 
+    val sorted = costWeightTuples.sortBy { case (c, w) => -c.toDouble / w }
+
+    println(sorted.mkString(","))
+
     fill(
-      costWeightTuples.sortBy { case (c, w) => -c.toDouble / w },
+      sorted,
       availableWeight,
       ListBuffer()
     )

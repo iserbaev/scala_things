@@ -6,7 +6,7 @@ object MapperUrl {
   def processLine(): Unit = {
     val line = scala.io.StdIn.readLine()
     if (line == null || line.isEmpty) return ()
-    val Array(_,_,url) = line.split("\t")
+    val Array(_, _, url) = line.split("\t")
 
     println(url)
 

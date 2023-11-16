@@ -10,7 +10,7 @@ object Mapper2 {
 
     val Array(_, group) = line.split(",")
 
-    processLine(m :+ ((group,1)))
+    processLine(m :+ ((group, 1)))
   }
 
   def main(args: Array[String]): Unit = {
