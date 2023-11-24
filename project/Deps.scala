@@ -137,7 +137,7 @@ object Deps {
 
   val spark = Seq(
     "org.apache.spark" %% "spark-core" % Versions.spark,
-    "org.apache.spark" %% "spark-sql" % Versions.spark % "provided"
+    "org.apache.spark" %% "spark-sql" % Versions.spark
   )
 
   lazy val algsProjectDeps: Seq[ModuleID] =
