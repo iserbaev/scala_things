@@ -49,7 +49,7 @@ object Statement_7 {
 
       sizes.zipWithIndex.foldLeft(builder) { case (acc, (size, index)) =>
         acc += index + 1 -> RealTable(index + 1, size)
-      }
+      }: Unit
 
       val mapper = builder.result()
 

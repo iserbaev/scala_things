@@ -28,7 +28,7 @@ object StackBalanced {
               || (ch._1 == '}' && st.top._1 == '{')
           ) =>
         if (acc.isEmpty) {
-          st.pop()
+          st.pop(): Unit
           if (st.isEmpty) {
             "Success"
           } else {
@@ -36,7 +36,7 @@ object StackBalanced {
           }
 
         } else {
-          st.pop()
+          st.pop(): Unit
           recur(acc.head, acc.tail, st)
         }
       case _ =>
@@ -86,7 +86,7 @@ object Test extends App {
     "(slkj, {lk[lve]} ,l)" -> "Success",
     "(slkj{lk[lsj]}"       -> "1",
     "dasdsadsadas]]]"      -> "13"
-  ).map { case (k, v) =>
+  ).foreach { case (k, v) =>
     test(k, v)
   }
 }

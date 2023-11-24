@@ -22,7 +22,7 @@ case class MaxWindow(windowSize: Int) {
           output.topMaxOption.getOrElse(Int.MinValue)
         )
       )
-      output.popSafely
+      output.popSafely: Unit
     }
 
     this

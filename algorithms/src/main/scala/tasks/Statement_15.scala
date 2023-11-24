@@ -35,7 +35,7 @@ object Main15 {
       br.readLine()
     }.toIndexedSeq
 
-    process(rows)
+    process(rows): Unit
 
     br.close()
   }

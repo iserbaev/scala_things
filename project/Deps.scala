@@ -2,30 +2,31 @@ import sbt._
 
 object Deps {
   object Versions {
-    val Scala       = "2.13.10"
-    val cats        = "2.9.0"
-    val catsEffect  = "3.4.8"
+    val Scala       = "2.13.12"
+    val cats        = "2.10.0"
+    val catsEffect  = "3.5.2"
     val catsTagless = "0.14.0"
     val shapeless   = "2.3.10"
 
     // Compiler Plugins
-    val BetterMonadicFor        = "0.3.1"
-    val KindProjector           = "0.13.2"
-    val SemanticDB              = "4.7.6"
-    val ScalafixOrganizeImports = "0.6.0"
-    val ScalafixTypelevel       = "0.1.5"
+    val BetterMonadicFor = "0.3.1"
+    val KindProjector = "0.13.2"
+    val SemanticDB = "4.8.12"
+    val ScalafixTypelevel = "0.2.0"
 
     val scalaLogging = "3.9.2"
     val logback      = "1.4.5"
 
-    val fs2 = "3.6.1"
+    val fs2 = "3.9.2"
 
-    val circe         = "0.14.5"
+    val circe         = "0.14.6"
     val http4sVersion = "0.23.18"
 
-    val doobieVersion = "1.0.0-RC2"
+    val doobieVersion = "1.0.0-RC4"
 
     val fs2_kafka = "3.0.1"
+
+    val spark ="3.5.0"
 
     val spire  = "0.18.0"
     val breeze = "2.1.0"
@@ -122,23 +123,26 @@ object Deps {
   val sbtKindProjector    = "org.typelevel" % "kind-projector"     % Versions.KindProjector
   val sbtSemanticDB       = "org.scalameta" % "semanticdb-scalac"  % Versions.SemanticDB
 
-  val sbtScalafixOrganizeImports = Seq(
-    "com.github.liancheng" %% "organize-imports" % Versions.ScalafixOrganizeImports,
-  )
   val sbtScalafixTypelevel = Seq(
     "org.typelevel" %% "typelevel-scalafix-cats"        % Versions.ScalafixTypelevel,
     "org.typelevel" %% "typelevel-scalafix-cats-effect" % Versions.ScalafixTypelevel,
     "org.typelevel" %% "typelevel-scalafix-fs2"         % Versions.ScalafixTypelevel
   )
 
-  val sbtScalafix = Def.setting(
-    sbtScalafixOrganizeImports ++ sbtScalafixTypelevel
-  )
+  val sbtScalafix = Def.setting(sbtScalafixTypelevel)
 
   val breeze = Seq(
     "org.scalanlp" %% "breeze" % Versions.breeze
   )
 
+  val spark = Seq(
+    "org.apache.spark" %% "spark-core" % Versions.spark,
+    "org.apache.spark" %% "spark-sql" % Versions.spark % "provided"
+  )
+
   lazy val algsProjectDeps: Seq[ModuleID] =
     breeze ++ logging ++ testDeps ++ cats ++ catsEffect ++ catsTagless ++ conf ++ fs2 ++ shapeless ++ spire ++ lens ++ weaver
+
+  lazy val sparkStepikProjectDeps: Seq[ModuleID] =
+    spark ++ logging ++ testDeps ++ cats ++ catsEffect ++ catsTagless ++ conf ++ fs2 ++ weaver
 }

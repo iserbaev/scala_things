@@ -72,7 +72,7 @@ object ReliableService extends App {
               case Success(value) => Success(value)
             }
         case Success(value) =>
-          cache.put(k, value)
+          cache.put(k, value): Unit
           Future.successful(value -> true)
       }
     }).flatten

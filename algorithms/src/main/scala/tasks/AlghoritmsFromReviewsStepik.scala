@@ -6,7 +6,7 @@ object MaxPairwise {
     val br: java.io.BufferedReader = new java.io.BufferedReader(
       new java.io.InputStreamReader(System.in)
     )
-    br.readLine().toInt
+    br.readLine().toInt: Unit
     br.readLine().split(" ").map(_.toLong).toList match {
       case List()     => println(0)
       case List(a)    => println(a)
@@ -125,7 +125,7 @@ object FibonacciModulo {
       current = (temp + current) % modulo
       if (prev == 0L && current == 1L) result = idx + 1
       prev == 0L && current == 1L
-    }
+    }: Unit
 
     result
   }

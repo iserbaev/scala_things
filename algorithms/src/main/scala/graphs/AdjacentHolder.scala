@@ -41,7 +41,7 @@ object AdjacentHolder {
       val in  = Array.fill(size)(0)
       val out = Array.fill(size)(0)
 
-      for {
+      (for {
         i <- vertices
         j <- vertices
       } yield {
@@ -49,7 +49,7 @@ object AdjacentHolder {
           out.update(i, 1)
           in.update(j, 1)
         }
-      }
+      }): Unit
 
       (in, out)
     }

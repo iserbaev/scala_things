@@ -97,8 +97,8 @@ object BinarySearchTree {
       case BNil =>
         acc
       case n @ Node(_, left, right, _) =>
-        inOrderTraversal(left, acc)
-        acc.append(n.k)
+        inOrderTraversal(left, acc): Unit
+        acc.append(n.k): Unit
         inOrderTraversal(right, acc)
     }
 

@@ -30,7 +30,7 @@ object CarFuel {
 
     val distance = br.readLine().toInt
     val capacity = br.readLine().toInt
-    br.readLine().toInt
+    br.readLine().toInt: Unit
     val stops = br.readLine().split(" ").map(_.toInt) :+ distance
 
     if (capacity >= distance) println(0)
@@ -63,7 +63,7 @@ object MaximumAdvertisementRevenue {
       new java.io.InputStreamReader(System.in)
     )
 
-    br.readLine().toInt
+    br.readLine().toInt: Unit
     val prices = br.readLine().split(" ").map(_.toInt).sorted(Ordering.Int.reverse)
     val clicks = br.readLine().split(" ").map(_.toInt).sorted(Ordering.Int.reverse)
 
@@ -118,7 +118,7 @@ object LargestConcatenate {
       new java.io.InputStreamReader(System.in)
     )
 
-    br.readLine().toInt
+    br.readLine().toInt: Unit
     val numbers = br.readLine().split(" ").map(_.toInt).toArray
 
     val ordering = Ordering.fromLessThan[Int] { (l, r) =>

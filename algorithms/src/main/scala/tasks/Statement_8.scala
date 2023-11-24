@@ -83,7 +83,7 @@ object Test8 extends App {
       (5, 3)
     ),
     Seq(2, 2, 3, 5, 5)
-  )
+  ): Unit
 
   test(
     Seq(0, 6, 5, 3, 7),
@@ -93,7 +93,7 @@ object Test8 extends App {
       (3, 2)
     ),
     Seq(13, 18, 21)
-  )
+  ): Unit
 
   test(
     Seq(0, 2, 11, 5, 1, 7, 3),
@@ -106,7 +106,7 @@ object Test8 extends App {
       (3, 1)
     ),
     Seq(11, 13, 13, 13, 16, 29)
-  )
+  ): Unit
 
   performanceTest(10000, 1000, 10)
   performanceTest(100000, 10000, 100)

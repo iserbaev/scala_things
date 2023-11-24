@@ -14,7 +14,7 @@ case class Heap[A: ClassTag](maxSize: Int)(implicit val ord: Ordering[A]) {
   def siftUp(a: Array[A], i: Int): Unit = {
     var ii = i
     while (ii > 1 && a.fromIndex(parent(ii)) < a.fromIndex(ii)) {
-      swapHeap(a, parent(ii), ii)
+      swapHeap(a, parent(ii), ii): Unit
       ii = parent(ii)
     }
   }
@@ -43,7 +43,7 @@ case class Heap[A: ClassTag](maxSize: Int)(implicit val ord: Ordering[A]) {
     }
 
     if (largest != i) {
-      siftDown(swapHeap(a, i, largest), largest)
+      siftDown(swapHeap(a, i, largest), largest): Unit
     }
     a
   }
@@ -79,7 +79,7 @@ object Heap {
   }
   def build[A: ClassTag](a: Array[A])(implicit ord: Ordering[A]): Heap[A] = {
     val h = new Heap[A](a.length + 1)
-    h.buildMaxHeap(a)
+    h.buildMaxHeap(a): Unit
     h
   }
   def min(a: Array[Int]): Heap[Int] =

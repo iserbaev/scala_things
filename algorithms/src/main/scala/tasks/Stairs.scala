@@ -17,7 +17,7 @@ object Stairs {
   }
 
   def main(args: Array[String]): Unit = {
-    scala.io.StdIn.readLine().toInt
+    scala.io.StdIn.readLine().toInt: Unit
     val s2 = scala.io.StdIn.readLine().split(" ").map(_.toInt)
 
     println(stairs(s2))

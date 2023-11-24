@@ -6,10 +6,10 @@ object BinarySearch {
       new java.io.InputStreamReader(System.in)
     )
 
-    br.readLine().toInt // n
+    br.readLine().toInt: Unit // n
     val k = br.readLine().split(" ").map(_.toLong).zipWithIndex.toMap
 
-    br.readLine().toInt // m
+    br.readLine().toInt: Unit // m
     val q = br.readLine().split(" ").map(_.toLong)
 
     val res = q.map(l => k.getOrElse(l, -1))
@@ -25,7 +25,7 @@ object BinarySearchWithDuplicates {
       new java.io.InputStreamReader(System.in)
     )
 
-    br.readLine().toInt // n
+    br.readLine().toInt: Unit // n
     val k = br
       .readLine()
       .split(" ")
@@ -34,7 +34,7 @@ object BinarySearchWithDuplicates {
       }
       ._1
 
-    br.readLine().toInt // m
+    br.readLine().toInt: Unit // m
     val q = br.readLine().split(" ").map(_.toInt)
     br.close()
 

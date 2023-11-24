@@ -19,7 +19,7 @@ sealed trait AVLTree[+A] extends Iterable[A] with Serializable {
     val i = iterator
     while (i.hasNext) {
       val elem = i.next()
-      f(elem)
+      f(elem): Unit
     }
   }
 
@@ -232,11 +232,11 @@ object AVLTree {
     private def engageRight(): Unit =
       if (Leaf != stack.head.right) {
         val right: Node[A] = stack.head.right.asInstanceOf[Node[A]]
-        stack.pop()
-        stack.push(right)
+        stack.pop(): Unit
+        stack.push(right): Unit
         diveLeft()
       } else {
-        stack.pop()
+        stack.pop(): Unit
         ()
       }
 
@@ -281,8 +281,8 @@ object AVLTree {
       case Leaf =>
         acc
       case n @ Node(_, left, right) =>
-        inOrderTraversal(left, acc)
-        acc.append(n.data)
+        inOrderTraversal(left, acc): Unit
+        acc.append(n.data): Unit
         inOrderTraversal(right, acc)
     }
 

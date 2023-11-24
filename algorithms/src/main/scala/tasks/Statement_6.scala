@@ -30,7 +30,7 @@ object Statement_6 {
   case class Pool(size: Int) {
     private val builder =
       mutable.PriorityQueue.newBuilder[Processor](Processor.minDurationOrdering)
-    (0 until size).map(i => builder += Processor(i, 0, 0))
+    (0 until size).foreach(i => builder += Processor(i, 0, 0))
 
     private val processors = builder.result()
 

@@ -50,8 +50,8 @@ object Main12 {
 
         val newHash = recalcHash(oldHash, window(0), c)
 
-        window.remove(0)
-        window.append(c)
+        window.remove(0): Unit
+        window.append(c): Unit
 
         (window, headIndex + 1, newHash)
 

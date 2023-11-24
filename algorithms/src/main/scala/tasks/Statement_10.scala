@@ -64,7 +64,7 @@ object Main10 {
 
     val cmds = (1 to n).flatMap(_ => Option(br.readLine()))
 
-    process(cmds)
+    process(cmds): Unit
 
     br.close()
   }
@@ -114,11 +114,11 @@ object Test10 extends App {
     "find 1"
   )
 
-  Main10.process(cmds)
+  Main10.process(cmds): Unit
 
   println("------------")
-  Main10.process(cmds2)
+  Main10.process(cmds2): Unit
   println("------------")
-  Main10.process(cmds3)
+  Main10.process(cmds3): Unit
   println("------------")
 }

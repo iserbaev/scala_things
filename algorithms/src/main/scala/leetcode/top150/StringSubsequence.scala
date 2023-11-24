@@ -19,6 +19,6 @@ object StringSubsequence extends App {
       res
     })
 
-  isSubsequence("acb", "ahbgdc")
-  isSubsequence("abc", "ahbgdc")
+  isSubsequence("acb", "ahbgdc"): Unit
+  isSubsequence("abc", "ahbgdc"): Unit
 }
