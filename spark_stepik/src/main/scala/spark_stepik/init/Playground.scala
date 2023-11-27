@@ -1,4 +1,4 @@
-package init
+package spark_stepik.init
 
 import org.apache.spark.sql.SparkSession
 
