@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<configuration scan="true">
+    <appender name="stderr" class="ch.qos.logback.core.ConsoleAppender">
+        <target>System.err</target>
+        <encoder>
+            <pattern>%-5level [%thread] %date{ISO8601} %file:%line %message%n</pattern>
+        </encoder>
+    </appender>
+
+    <appender name="stderr_async" class="ch.qos.logback.classic.AsyncAppender">
+        <appender-ref ref="stderr"/>
+    </appender>
+
+    <root level="info">
+        <appender-ref ref="stderr_async"/>
+    </root>
+</configuration>
