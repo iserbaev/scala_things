@@ -5,7 +5,7 @@ import org.apache.spark.sql.types._
 import spark_stepik.SparkCxt
 
 object DF2 extends App with SparkCxt {
-  override val appName: String = "DF1"
+  override val appName: String = "DF2"
 
   val moviesSchema = StructType(
     Seq(
