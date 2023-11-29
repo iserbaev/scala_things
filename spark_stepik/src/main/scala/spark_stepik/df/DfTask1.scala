@@ -5,8 +5,8 @@ import org.apache.spark.sql.functions._
 import org.apache.spark.sql.types._
 import spark_stepik.SparkCxt
 
-object DfTasks extends App with SparkCxt {
-  override val appName: String = "DfTasks"
+object DfTask1 extends App with SparkCxt {
+  override val appName: String = "DfTask1"
 
   def withProperAge(df: DataFrame): DataFrame =
     df.withColumn("Age", col("Age").plus(2))
