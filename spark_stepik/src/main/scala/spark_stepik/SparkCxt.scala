@@ -5,7 +5,7 @@ import org.apache.spark.sql.SparkSession
 
 trait SparkCxt {
 
-  val appName: String
+  def appName: String = this.getClass.getSimpleName
 
   lazy val spark: SparkSession = createSession(appName)
   lazy val sc: SparkContext    = spark.sparkContext
