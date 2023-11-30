@@ -1,8 +1,9 @@
 package spark_stepik.ds
 
-import org.apache.spark.sql.DataFrame
 import org.apache.spark.sql.functions._
+import org.apache.spark.sql.{ Column, DataFrame }
 import spark_stepik.SparkCxt
+
 object AthleticShoesDS extends App with SparkCxt {
   case class Shoes(
       item_category: String,
@@ -20,20 +21,23 @@ object AthleticShoesDS extends App with SparkCxt {
     .option("inferSchema", "true")
     .csv("spark_stepik/src/main/resources/2_ds_files/athletic_shoes.csv")
 
-  val processedDF = athleticShoesDF.na
-    .drop(Seq("item_name", "item_category"))
-    .select(
-      col("item_category"),
-      col("item_name"),
-      coalesce(col("item_after_discount"), col("item_price")).as("item_after_discount"),
-      col("item_price"),
-      coalesce(col("percentage_solds"), lit(-1)).as("percentage_solds"),
-      coalesce(col("item_rating"), lit(0)).as("item_rating"),
-      col("item_shipping"),
-      coalesce(col("buyer_gender"), lit("unknown")).as("buyer_gender"),
+  def replaceNull(columnName: String, column: Column): Column =
+    coalesce(col(columnName), column).as(columnName)
+
+  def extractColumns(df: DataFrame): DataFrame =
+    df.select(
+      replaceNull("item_category", lit("n/a")),
+      replaceNull("item_name", lit("n/a")),
+      replaceNull("item_after_discount", col("item_price")),
+      replaceNull("item_rating", lit(0)),
+      replaceNull("percentage_solds", lit(-1)),
+      replaceNull("buyer_gender", lit("unknown")),
+      replaceNull("item_price", lit("n/a")),
+      replaceNull("item_shipping", lit("n/a"))
     )
-    .na
-    .fill("n/a")
+
+  val processedDF = athleticShoesDF
+    .transform(extractColumns)
 
   import spark.implicits._
   val ds = processedDF.as[Shoes]
