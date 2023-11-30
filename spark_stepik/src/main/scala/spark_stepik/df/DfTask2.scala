@@ -1,6 +1,6 @@
 package spark_stepik.df
 
-import org.apache.spark.sql.{DataFrame, SaveMode}
+import org.apache.spark.sql.{ DataFrame, SaveMode }
 import org.apache.spark.sql.functions._
 import spark_stepik.SparkCxt
 
