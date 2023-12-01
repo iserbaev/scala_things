@@ -13,48 +13,47 @@ object EmployeeDS extends App with SparkCxt {
 
   employeeDF
     .select("*")
-    .where(
-      col("birthday").isNull)
+    .where(col("birthday").isNull)
     .show()
 
   employeeDF
     .select("*")
-    .orderBy(
-      col("date_of_birth").desc_nulls_first)
+    .orderBy(col("date_of_birth").desc_nulls_first)
     .show()
 
-  employeeDF
-    .na.drop()
+  employeeDF.na
+    .drop()
     .show()
 
-  employeeDF
-    .na
+  employeeDF.na
     .fill("n/a", List("birthday", "date_of_birth"))
     .show()
 
-  employeeDF.na.fill(Map(
-    "birthday" -> "n/a",
-    "date_of_birth" -> "Unknown",
-  )).show()
-
-  employeeDF
-    .select(
-      col("name"),
-      coalesce(col("birthday"), col("date_of_birth")))
+  employeeDF.na
+    .fill(
+      Map(
+        "birthday"      -> "n/a",
+        "date_of_birth" -> "Unknown",
+      )
+    )
     .show()
 
   employeeDF
-    .select(
-      col("name"),
-      coalesce(col("birthday"), col("date_of_birth"), lit("n/a")))
+    .select(col("name"), coalesce(col("birthday"), col("date_of_birth")))
     .show()
 
-  employeeDF.selectExpr(
-    "name",
-    "birthday",
-    "date_of_birth",
-    "ifnull(birthday, date_of_birth) as ifnull",
-    "nvl(birthday, date_of_birth) as nvl",
-    "nvl2(birthday, date_of_birth, 'Unknown') as nvl2"
-  ).show()
+  employeeDF
+    .select(col("name"), coalesce(col("birthday"), col("date_of_birth"), lit("n/a")))
+    .show()
+
+  employeeDF
+    .selectExpr(
+      "name",
+      "birthday",
+      "date_of_birth",
+      "ifnull(birthday, date_of_birth) as ifnull",
+      "nvl(birthday, date_of_birth) as nvl",
+      "nvl2(birthday, date_of_birth, 'Unknown') as nvl2"
+    )
+    .show()
 }
