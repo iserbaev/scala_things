@@ -35,7 +35,8 @@ lazy val sparkStepik = project
     version      := "0.1",
     name := "spark_stepik",
     libraryDependencies ++= sparkStepikProjectDeps,
-    testFrameworks += new TestFramework("weaver.framework.CatsEffect")
+    testFrameworks += new TestFramework("weaver.framework.CatsEffect"),
+    idePackagePrefix := Some("spark_stepik.cluster")
   )
 
 lazy val root = (project in file("."))
