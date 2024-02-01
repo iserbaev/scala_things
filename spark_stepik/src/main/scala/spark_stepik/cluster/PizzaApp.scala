@@ -1,7 +1,9 @@
 package spark_stepik.cluster
 
-import org.apache.log4j.{Level, Logger}
-import org.apache.spark.sql.{SaveMode, SparkSession}
+import org.apache.log4j.{ Level, Logger }
+import org.apache.spark.sql.expressions.Window
+import org.apache.spark.sql.functions._
+import org.apache.spark.sql.{ DataFrame, SaveMode, SparkSession }
 
 //spark_stepik/src/main/resources/5/pizza_orders.csv
 //data/pizza
@@ -15,26 +17,42 @@ object PizzaApp {
       System.exit(1)
     }
 
-    val csvPath = args(0)
+    val csvPath     = args(0)
     val pathToWrite = args(1)
 
-    val spark = SparkSession.builder()
+    val spark = SparkSession
+      .builder()
       .appName("Pizza App")
       .getOrCreate()
-
 
     val pizzaDF = spark.read
       .option("inferSchema", "true")
       .option("header", "true")
       .csv(csvPath)
 
-    pizzaDF.printSchema()
+    val totalOrdersByTypeDF: DataFrame = pizzaDF.groupBy("order_type").agg(count("order_id").as("orders_total"))
 
-    pizzaDF.show()
+    val ordersGroupDF: DataFrame = pizzaDF
+      .withColumn("orders_cnt", count("*").over(Window.partitionBy("order_type", "address_id")))
+      .select(
+        col("order_type").as("otp"),
+        col("address_id"),
+        col("orders_cnt"),
+        row_number().over(Window.partitionBy("order_type").orderBy(col("orders_cnt").desc)).as("rnb")
+      )
+      .filter(col("rnb") === 1)
 
-    pizzaDF.write
+    val joinedDF = ordersGroupDF
+      .join(totalOrdersByTypeDF, ordersGroupDF.col("otp") === totalOrdersByTypeDF.col("order_type"))
+      .select(
+        col("order_type"),
+        col("address_id"),
+        col("orders_cnt"),
+        col("orders_total"),
+      )
+
+    joinedDF.write
       .mode(SaveMode.Overwrite)
       .save(pathToWrite)
   }
-
 }
