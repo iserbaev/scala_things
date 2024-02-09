@@ -4,7 +4,7 @@ docker-compose up --scale spark-worker=3 -d
 
 ----- submit APP
 docker exec -it spark-cluster_spark-master_1 bash
-./spark/bin/spark-submit --class spark_stepik.cluster.EmployeeApp --deploy-mode client \
+./spark/bin/spark-submit --class spark_stepik.cluster.PizzaApp --deploy-mode client \
                          --master spark://82f1a7c8f21c:7077 --verbose --supervise \
                          /opt/spark-apps/spark_stepik.jar \
                          /opt/spark-data/employee.csv

@@ -1,0 +1,46 @@
+spark.conf.set("spark.sql.autoBroadcastJoinThreshold", -1)
+
+import org.apache.spark.sql.functions._
+import org.apache.spark.sql.{ DataFrame, SaveMode, SparkSession }
+import org.apache.spark.sql.types._
+
+def addColumn(df: DataFrame, n: Int): DataFrame = {
+    val columns = (1 to n).map(col => s"col_$col")
+    columns.foldLeft(df)((df, column) => df.withColumn(column, lit("n/a")))
+  }
+
+val data1 = (1 to 500000).map(i => (i, i * 100))
+val data2 = (1 to 10000).map(i => (i, i * 1000))
+
+import spark.implicits._
+
+val df1 = data1.toDF("id","salary").repartition(5)
+val df2 = data2.toDF("id","salary").repartition(10)
+
+
+// Способ 2 - заново разделим данные, но на этот раз разделять будем по id; затем объединим данные и добавим колонки:
+
+  val repartitionedById1 = df1.repartition(col("id"))
+  val repartitionedById2 = df2.repartition(col("id"))
+
+  val joinedDF2 = spark.time(repartitionedById2.join(repartitionedById1, "id"))
+  val dfWithColumns2 = addColumn(joinedDF2, 10)
+  dfWithColumns2.explain()
+
+
+// Способ 2 с трансформациями:
+val repartitionedById11 = df1.repartition(col("id"))
+val repartitionedById22 = df2.repartition(col("id"))
+
+def withSalaryInEuro(df: DataFrame): DataFrame = {
+  val inEuros = col("Salary").cast(IntegerType) / lit(100)
+  df.withColumn("salary_eur", inEuros)
+}
+
+def withSalary1 = repartitionedById11.transform(withSalaryInEuro)
+def withSalary2 = repartitionedById22.transform(withSalaryInEuro).orderBy("salary_eur")
+
+val joinedWithEurSalaryDF2 = spark.time(withSalary1.join(withSalary2, "id"))
+val dfWithEurSalaryWithColumn2 = addColumn(joinedWithEurSalaryDF2, 10)
+
+dfWithEurSalaryWithColumn2.explain()
