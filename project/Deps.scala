@@ -26,7 +26,7 @@ object Deps {
 
     val fs2_kafka = "3.0.1"
 
-    val spark ="3.5.0"
+    val spark ="3.2.1"
 
     val spire  = "0.18.0"
     val breeze = "2.1.0"

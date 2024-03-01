@@ -1,0 +1,77 @@
+spark.conf.set("spark.sql.autoBroadcastJoinThreshold", -1)
+
+import org.apache.spark.sql.functions._
+import org.apache.spark.sql.{ Column, DataFrame, SparkSession }
+import org.apache.spark.sql.types._
+
+import spark.implicits._
+
+val freelancersCsvPath = "/opt/spark-data/freelancers.csv"
+val offersCsvPath      = "/opt/spark-data/offers.csv"
+
+val freelancersDF = spark.read.option("inferSchema", "true").option("header", "true").csv(freelancersCsvPath)
+
+val offersDF = spark.read.option("inferSchema", "true").option("header", "true").csv(offersCsvPath)
+
+    def avgPriceTransform(left: DataFrame, right: DataFrame)(df: DataFrame) = {
+      df.filter(abs(left.col("experienceLevel") - right.col("experienceLevel")) <= 1)
+        .groupBy("id")
+        .agg(avg("price").as("avgPrice"))
+    }
+
+    def saltedJoin(
+        df: DataFrame,
+        buildDf: DataFrame,
+        joinExpression: Column,
+        joinType: String,
+        salt: Int
+    ): DataFrame = {
+      import org.apache.spark.sql.functions._
+      val tmpDf = buildDf.withColumn("slt_range", array(Range(0, salt).toList.map(lit): _*))
+
+      val tableDf  = tmpDf.withColumn("slt_ratio_s", explode(tmpDf("slt_range"))).drop("slt_range")
+      val streamDf = df.withColumn("slt_ratio", monotonically_increasing_id() % salt)
+
+      val saltedExpr = streamDf("slt_ratio") === tableDf("slt_ratio_s") && joinExpression
+
+      streamDf.join(tableDf, saltedExpr, joinType).drop("slt_ratio_s").drop("slt_ratio")
+    }
+
+    def avgNaiveDF: DataFrame = freelancersDF.join(offersDF, Seq("category", "city"))
+
+    def broadcastJoinDF: DataFrame =
+      freelancersDF.join(broadcast(offersDF), Seq("category", "city"))
+
+    def broadcastJoinDF2: DataFrame =
+      offersDF.join(broadcast(freelancersDF), Seq("category", "city"))
+
+    def saltedJoinDF: DataFrame = saltedJoin(
+      offersDF,
+      freelancersDF,
+      freelancersDF("category") === offersDF("category") && freelancersDF("city") === offersDF("city"),
+      "inner",
+      200
+    )
+
+
+
+
+
+
+
+val naiveAvgPrice = spark.time(avgNaiveDF).transform(avgPriceTransform(freelancersDF, offersDF))
+naiveAvgPrice.explain
+naiveAvgPrice.count
+
+val broadcastAvgPrice = spark.time(broadcastJoinDF).transform(avgPriceTransform(freelancersDF, offersDF))
+broadcastAvgPrice.explain
+broadcastAvgPrice.count
+
+val broadcastAvgPrice2 = spark.time(broadcastJoinDF2).transform(avgPriceTransform(freelancersDF, offersDF))
+broadcastAvgPrice2.explain
+broadcastAvgPrice2.count
+
+val saltedAvgPrice = spark.time(saltedJoinDF).transform(avgPriceTransform(freelancersDF, offersDF))
+saltedAvgPrice.explain
+saltedAvgPrice.count
+

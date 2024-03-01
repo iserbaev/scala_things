@@ -12,7 +12,6 @@ lazy val commonSettings = Seq(
 
 inThisBuild(
   Seq(
-    scalaVersion := Deps.Versions.Scala,
     addCompilerPlugin(Deps.sbtBetterMonadicFor),
     addCompilerPlugin(Deps.sbtKindProjector.cross(CrossVersion.full)),
     testFrameworks += new TestFramework("weaver.framework.CatsEffect"),
@@ -23,6 +22,7 @@ inThisBuild(
 lazy val algorithms = project
   .in(file("algorithms"))
   .settings(
+    scalaVersion := Deps.Versions.Scala,
     version      := "0.1",
     name := "algorithms",
     libraryDependencies ++= algsProjectDeps,
@@ -32,6 +32,7 @@ lazy val algorithms = project
 lazy val sparkStepik = project
   .in(file("spark_stepik"))
   .settings(
+    scalaVersion := "2.12.15",
     version      := "0.1",
     name := "spark_stepik",
     libraryDependencies ++= sparkStepikProjectDeps,
