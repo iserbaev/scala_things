@@ -15,7 +15,7 @@ object Deps {
     val ScalafixTypelevel = "0.2.0"
 
     val scalaLogging = "3.9.2"
-    val logback      = "1.4.5"
+    val logback      = "1.4.11"
 
     val fs2 = "3.9.2"
 
@@ -26,7 +26,7 @@ object Deps {
 
     val fs2_kafka = "3.0.1"
 
-    val spark ="3.2.1"
+    val spark ="3.5.0"
 
     val spire  = "0.18.0"
     val breeze = "2.1.0"
@@ -137,7 +137,8 @@ object Deps {
 
   val spark = Seq(
     "org.apache.spark" %% "spark-core" % Versions.spark,
-    "org.apache.spark" %% "spark-sql" % Versions.spark
+    "org.apache.spark" %% "spark-sql" % Versions.spark,
+    "org.apache.spark" %% "spark-streaming" % Versions.spark,
   )
 
   lazy val algsProjectDeps: Seq[ModuleID] =
