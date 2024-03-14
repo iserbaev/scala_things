@@ -47,8 +47,7 @@ lazy val sparkStreaming = project
     version      := "0.1",
     name         := "spark_streaming",
     libraryDependencies ++= sparkStepikProjectDeps,
-    testFrameworks += new TestFramework("weaver.framework.CatsEffect"),
-    idePackagePrefix := Some("spark_streaming.cluster")
+    testFrameworks += new TestFramework("weaver.framework.CatsEffect")
   )
 
 lazy val root = (project in file("."))
