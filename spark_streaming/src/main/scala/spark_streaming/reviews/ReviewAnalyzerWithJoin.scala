@@ -59,17 +59,17 @@ object ReviewAnalyzerWithJoin extends App {
       .schema(schema)
       .csv(directory)
 
-  val reviewsStreamDf = readStream("spark_streaming/src/main/resources/employee_reviews", emplRreviewsSchema)
+  val employeeReviewsStreamDf = readStream("spark_streaming/src/main/resources/employee_reviews", emplRreviewsSchema)
 
   val departmentsStreamDf = readStream("spark_streaming/src/main/resources/departments", departmentSchema)
 
   // Когда дело касается потокового датафрейма, то код для join будет тот же самый.
   // Причем заметьте, что объединять можно как потоковый датафрейм с обычным, так и потоковый датафрейм с потоковым:
 
-  val joinedStreamDf1 = reviewsStreamDf
+  val joinedStreamDf1 = employeeReviewsStreamDf
     .join(
       departmentsDf, // объединяем с обычным датафреймом
-      reviewsStreamDf.col("Department") === departmentsDf.col("dept_code")
+      employeeReviewsStreamDf.col("Department") === departmentsDf.col("dept_code")
     )
     .select("Title", "Department", "dept_name")
 
@@ -119,10 +119,10 @@ object ReviewAnalyzerWithJoin extends App {
 
   // Когда же идет объединение двух потоковых датафреймов, то для получения результатов доступен только outputMode("append"):
 
-  val joinedTwoStreamDf3 = reviewsStreamDf
+  val joinedTwoStreamDf3 = employeeReviewsStreamDf
     .join(
       departmentsStreamDf,
-      reviewsStreamDf.col("Department") === departmentsStreamDf.col("dept_code"))
+      employeeReviewsStreamDf.col("Department") === departmentsStreamDf.col("dept_code"))
     .select("Title", "Department", "dept_name")
 
   val joinTwoStreamsQuery = joinedTwoStreamDf3
