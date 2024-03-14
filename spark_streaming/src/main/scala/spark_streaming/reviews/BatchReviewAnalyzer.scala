@@ -16,7 +16,7 @@ object BatchReviewAnalyzer extends App {
   val reviewsDf = spark.read
     .option("header", true)
     .option("inferSchema", true)
-    .csv("src/main/resources/reviews/reviews.csv")
+    .csv("spark_streaming/src/main/resources/reviews/reviews.csv")
 
 
   val lowRatingDf = reviewsDf

@@ -25,7 +25,7 @@ object StreamReviewAnalyzerAvgRatingOutputModeComplete extends App {
     .readStream
     .option("header", "true")
     .schema(schema)
-    .csv("src/main/resources/reviews")
+    .csv("spark_streaming/src/main/resources/reviews")
 
 
   val ratingByDayStreamDf = reviewsStreamDf

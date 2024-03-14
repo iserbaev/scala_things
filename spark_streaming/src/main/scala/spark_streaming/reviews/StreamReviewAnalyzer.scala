@@ -26,7 +26,7 @@ object StreamReviewAnalyzer extends App {
   val reviewsStreamDf: DataFrame = spark.readStream
     .option("header", "true")
     .schema(schema)
-    .csv("src/main/resources/reviews")
+    .csv("spark_streaming/src/main/resources/reviews")
 
   val lowRatingStreamDf = reviewsStreamDf
     .filter(col("rating") < 8)
