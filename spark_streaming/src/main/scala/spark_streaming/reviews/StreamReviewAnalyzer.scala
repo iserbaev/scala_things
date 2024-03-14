@@ -1,8 +1,8 @@
-package spark_streaming
+package spark_streaming.reviews
 
 import org.apache.spark.sql.functions._
 import org.apache.spark.sql.types._
-import org.apache.spark.sql.{ DataFrame, SparkSession }
+import org.apache.spark.sql.{DataFrame, SparkSession}
 
 object StreamReviewAnalyzer extends App {
 
