@@ -1,8 +1,9 @@
 package spark_streaming.reviews
 
 import org.apache.spark.sql.functions._
+import org.apache.spark.sql.streaming.Trigger
 import org.apache.spark.sql.types.StructType
-import org.apache.spark.sql.{ DataFrame, SparkSession }
+import org.apache.spark.sql.{DataFrame, SparkSession}
 
 object ReviewAnalyzerWithJoin extends App {
 
@@ -75,6 +76,7 @@ object ReviewAnalyzerWithJoin extends App {
   val joinQuery1 = joinedStreamDf1.writeStream
     .format("console")
     .outputMode("append")
+    .trigger(Trigger.AvailableNow())
     .start()
 
   joinQuery1.awaitTermination()
@@ -127,6 +129,7 @@ object ReviewAnalyzerWithJoin extends App {
     .writeStream
     .format("console")
     .outputMode("append")
+    .trigger(Trigger.AvailableNow())
     .start()
 
   joinTwoStreamsQuery.awaitTermination()
