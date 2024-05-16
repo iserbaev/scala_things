@@ -2,40 +2,45 @@ import sbt._
 
 object Deps {
   object Versions {
-    val Scala       = "2.13.12"
+    val Scala       = "2.13.14"
     val cats        = "2.10.0"
-    val catsEffect  = "3.5.2"
-    val catsTagless = "0.14.0"
+    val catsEffect  = "3.5.4"
+    val catsTagless = "0.16.0"
     val shapeless   = "2.3.10"
 
     // Compiler Plugins
     val BetterMonadicFor = "0.3.1"
-    val KindProjector = "0.13.2"
+    val KindProjector = "0.13.3"
     val SemanticDB = "4.8.12"
     val ScalafixTypelevel = "0.2.0"
 
     val scalaLogging = "3.9.2"
     val logback      = "1.4.11"
 
-    val fs2 = "3.9.2"
+    val fs2 = "3.10.0"
 
     val circe         = "0.14.6"
     val http4sVersion = "0.23.18"
 
-    val doobieVersion = "1.0.0-RC4"
+    val doobieVersion = "1.0.0-RC5"
 
     val fs2_kafka = "3.0.1"
 
     val spark ="3.5.0"
+    val SttpApispec        = "0.8.0"
+    val SttpClient3        = "3.9.5"
+    val SttpModel          = "1.7.9"
+    val SttpShared         = "1.3.17"
+    val SttpTapir          = "1.10.0"
 
     val spire  = "0.18.0"
     val breeze = "2.1.0"
 
     val scalaTest             = "3.0.8"
-    val testcontainers        = "0.40.14"
+    val testcontainers        = "0.41.3"
     val kafkaTestContainer    = "1.12.3"
     val postgresTestcontainer = "1.12.3"
-    val Weaver                = "0.8.2"
+    val Weaver                = "0.8.4"
 
     val quickLens = "1.9.3"
   }
@@ -139,6 +144,24 @@ object Deps {
     "org.apache.spark" %% "spark-core" % Versions.spark,
     "org.apache.spark" %% "spark-sql" % Versions.spark,
     "org.apache.spark" %% "spark-streaming" % Versions.spark,
+  )
+
+  val tapirCore = Seq(
+    "com.softwaremill.sttp.model" %% "core"             % Versions.SttpModel,
+    "com.softwaremill.sttp.tapir" %% "tapir-core"       % Versions.SttpTapir,
+    "com.softwaremill.sttp.tapir" %% "tapir-json-circe" % Versions.SttpTapir,
+  )
+
+  val tapirMetrics = Seq("com.softwaremill.sttp.tapir" %% "tapir-prometheus-metrics" % Versions.SttpTapir)
+
+  val tapirServer = Seq(
+    "com.softwaremill.sttp.apispec" %% "openapi-model"           % Versions.SttpApispec,
+    "com.softwaremill.sttp.shared"  %% "fs2"                     % Versions.SttpShared,
+    "com.softwaremill.sttp.tapir"   %% "tapir-http4s-server"     % Versions.SttpTapir,
+    "com.softwaremill.sttp.tapir"   %% "tapir-openapi-docs"      % Versions.SttpTapir,
+    "com.softwaremill.sttp.tapir"   %% "tapir-server"            % Versions.SttpTapir,
+    "com.softwaremill.sttp.tapir"   %% "tapir-swagger-ui"        % Versions.SttpTapir,
+    "com.softwaremill.sttp.tapir"   %% "tapir-swagger-ui-bundle" % Versions.SttpTapir,
   )
 
   lazy val algsProjectDeps: Seq[ModuleID] =
