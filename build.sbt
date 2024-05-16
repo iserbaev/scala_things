@@ -50,6 +50,17 @@ lazy val sparkStreaming = project
     testFrameworks += new TestFramework("weaver.framework.CatsEffect")
   )
 
+lazy val shoppingCart = project
+  .in(file("shopping_cart"))
+  .settings(
+    scalaVersion := Deps.Versions.Scala,
+    ThisBuild / libraryDependencySchemes += "io.circe" %% "circe-core" % VersionScheme.Always,
+    version      := "0.1",
+    name         := "shopping_cart",
+    libraryDependencies ++= shoppingCartProjectDeps,
+    testFrameworks += new TestFramework("weaver.framework.CatsEffect")
+  )
+
 lazy val root = (project in file("."))
-  .aggregate(algorithms, sparkStepik, sparkStreaming)
+  .aggregate(algorithms, sparkStepik, sparkStreaming, shoppingCart)
   .settings(name := """scala learn""")

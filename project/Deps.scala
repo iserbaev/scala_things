@@ -18,12 +18,16 @@ object Deps {
     val catsMtl     = "1.2.1"
     val catsTagless = "0.16.0"
 
-    val derevo = "0.12.5"
+    val circe         = "0.14.7"
+
+    val derevo = "0.13.0"
 
     val doobie = "1.0.0-RC5"
 
     val fs2       = "3.10.2"
     val fs2_kafka = "3.0.1"
+
+    val http4sVersion = "0.23.27"
 
     val quickLens = "1.9.3"
 
@@ -33,14 +37,10 @@ object Deps {
 
     val refined = "0.9.25"
 
-    val circe         = "0.14.7"
-    val http4sVersion = "0.23.27"
-
     val shapeless = "2.3.10"
     val spark     = "3.5.0"
 
-    val SttpApispec = "0.8.0"
-    val SttpClient3 = "3.9.5"
+    val SttpApispec = "0.10.0"
     val SttpModel   = "1.7.10"
     val SttpShared  = "1.3.18"
     val SttpTapir   = "1.10.7"
@@ -210,4 +210,7 @@ object Deps {
 
   lazy val sparkStepikProjectDeps: Seq[ModuleID] =
     spark ++ logging ++ testDeps ++ cats ++ catsEffect ++ catsTagless ++ conf ++ fs2 ++ weaver
+
+  lazy val shoppingCartProjectDeps: Seq[ModuleID] =
+    cats ++ catsEffect ++ catsMtl ++ derevo ++ newtype ++ refined ++ tapirCore ++ tapirServer ++ weaver
 }
