@@ -1,4 +1,4 @@
-import model.{Person, UserNameR}
+import common.model.{Person, UserNameR}
 
 object Runner extends App {
 

@@ -1,3 +1,5 @@
+package common
+
 import NewtypeRefinedOps._
 import cats.data.EitherNel
 import cats.syntax.all._

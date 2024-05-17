@@ -1,3 +1,5 @@
+package common
+
 import cats.data.EitherNel
 import cats.syntax.all._
 import eu.timepit.refined.api.{Refined, Validate}
