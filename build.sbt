@@ -55,6 +55,10 @@ lazy val shoppingCart = project
   .settings(
     scalaVersion := Deps.Versions.Scala,
     ThisBuild / libraryDependencySchemes += "io.circe" %% "circe-core" % VersionScheme.Always,
+    scalacOptions
+      ++= Seq(
+      "-Ymacro-annotations", "-Wconf:cat=unused:info"
+    ),
     version      := "0.1",
     name         := "shopping_cart",
     libraryDependencies ++= shoppingCartProjectDeps,
