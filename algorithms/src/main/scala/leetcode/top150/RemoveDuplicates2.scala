@@ -14,7 +14,7 @@ object RemoveDuplicates2 extends App {
           max
         } else i
       }
-      .sortInPlace(): Unit
+      .sortInPlace()
 
     println(nums.mkString(", "))
     println(nums.length - duplicates)
@@ -22,7 +22,7 @@ object RemoveDuplicates2 extends App {
     nums.length - duplicates
   }
 
-  removeDuplicates(Array(1, 1, 1, 2, 2, 3)): Unit
+  removeDuplicates(Array(1, 1, 1, 2, 2, 3))
 
-  removeDuplicates(Array(0, 0, 1, 1, 1, 1, 2, 3, 3)): Unit
+  removeDuplicates(Array(0, 0, 1, 1, 1, 1, 2, 3, 3))
 }

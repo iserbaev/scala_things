@@ -5,7 +5,7 @@ object RotateArray extends App {
     val shift         = k % nums.length
     val (left, right) = nums.splitAt(nums.length - shift)
     val newArr        = right ++ left
-    newArr.copyToArray(nums): Unit
+    newArr.copyToArray(nums)
     ()
   }
 
