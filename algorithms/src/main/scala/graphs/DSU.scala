@@ -42,7 +42,7 @@ object DSU {
     (0 to n).foreach(i => parent.update(i, i))
 
     // Traverse all edges
-    edges.indices.foreach(i => connect(edges(i)(0), edges(i)(1)))
+    edges.indices.foreach(i => connect(edges(i).head, edges(i)(1)))
 
     // Print answer
     connectedComponents(n)

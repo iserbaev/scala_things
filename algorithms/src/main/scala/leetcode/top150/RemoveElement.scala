@@ -11,5 +11,5 @@ object RemoveElement extends App {
     filtered.length
   }
 
-  removeElement(Array(3, 2, 2, 3), 3): Unit
+  removeElement(Array(3, 2, 2, 3), 3)
 }

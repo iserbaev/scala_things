@@ -29,5 +29,5 @@ object MinimumSizeSubarraySum extends App {
     }
 
 //  minSubArrayLen(7, Array(2, 3, 1, 2, 4, 3))
-  minSubArrayLen(15, Array(1, 2, 3, 4, 5)): Unit
+  minSubArrayLen(15, Array(1, 2, 3, 4, 5))
 }
