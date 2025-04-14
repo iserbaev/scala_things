@@ -33,7 +33,7 @@ trait LoggableDynamicArray[T] extends DynamicArray[T] {
   }
 }
 
-class IntDynamicArray(bucket: Int) extends DynamicArray[Int] {
+class IntMutableDynamicArray(bucket: Int) extends DynamicArray[Int] {
   private[this] var array       = newBucket
   private[this] var filledIndex = -1
 
@@ -59,7 +59,7 @@ class IntDynamicArray(bucket: Int) extends DynamicArray[Int] {
 
 object DynamicArrayTestApp {
   def main(args: Array[String]): Unit = {
-    val da = new IntDynamicArray(2) with LoggableDynamicArray[Int] {}
+    val da = new IntMutableDynamicArray(2) with LoggableDynamicArray[Int] {}
 
     val br: BufferedReader = new BufferedReader(
       new InputStreamReader(System.in)

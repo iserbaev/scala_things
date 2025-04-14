@@ -1,6 +1,7 @@
 package tasks
 
 import java.io.{BufferedReader, InputStreamReader}
+import scala.collection.mutable
 
 trait SinglyLinkedList[T] {
   def pushFront(x: T): Unit
@@ -27,31 +28,25 @@ trait LoggableSinglyLinkedList[T] extends SinglyLinkedList[T] {
   }
 }
 
-class IntSinglyLinkedList(bucket: Int) extends SinglyLinkedList[Int] {
-  private[this] var array = newBucket
-  private[this] var filledIndex = -1
-
-  private def newBucket = Array.ofDim[Int](bucket)
+class IntSinglyLinkedList extends SinglyLinkedList[Int] {
+  private[this] var mutableSeq = mutable.ListBuffer.empty[Int]
 
   override def pushFront(x: Int): Unit = {
-    filledIndex = filledIndex + 1
-    if (filledIndex >= array.length) array = array ++ newBucket
-    array.update(filledIndex, x)
+    mutableSeq += x: Unit
   }
 
   override def popFront(): Unit = {
-    array = array.dropRight(1)
-    filledIndex = filledIndex - 1
+    mutableSeq = mutableSeq.dropRight(1)
   }
 
   override def find(x: Int): Boolean = {
-    array.contains(x)
+    mutableSeq.contains(x)
   }
 }
 
 object SinglyLinkedListTestApp {
   def main(args: Array[String]): Unit = {
-    val da = new IntSinglyLinkedList(1) with LoggableSinglyLinkedList[Int] {}
+    val da = new IntSinglyLinkedList with LoggableSinglyLinkedList[Int] {}
 
     val br: BufferedReader = new BufferedReader(
       new InputStreamReader(System.in)
