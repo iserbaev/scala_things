@@ -1,6 +1,6 @@
 package tasks
 
-import java.io.{BufferedReader, InputStreamReader}
+import java.io.{ BufferedReader, InputStreamReader }
 import scala.collection.mutable
 
 trait StepicStack[T] {
@@ -10,18 +10,18 @@ trait StepicStack[T] {
 }
 
 trait LoggableStepicStack[T] extends StepicStack[T] {
-  abstract override def push(x: T): Unit = {
+  override abstract def push(x: T): Unit = {
     super.push(x)
     println("Элемент добавлен")
   }
 
-  abstract override def pop(): T = {
+  override abstract def pop(): T = {
     val result = super.pop()
     println(result)
     result
   }
 
-  abstract override def top(): T = {
+  override abstract def top(): T = {
     val result = super.top()
     println(result)
     result
@@ -31,9 +31,8 @@ trait LoggableStepicStack[T] extends StepicStack[T] {
 class IntStepicStack extends StepicStack[Int] {
   private[this] var mutableSeq = mutable.ListBuffer.empty[Int]
 
-  override def push(x: Int): Unit = {
+  override def push(x: Int): Unit =
     mutableSeq += x: Unit
-  }
 
   override def pop(): Int = {
     val result = mutableSeq.last
@@ -62,9 +61,9 @@ object StepicStackTestApp {
       cmd match {
         case "push" =>
           da.push(value.get.toInt): Unit
-        case "pop"       =>
+        case "pop" =>
           da.pop(): Unit
-        case "top"       =>
+        case "top" =>
           da.top(): Unit
         case _ =>
           throw new IllegalArgumentException(s"Can't parse $cmdLine")
