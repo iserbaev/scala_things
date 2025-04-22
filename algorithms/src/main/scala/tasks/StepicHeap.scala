@@ -1,6 +1,6 @@
 package tasks
 
-import java.io.{BufferedReader, InputStreamReader}
+import java.io.{ BufferedReader, InputStreamReader }
 import scala.collection.mutable
 import scala.collection.mutable.ArrayBuffer
 import scala.math.Ordering.Implicits._
@@ -21,7 +21,7 @@ class StepicHeap[T]()(implicit ord: Ordering[T]) {
     } else idx
   } else idx
 
-  private def swap(idx1: Int, idx2: Int): Unit = {
+  protected def swap(idx1: Int, idx2: Int): Unit = {
     val e1 = heap(idx1)
     val e2 = heap(idx2)
     heap.update(idx1, e2)
@@ -29,8 +29,8 @@ class StepicHeap[T]()(implicit ord: Ordering[T]) {
   }
 
   def heapifyDown(idx: Int): Int = {
-    val left = getLeft(idx)
-    val right = getRight(idx)
+    val left    = getLeft(idx)
+    val right   = getRight(idx)
     var largest = idx
 
     if (left < heap.size && heap(left) > heap(largest)) {
@@ -49,7 +49,7 @@ class StepicHeap[T]()(implicit ord: Ordering[T]) {
   }
 
   def insert(x: T): Int = {
-    heap+=(x)
+    heap += x
     val idx = heap.size - 1
     heapifyUp(idx)
   }
@@ -63,15 +63,13 @@ class StepicHeap[T]()(implicit ord: Ordering[T]) {
     maxVal
   }
 
-  def getMax: T = {
+  def getMax: T =
     heap(0)
-  }
-
 
 }
 
 class StepicHeapWithCmdCounter(implicit ordering: Ordering[Int]) extends StepicHeap[Int] {
-  private var cmdCounter = 0
+  private var cmdCounter      = 0
   private val cmdCounterToIdx = mutable.Map.empty[Int, Int]
 
   override def insert(x: Int): Int = {
@@ -83,16 +81,22 @@ class StepicHeapWithCmdCounter(implicit ordering: Ordering[Int]) extends StepicH
 
   override def extractMax(): Int = {
     cmdCounter += 1
-    cmdCounterToIdx.update(cmdCounter, 0)
-
     super.extractMax()
   }
 
   override def getMax: Int = {
     cmdCounter += 1
-    cmdCounterToIdx.update(cmdCounter, 0)
-
     super.getMax
+  }
+
+  override protected def swap(idx1: Int, idx2: Int): Unit = {
+    super.swap(idx1, idx2)
+    cmdCounterToIdx.find(_._2 == idx1).foreach{ case (_, cmd1) =>
+      cmdCounterToIdx.update(cmd1, idx2)
+    }
+    cmdCounterToIdx.find(_._2 == idx2).foreach{ case (_, cmd2) =>
+      cmdCounterToIdx.update(cmd2, idx1)
+    }
   }
 
   def decreaseKey(cmdCount: Int, decreaseValue: Int): Unit = {
@@ -103,7 +107,7 @@ class StepicHeapWithCmdCounter(implicit ordering: Ordering[Int]) extends StepicH
 }
 
 trait LoggableStepikHeap[T] extends StepicHeap[T] {
-  abstract override def getMax: T = {
+  override abstract def getMax: T = {
     val result = super.getMax
     println(result)
     result
@@ -134,7 +138,7 @@ object StepicHeapTestApp {
     )
 
     var cmdCount = br.readLine().toInt
-    var cmdLine = br.readLine()
+    var cmdLine  = br.readLine()
 
     while (cmdCount > 0) {
       val cmdValue     = cmdLine.split(" ")
@@ -143,9 +147,9 @@ object StepicHeapTestApp {
       cmd match {
         case "insert" =>
           da.insert(value.get.toInt): Unit
-        case "extractMin"       =>
+        case "extractMin" =>
           da.extractMax(): Unit
-        case "getMin"  =>
+        case "getMin" =>
           da.getMax: Unit
         case "decreaseKey" =>
           da.decreaseKey(cmdValue(1).toInt, cmdValue.last.toInt): Unit
