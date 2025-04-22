@@ -91,10 +91,10 @@ class StepicHeapWithCmdCounter(implicit ordering: Ordering[Int]) extends StepicH
 
   override protected def swap(idx1: Int, idx2: Int): Unit = {
     super.swap(idx1, idx2)
-    cmdCounterToIdx.find(_._2 == idx1).foreach{ case (_, cmd1) =>
+    cmdCounterToIdx.find(_._2 == idx1).foreach{ case (cmd1, _) =>
       cmdCounterToIdx.update(cmd1, idx2)
     }
-    cmdCounterToIdx.find(_._2 == idx2).foreach{ case (_, cmd2) =>
+    cmdCounterToIdx.find(_._2 == idx2).foreach{ case (cmd2, _) =>
       cmdCounterToIdx.update(cmd2, idx1)
     }
   }
