@@ -1,5 +1,6 @@
 package tasks
 
+import java.io.{BufferedReader, InputStreamReader}
 import scala.collection.mutable
 import scala.collection.mutable.ArrayBuffer
 import scala.math.Ordering.Implicits._
@@ -41,14 +42,14 @@ class StepicHeap[T]()(implicit ord: Ordering[T]) {
 
     if (largest != idx) {
       swap(idx, largest)
-      heapifyDown(largest)
+      heapifyDown(largest): Unit
     }
 
     largest
   }
 
   def insert(x: T): Int = {
-    heap.addOne(x)
+    heap+=(x)
     val idx = heap.size - 1
     heapifyUp(idx)
   }
@@ -57,8 +58,8 @@ class StepicHeap[T]()(implicit ord: Ordering[T]) {
     require(heap.nonEmpty, "Empty heap")
 
     val maxVal = heap(0)
-    heap.remove(0)
-    heapifyDown(0)
+    heap.remove(0): Unit
+    heapifyDown(0): Unit
     maxVal
   }
 
@@ -101,6 +102,14 @@ class StepicHeapWithCmdCounter(implicit ordering: Ordering[Int]) extends StepicH
   }
 }
 
+trait LoggableStepikHeap[T] extends StepicHeap[T] {
+  abstract override def getMax: T = {
+    val result = super.getMax
+    println(result)
+    result
+  }
+}
+
 object IntStepicHeap {
 
   def buildMaxHeap(heap: ArrayBuffer[Int]): StepicHeap[Int] = {
@@ -109,9 +118,45 @@ object IntStepicHeap {
     intStepicHeap
   }
 
-  def buildMinHeap(heap: ArrayBuffer[Int]): StepicHeap[Int] = {
-    val intStepicHeap = new StepicHeapWithCmdCounter()(Ordering.Int.reverse)
+  def buildMinHeap(heap: ArrayBuffer[Int]): StepicHeapWithCmdCounter = {
+    val intStepicHeap = new StepicHeapWithCmdCounter()(Ordering.Int.reverse) with LoggableStepikHeap[Int]
     heap.foreach(intStepicHeap.insert)
     intStepicHeap
   }
 }
+
+object StepicHeapTestApp {
+  def main(args: Array[String]): Unit = {
+    val da = IntStepicHeap.buildMinHeap(ArrayBuffer.empty[Int])
+
+    val br: BufferedReader = new BufferedReader(
+      new InputStreamReader(System.in)
+    )
+
+    var cmdCount = br.readLine().toInt
+    var cmdLine = br.readLine()
+
+    while (cmdCount > 0) {
+      val cmdValue     = cmdLine.split(" ")
+      val (cmd, value) = (cmdValue.head, cmdValue.lastOption)
+
+      cmd match {
+        case "insert" =>
+          da.insert(value.get.toInt): Unit
+        case "extractMin"       =>
+          da.extractMax(): Unit
+        case "getMin"  =>
+          da.getMax: Unit
+        case "decreaseKey" =>
+          da.decreaseKey(cmdValue(1).toInt, cmdValue.last.toInt): Unit
+        case _ =>
+          throw new IllegalArgumentException(s"Can't parse $cmdLine")
+      }
+
+      cmdLine = br.readLine()
+      cmdCount -= 1
+    }
+    sys.exit(0)
+  }
+}
+
