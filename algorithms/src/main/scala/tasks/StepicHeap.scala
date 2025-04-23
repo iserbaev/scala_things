@@ -1,7 +1,6 @@
 package tasks
 
 import java.io.{ BufferedReader, InputStreamReader }
-import scala.collection.mutable
 import scala.collection.mutable.ArrayBuffer
 import scala.math.Ordering.Implicits._
 
@@ -22,10 +21,22 @@ class StepicHeap[T]()(implicit ord: Ordering[T]) {
   } else idx
 
   protected def swap(idx1: Int, idx2: Int): Unit = {
-    val e1 = heap(idx1)
-    val e2 = heap(idx2)
-    heap.update(idx1, e2)
-    heap.update(idx2, e1)
+    swapHeap(idx1, idx2)(heap)
+  }
+
+  protected def add(x: T): Unit = {
+    heap += x
+  }
+
+  protected def remove(idx: Int): T = {
+    heap.remove(idx)
+  }
+
+  protected def swapHeap[A](idx1: Int, idx2: Int)(h: ArrayBuffer[A]): Unit = {
+    val e1 = h(idx1)
+    val e2 = h(idx2)
+    h.update(idx1, e2)
+    h.update(idx2, e1)
   }
 
   def heapifyDown(idx: Int): Int = {
@@ -49,7 +60,7 @@ class StepicHeap[T]()(implicit ord: Ordering[T]) {
   }
 
   def insert(x: T): Int = {
-    heap += x
+    add(x)
     val idx = heap.size - 1
     heapifyUp(idx)
   }
@@ -57,10 +68,9 @@ class StepicHeap[T]()(implicit ord: Ordering[T]) {
   def extractMax(): T = {
     require(heap.nonEmpty, "Empty heap")
 
-    val maxVal = heap(0)
-    heap.remove(0): Unit
+    val removedMax = remove(0)
     heapifyDown(0): Unit
-    maxVal
+    removedMax
   }
 
   def getMax: T =
@@ -70,39 +80,49 @@ class StepicHeap[T]()(implicit ord: Ordering[T]) {
 
 class StepicHeapWithCmdCounter(implicit ordering: Ordering[Int]) extends StepicHeap[Int] {
   private var cmdCounter      = 0
-  private val cmdCounterToIdx = mutable.Map.empty[Int, Int]
+  private val cmdBuffer = ArrayBuffer.empty[Int]
 
   override def insert(x: Int): Int = {
-    val resultIdx = super.insert(x)
     cmdCounter += 1
-    cmdCounterToIdx.update(cmdCounter, resultIdx)
+    val resultIdx = super.insert(x)
     resultIdx
   }
 
   override def extractMax(): Int = {
     cmdCounter += 1
-    super.extractMax()
+    val result = super.extractMax()
+    result
   }
 
   override def getMax: Int = {
     cmdCounter += 1
-    super.getMax
+    val max = super.getMax
+    max
+  }
+
+  override protected def add(x: Int): Unit = {
+    super.add(x): Unit
+    cmdBuffer += cmdCounter
+  }
+
+  override protected def remove(idx: Int): Int = {
+    val result = super.remove(idx)
+    cmdBuffer.remove(idx): Unit
+    result
   }
 
   override protected def swap(idx1: Int, idx2: Int): Unit = {
-    super.swap(idx1, idx2)
-    cmdCounterToIdx.find(_._2 == idx1).foreach{ case (cmd1, _) =>
-      cmdCounterToIdx.update(cmd1, idx2)
-    }
-    cmdCounterToIdx.find(_._2 == idx2).foreach{ case (cmd2, _) =>
-      cmdCounterToIdx.update(cmd2, idx1)
-    }
+    super.swap(idx1, idx2): Unit
+    swapHeap(idx1, idx2)(cmdBuffer)
   }
 
   def decreaseKey(cmdCount: Int, decreaseValue: Int): Unit = {
-    val idx = cmdCounterToIdx(cmdCount)
+    cmdCounter += 1
+    val idx = cmdBuffer.indexOf(cmdCount)
     val old = heap(idx)
-    heap.update(idx, old - decreaseValue)
+    heap.update(idx, old - decreaseValue): Unit
+    heapifyDown(0): Unit
+    ()
   }
 }
 
