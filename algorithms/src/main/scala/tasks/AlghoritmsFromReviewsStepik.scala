@@ -31,19 +31,20 @@ object FibonacciMemoized {
   }
 
   //Fn = Fn-1 + Fn-2
-  def fibonacciMemoized(n: Int): Int = {
-    val acc = Array.fill(n + 2)(0)
-    acc.update(1, 1)
+  def fibonacciMemoized(n: Int): BigInt = {
+    val acc = Array.fill(n + 2)(BigInt(0))
+    acc.update(1, BigInt(1))
 
     @scala.annotation.tailrec
-    def recur(prev: Int, current: Int, ac: Array[Int]): Int =
+    def recur(prev: Int, current: Int, ac: Array[BigInt]): Array[BigInt] =
       if (current >= n) {
-        ac(n)
+        ac
       } else {
-        recur(current, current + 1, ac.updated(current + 1, ac(current) + ac(prev)))
+        recur(current, current + 1, ac.updated(current + 1, (ac(current) + ac(prev))))
       }
 
-    recur(0, 1, acc)
+    val result = recur(0, 1, acc)
+    result(n - 1)
   }
 }
 

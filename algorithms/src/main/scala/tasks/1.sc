@@ -10,17 +10,12 @@ import scala.util.{Failure, Success}
 
 val in = "Sstriings"
 
-in.tail.foldLeft(((in.head,1),Seq.empty[(Char,Int)])){ case (((prev,count),acc),char) =>
-  if (char == prev) {
-    ((prev,count + 1),acc)
-  } else {
-    if (count > 1) {
-      ((char,1),acc.+:((prev,count)))
-    } else {
-      ((char,1),acc)
-    }
+in.foldLeft(Map.empty[Char,Int]){ case (acc,char) =>
+  acc.updatedWith(char) {
+    case Some(value) => Some(value + 1)
+    case None => Some(1)
   }
-}._2
+}.toIndexedSeq
 
 /**
 Дана строка s. Посчитать количество повторений каждой буквы, вывести в виде
@@ -39,7 +34,7 @@ List[(Char,Int)]
 
 val s: String = "aaabbcccdeeefgha"
 
-s.groupBy(identity).mapValues(_.length)
+s.groupBy(identity).view.mapValues(_.length)
 
 /**
 Посчитать количество последовательностей  из отрицательных чисел не менее 3
