@@ -35,9 +35,13 @@ object SquareRoot {
 
       val isValid = math.abs(number - mult) <= eps
 
-      if (isValid) mult
-      else if (mult > number) recur(start, halfSum, counter + 1)
-      else recur(halfSum, end, counter + 1)
+      if (isValid) {
+        halfSum
+      } else if (mult > number) {
+        recur(start, halfSum, counter + 1)
+      } else {
+        recur(halfSum, end, counter + 1)
+      }
     }
 
     recur(0, number)

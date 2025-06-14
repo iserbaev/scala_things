@@ -1,7 +1,7 @@
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration._
 import scala.concurrent.{Await, Future}
-import scala.util.{Failure, Success}
+import scala.util.{Failure, Success, Try}
 
 /**
  *  Посчитать все последовательности одинаковых символов
@@ -124,7 +124,7 @@ def sequence2[T](ff: Seq[Transformation[T]]): Transformation[T] = (t:T) => {
   */
 
 
-val tasks = Seq(
+def tasks = Seq(
   Future.successful {
     Thread.sleep(1000)
     "red"
@@ -135,7 +135,7 @@ val tasks = Seq(
 )
 
 val f = for {
-  fseq <- Future.sequence(tasks.map(_.transform(Success(_))))
+  fseq <- Future.sequence(tasks.map(_.transform(Try(_))))
 } yield {
   fseq.foldLeft((Seq.empty[String],Seq.empty[Throwable])){ case ((ss,thrs),tr) =>
     tr match {
@@ -147,7 +147,8 @@ val f = for {
   }
 }
 
-Await.result(f, Duration.Inf)
+val res = Await.result(f, Duration.Inf)
+println(res)
 
 //  / Дан список произвольных элементов, пусть это будет List[Int]
 //    List(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13 ..., 100)
